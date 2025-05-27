@@ -10,16 +10,16 @@ namespace MV.ApplicationLayer.Services.User
 {
     public class UserService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUnitOfWork unitOfWork)
         {
-            _userRepository = userRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<bool> LoginUser(LoginRequest loginRequest)
         {
-            return await _userRepository.LoginUser(loginRequest);
+            return await _unitOfWork.userRepository.LoginUser(loginRequest);
         }
     }
 }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.Services.User;
-using MV.InfrastructureLayer.Interfaces;
+//using MV.InfrastructureLayer.Interfaces;
 
 namespace MV.PresnetationLayer.Controllers
 {
