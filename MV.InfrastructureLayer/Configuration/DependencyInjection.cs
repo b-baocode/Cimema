@@ -2,9 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MV.ApplicationLayer.RepoInterfaces;
+using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services.User;
 using MV.InfrastructureLayer;
-using MV.InfrastructureLayer.Entities;
+using MV.InfrastructureLayer.DBContext;
 //using MV.InfrastructureLayer.Interfaces;
 using MV.InfrastructureLayer.Repositories;
 
@@ -18,7 +19,7 @@ namespace MV.InfrastructureLayer.Configuration
             IConfiguration configuration)
         {
 
-            services.AddDbContext<OjtmovieTheaterContext>(options =>
+            services.AddDbContext<MovieTheaterContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
             );
 
@@ -26,7 +27,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IUserRepository, UserRepository>();
 
             //Service injection
-            services.AddScoped<UserService>();
+            services.AddScoped<IUserService,UserService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();

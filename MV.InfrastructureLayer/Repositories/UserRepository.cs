@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.RepoInterfaces;
-using MV.InfrastructureLayer.Entities;
+using MV.DomainLayer.Entities;
+using MV.InfrastructureLayer.DBContext;
+//using MV.InfrastructureLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +14,9 @@ namespace MV.InfrastructureLayer.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly OjtmovieTheaterContext _context;
+        private readonly MovieTheaterContext _context;
 
-        public UserRepository(OjtmovieTheaterContext context)
+        public UserRepository(MovieTheaterContext context)
         {
             _context = context;
         }
@@ -22,7 +24,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<bool> LoginUser(LoginRequest loginRequest)
         {
             var checkExist = await _context.Set<User>()
-                .FirstOrDefaultAsync(x => x.Username == loginRequest.Username && x.Userpass == loginRequest.Password);
+                .FirstOrDefaultAsync(x => x.Username == loginRequest.Username && x.Password == loginRequest.Password);
             if (checkExist == null)
             {
                 return false;

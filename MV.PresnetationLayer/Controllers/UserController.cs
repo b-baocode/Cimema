@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
+using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services.User;
 //using MV.InfrastructureLayer.Interfaces;
 
@@ -10,8 +11,8 @@ namespace MV.PresnetationLayer.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private readonly UserService _userService;
-        public UserController(UserService userService)
+        private readonly IUserService _userService;
+        public UserController(IUserService userService)
         {
             _userService = userService;
         }

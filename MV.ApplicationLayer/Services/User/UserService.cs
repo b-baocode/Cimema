@@ -1,5 +1,6 @@
 ﻿using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.RepoInterfaces;
+using MV.ApplicationLayer.ServiceInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services.User
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
 

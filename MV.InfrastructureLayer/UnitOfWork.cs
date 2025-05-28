@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepoInterfaces;
-using MV.InfrastructureLayer.Entities;
+using MV.InfrastructureLayer.DBContext;
 //using MV.InfrastructureLayer.Interfaces;
 using MV.InfrastructureLayer.Repositories;
 using System;
@@ -13,7 +13,7 @@ namespace MV.InfrastructureLayer
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly OjtmovieTheaterContext _context;
+        private readonly MovieTheaterContext _context;
 
 
         // Repository fields should be of the INTERFACE type
@@ -24,7 +24,7 @@ namespace MV.InfrastructureLayer
 
 
         // CONSTRUCTOR INJECTION for DbContext
-        public UnitOfWork(OjtmovieTheaterContext context)
+        public UnitOfWork(MovieTheaterContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
