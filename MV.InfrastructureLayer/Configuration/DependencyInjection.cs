@@ -25,6 +25,7 @@ namespace MV.InfrastructureLayer.Configuration
 
             //Repo injection
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 
             //Service injection
             services.AddScoped<IUserService,UserService>();

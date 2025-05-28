@@ -16,37 +16,37 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddInfranstructureToApplication(builder.Configuration);
 
 //Swagger
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo { Title = "OJTMovieTheater", Version = "v1" });
+//builder.Services.AddSwaggerGen(options =>
+//{
+//    options.SwaggerDoc("v1", new OpenApiInfo { Title = "OJTMovieTheater", Version = "v1" });
 
-    // 1. Define the Security Scheme (how Swagger knows about Bearer tokens)
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter a valid token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
+//    // 1. Define the Security Scheme (how Swagger knows about Bearer tokens)
+//    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+//    {
+//        In = ParameterLocation.Header,
+//        Description = "Please enter a valid token",
+//        Name = "Authorization",
+//        Type = SecuritySchemeType.Http,
+//        BearerFormat = "JWT",
+//        Scheme = "Bearer"
+//    });
 
-    // 2. Define the Security Requirement (which operations require this scheme)
-    options.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer" // Refers to the "Bearer" defined above
-                }
-            },
-            new string[] {} // A list of scopes for the JWT. Empty for standard JWTs.
-        }
-    });
-});
+//    // 2. Define the Security Requirement (which operations require this scheme)
+//    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+//    {
+//        {
+//            new OpenApiSecurityScheme
+//            {
+//                Reference = new OpenApiReference
+//                {
+//                    Type = ReferenceType.SecurityScheme,
+//                    Id = "Bearer" // Refers to the "Bearer" defined above
+//                }
+//            },
+//            new string[] {} // A list of scopes for the JWT. Empty for standard JWTs.
+//        }
+//    });
+//});
 
 
 

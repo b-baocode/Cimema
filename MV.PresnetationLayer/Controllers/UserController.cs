@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services.User;
@@ -25,13 +26,13 @@ namespace MV.PresnetationLayer.Controllers
 
 
 
-                if (loginResult)
+                if (!String.IsNullOrEmpty(loginResult))
                 {
-                    return Ok("Yes");
+                    return Ok(loginResult);
                 }
                 else
                 {
-                    return BadRequest("Wrong");
+                    return Unauthorized();
                 }
 
             }

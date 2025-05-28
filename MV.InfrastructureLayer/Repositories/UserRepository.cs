@@ -21,18 +21,11 @@ namespace MV.InfrastructureLayer.Repositories
             _context = context;
         }
 
-        public async Task<bool> LoginUser(LoginRequest loginRequest)
+        public async Task<User> LoginUser(LoginRequest loginRequest)
         {
             var checkExist = await _context.Set<User>()
                 .FirstOrDefaultAsync(x => x.Username == loginRequest.Username && x.Password == loginRequest.Password);
-            if (checkExist == null)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return checkExist;
         }
     }
 }

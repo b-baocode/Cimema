@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using MV.ApplicationLayer.RepoInterfaces;
 using MV.InfrastructureLayer.DBContext;
 //using MV.InfrastructureLayer.Interfaces;
@@ -22,6 +23,7 @@ namespace MV.InfrastructureLayer
         // Expose repository INTERFACES
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
 
+        
 
         // CONSTRUCTOR INJECTION for DbContext
         public UnitOfWork(MovieTheaterContext context)

@@ -4,6 +4,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
 {
     public interface IUserService
     {
-        Task<bool> LoginUser(LoginRequest loginRequest);
+        Task<string> LoginUser(LoginRequest loginRequest);
     }
 }

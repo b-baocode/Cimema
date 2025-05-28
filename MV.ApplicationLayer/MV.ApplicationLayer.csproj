@@ -10,4 +10,8 @@
     <Folder Include="DTO\ResponseModel\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MV.DomainLayer\MV.DomainLayer.csproj" />
+  </ItemGroup>
+
 </Project>
