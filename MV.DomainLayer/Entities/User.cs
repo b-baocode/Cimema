@@ -5,7 +5,7 @@ namespace MV.DomainLayer.Entities;
 
 public partial class User
 {
-    public string UserId { get; set; } = null!;
+    public string Userid { get; set; } = null!;
 
     public string? Username { get; set; }
 
@@ -13,27 +13,31 @@ public partial class User
 
     public string? Image { get; set; }
 
-    public DateTime? JoinDate { get; set; }
+    public DateTime? Joindate { get; set; }
 
-    public string? FullName { get; set; }
+    public string? Fullname { get; set; }
 
-    public DateOnly? BirthDate { get; set; }
+    public DateOnly? Birthdate { get; set; }
 
     public int? Gender { get; set; }
 
-    public string? IdentityNumber { get; set; }
+    public string? Identitynumber { get; set; }
 
-    public string Email { get; set; } = null!;
+    public string? Email { get; set; }
 
     public string? Phone { get; set; }
 
     public string? Address { get; set; }
 
-    public decimal? AccumulatedPoints { get; set; }
+    public decimal? Accumulatedpoints { get; set; }
 
     public int? Status { get; set; }
 
-    public string? RoleId { get; set; }
+    public int? Roleid { get; set; }
 
     public virtual Role? Role { get; set; }
+
+    public virtual ICollection<Scorehistory> Scorehistories { get; set; } = new List<Scorehistory>();
+
+    public virtual ICollection<Ticketinvoice> Ticketinvoices { get; set; } = new List<Ticketinvoice>();
 }

@@ -22,8 +22,6 @@ public partial class MovieTheaterContext : DbContext
 
     public virtual DbSet<Movie> Movies { get; set; }
 
-    public virtual DbSet<Order> Orders { get; set; }
-
     public virtual DbSet<Payment> Payments { get; set; }
 
     public virtual DbSet<Promotion> Promotions { get; set; }
@@ -132,24 +130,6 @@ public partial class MovieTheaterContext : DbContext
                     });
         });
 
-        modelBuilder.Entity<Order>(entity =>
-        {
-            entity.HasKey(e => e.Orderid).HasName("orders_pkey");
-
-            entity.ToTable("orders");
-
-            entity.Property(e => e.Orderid)
-                .HasMaxLength(50)
-                .HasColumnName("orderid");
-            entity.Property(e => e.Createdat)
-                .HasColumnType("timestamp without time zone")
-                .HasColumnName("createdat");
-            entity.Property(e => e.Status).HasColumnName("status");
-            entity.Property(e => e.Totalamount)
-                .HasPrecision(18, 2)
-                .HasColumnName("totalamount");
-        });
-
         modelBuilder.Entity<Payment>(entity =>
         {
             entity.HasKey(e => e.Paymentid).HasName("payments_pkey");
@@ -205,10 +185,14 @@ public partial class MovieTheaterContext : DbContext
 
         modelBuilder.Entity<Role>(entity =>
         {
-            entity.HasKey(e => e.RoleId).HasName("Roles_pkey");
+            entity.HasKey(e => e.Roleid).HasName("roles_pkey");
 
-            entity.Property(e => e.RoleId).HasMaxLength(50);
-            entity.Property(e => e.Name).HasMaxLength(50);
+            entity.ToTable("roles");
+
+            entity.Property(e => e.Roleid).HasColumnName("roleid");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasColumnName("name");
         });
 
         modelBuilder.Entity<Scorehistory>(entity =>
@@ -225,6 +209,13 @@ public partial class MovieTheaterContext : DbContext
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("date");
             entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.Userid)
+                .HasMaxLength(50)
+                .HasColumnName("userid");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Scorehistories)
+                .HasForeignKey(d => d.Userid)
+                .HasConstraintName("scorehistories_userid_fkey");
         });
 
         modelBuilder.Entity<Seat>(entity =>
@@ -337,6 +328,9 @@ public partial class MovieTheaterContext : DbContext
             entity.Property(e => e.Usedpoints)
                 .HasPrecision(18, 2)
                 .HasColumnName("usedpoints");
+            entity.Property(e => e.Userid)
+                .HasMaxLength(50)
+                .HasColumnName("userid");
 
             entity.HasOne(d => d.Promotion).WithMany(p => p.Ticketinvoices)
                 .HasForeignKey(d => d.Promotionid)
@@ -345,35 +339,57 @@ public partial class MovieTheaterContext : DbContext
             entity.HasOne(d => d.Showtime).WithMany(p => p.Ticketinvoices)
                 .HasForeignKey(d => d.Showtimeid)
                 .HasConstraintName("ticketinvoices_showtimeid_fkey");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Ticketinvoices)
+                .HasForeignKey(d => d.Userid)
+                .HasConstraintName("ticketinvoices_userid_fkey");
         });
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("Users_pkey");
+            entity.HasKey(e => e.Userid).HasName("users_pkey");
 
-            entity.HasIndex(e => e.Email, "Users_Email_key").IsUnique();
+            entity.ToTable("users");
 
-            entity.HasIndex(e => e.IdentityNumber, "Users_IdentityNumber_key").IsUnique();
-
-            entity.HasIndex(e => e.Phone, "Users_Phone_key").IsUnique();
-
-            entity.HasIndex(e => e.Username, "Users_Username_key").IsUnique();
-
-            entity.Property(e => e.UserId).HasMaxLength(50);
-            entity.Property(e => e.AccumulatedPoints).HasPrecision(18, 2);
-            entity.Property(e => e.Address).HasMaxLength(255);
-            entity.Property(e => e.Email).HasMaxLength(100);
-            entity.Property(e => e.FullName).HasMaxLength(100);
-            entity.Property(e => e.IdentityNumber).HasMaxLength(50);
-            entity.Property(e => e.JoinDate).HasColumnType("timestamp without time zone");
-            entity.Property(e => e.Password).HasMaxLength(255);
-            entity.Property(e => e.Phone).HasMaxLength(20);
-            entity.Property(e => e.RoleId).HasMaxLength(50);
-            entity.Property(e => e.Username).HasMaxLength(50);
+            entity.Property(e => e.Userid)
+                .HasMaxLength(50)
+                .HasColumnName("userid");
+            entity.Property(e => e.Accumulatedpoints)
+                .HasPrecision(18, 2)
+                .HasColumnName("accumulatedpoints");
+            entity.Property(e => e.Address)
+                .HasMaxLength(255)
+                .HasColumnName("address");
+            entity.Property(e => e.Birthdate).HasColumnName("birthdate");
+            entity.Property(e => e.Email)
+                .HasMaxLength(100)
+                .HasColumnName("email");
+            entity.Property(e => e.Fullname)
+                .HasMaxLength(100)
+                .HasColumnName("fullname");
+            entity.Property(e => e.Gender).HasColumnName("gender");
+            entity.Property(e => e.Identitynumber)
+                .HasMaxLength(50)
+                .HasColumnName("identitynumber");
+            entity.Property(e => e.Image).HasColumnName("image");
+            entity.Property(e => e.Joindate)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("joindate");
+            entity.Property(e => e.Password)
+                .HasMaxLength(255)
+                .HasColumnName("password");
+            entity.Property(e => e.Phone)
+                .HasMaxLength(20)
+                .HasColumnName("phone");
+            entity.Property(e => e.Roleid).HasColumnName("roleid");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.Username)
+                .HasMaxLength(50)
+                .HasColumnName("username");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
-                .HasForeignKey(d => d.RoleId)
-                .HasConstraintName("FK_Users_Roles");
+                .HasForeignKey(d => d.Roleid)
+                .HasConstraintName("users_roleid_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -25,7 +25,6 @@ namespace MV.ApplicationLayer.Services
             string token = "";
             var loginResult = await _unitOfWork.userRepository.LoginUser(loginRequest);
 
-            string role;
 
             if(loginResult != null)
             {

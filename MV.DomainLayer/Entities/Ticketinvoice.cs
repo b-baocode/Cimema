@@ -21,6 +21,8 @@ public partial class Ticketinvoice
 
     public int? Status { get; set; }
 
+    public string? Userid { get; set; }
+
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual Promotion? Promotion { get; set; }
@@ -28,4 +30,6 @@ public partial class Ticketinvoice
     public virtual Showtime? Showtime { get; set; }
 
     public virtual ICollection<Ticketdetail> Ticketdetails { get; set; } = new List<Ticketdetail>();
+
+    public virtual User? User { get; set; }
 }
