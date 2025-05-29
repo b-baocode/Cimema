@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using MV.ApplicationLayer.RepoInterfaces;
+using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;

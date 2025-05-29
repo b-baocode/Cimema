@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MV.ApplicationLayer.RepoInterfaces;
+using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
-using MV.ApplicationLayer.Services.User;
+using MV.ApplicationLayer.Services;
 using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.DBContext;
 //using MV.InfrastructureLayer.Interfaces;
@@ -28,7 +28,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 
             //Service injection
-            services.AddScoped<IUserService,UserService>();
+            services.AddScoped<ILoginService,LoginService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MV.ApplicationLayer.RepoInterfaces
+namespace MV.ApplicationLayer.RepositoryInterfaces
 {
     public interface IAuthenticationRepository
     {

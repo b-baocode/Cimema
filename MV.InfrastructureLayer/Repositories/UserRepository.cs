@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.DTO.RequestModel;
-using MV.ApplicationLayer.RepoInterfaces;
+using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
 //using MV.InfrastructureLayer.Entities;

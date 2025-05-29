@@ -2,7 +2,7 @@
 
 namespace MV.PresnetationLayer.ServiceInterfaces
 {
-    public interface IUserService
+    public interface ILoginService
     {
         Task<bool> LoginUser(LoginRequest loginRequest);
     }

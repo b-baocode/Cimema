@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MV.ApplicationLayer.RepoInterfaces;
+using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.InfrastructureLayer.DBContext;
 //using MV.InfrastructureLayer.Interfaces;
 using MV.InfrastructureLayer.Repositories;
