@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MV.ApplicationLayer.DTO.RequestModel;
@@ -19,7 +20,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPost("Login")]
-        public async Task<IActionResult> LoginUser([FromBody] LoginRequest loginRequest)
+        public async Task<ActionResult<string>> LoginUser([FromBody] LoginRequest loginRequest)
         {
           
                 var loginResult = await _loginService.LoginUser(loginRequest);
@@ -32,7 +33,7 @@ namespace MV.PresnetationLayer.Controllers
                 }
                 else
                 {
-                    return Unauthorized();
+                    return Unauthorized("Wrong username or password");
                 }
 
             }

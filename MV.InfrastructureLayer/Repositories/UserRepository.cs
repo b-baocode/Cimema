@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.DTO.RequestModel;
+using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
@@ -21,10 +22,21 @@ namespace MV.InfrastructureLayer.Repositories
             _context = context;
         }
 
-        public async Task<User> LoginUser(LoginRequest loginRequest)
+        public async Task<LoginResponse> LoginUser(LoginRequest loginRequest)
         {
             var checkExist = await _context.Set<User>()
-                .FirstOrDefaultAsync(x => x.Username == loginRequest.Username && x.Password == loginRequest.Password);
+                .Where(x => x.Username == loginRequest.Username && x.Password == loginRequest.Password)
+                .Select(u => new LoginResponse
+                {
+                    Username = u.Username,
+                    Email = u.Email,
+                    Phone = u.Phone,
+                    Role = u.Role!.Name
+                })
+                .FirstOrDefaultAsync();
+
+            
+
             return checkExist;
         }
     }

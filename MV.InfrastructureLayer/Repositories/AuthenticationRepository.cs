@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using System;
@@ -31,20 +32,18 @@ namespace MV.InfrastructureLayer.Repositories
             }
         }
 
-        public async Task<string> GenerateJwtToken(User user)
+        public async Task<string> GenerateJwtToken(LoginResponse loginResponse)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Username), // Subject (username)
-                //new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
-                //new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // User ID
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim("Full Name", user.FullName),
+                new Claim(JwtRegisteredClaimNames.Sub, loginResponse.Username), 
+                new Claim(JwtRegisteredClaimNames.Email, loginResponse.Email),
+                new Claim(ClaimTypes.MobilePhone, loginResponse.Phone),
                 //new Claim("Join Date", user.JoinDate),
-                new Claim("Role", user.RoleId) 
+                new Claim(ClaimTypes.Role, loginResponse.Role)
             };
 
             var token = new JwtSecurityToken(

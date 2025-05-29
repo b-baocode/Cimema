@@ -19,11 +19,13 @@ namespace MV.ApplicationLayer.Services
             _unitOfWork = unitOfWork;
             _authenticationRepository = authenticationRepository;
         }
-
+        
         public async Task<string> LoginUser(LoginRequest loginRequest)
         {
             string token = "";
             var loginResult = await _unitOfWork.userRepository.LoginUser(loginRequest);
+
+            string role;
 
             if(loginResult != null)
             {

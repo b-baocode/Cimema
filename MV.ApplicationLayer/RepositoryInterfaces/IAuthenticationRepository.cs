@@ -1,4 +1,5 @@
-﻿using MV.DomainLayer.Entities;
+﻿using MV.ApplicationLayer.DTO.ResponseModel;
+using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 {
     public interface IAuthenticationRepository
     {
-        Task<string> GenerateJwtToken(User user);
+        Task<string> GenerateJwtToken(LoginResponse loginResponse);
     }
 }

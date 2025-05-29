@@ -1,4 +1,5 @@
 ﻿using MV.ApplicationLayer.DTO.RequestModel;
+using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 {
     public interface IUserRepository
     {
-        Task<User> LoginUser(LoginRequest loginRequest);
+        Task<LoginResponse> LoginUser(LoginRequest loginRequest);
     }
 }
