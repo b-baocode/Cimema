@@ -34,7 +34,7 @@ namespace MV.InfrastructureLayer.Configuration
                     };
                 });
 
-            services.AddAuthorization(); // Also add authorization services here if they're always used with JWT
+            services.AddAuthorization();
 
             return services;
         }

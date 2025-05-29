@@ -16,8 +16,8 @@ namespace MV.InfrastructureLayer.Repositories
     public class AuthenticationRepository : IAuthenticationRepository
     {
         private readonly IConfiguration _configuration;
-        private readonly string _jwtKey;
-        private readonly string _jwtIssuer;
+        private readonly string? _jwtKey;
+        private readonly string? _jwtIssuer;
 
         public AuthenticationRepository(IConfiguration configuration)
         {
@@ -36,23 +36,22 @@ namespace MV.InfrastructureLayer.Repositories
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-            // Create claims for the token (e.g., User ID, Username, Role)
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Username), // Subject (username)
                 //new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()), // JWT ID
                 //new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()), // User ID
-                new Claim(JwtRegisteredClaimNames.Email, user.Email), // User's name
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
                 new Claim("Full Name", user.FullName),
                 //new Claim("Join Date", user.JoinDate),
-                new Claim("Role", user.RoleId) // User's role
+                new Claim("Role", user.RoleId) 
             };
 
             var token = new JwtSecurityToken(
                 issuer: _jwtIssuer,
-                //audience: null, // If you enable ValidAudience, set this
+                //audience: null, 
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1), // Token valid for 1 hour
+                expires: DateTime.UtcNow.AddHours(1), 
                 signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
