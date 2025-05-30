@@ -13,24 +13,36 @@ namespace MV.ApplicationLayer.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthenticationRepository _authenticationRepository;
+        private readonly IPasswordRepository _passwordRepository;
 
-        public LoginService(IUnitOfWork unitOfWork, IAuthenticationRepository authenticationRepository)
+        public LoginService(IUnitOfWork unitOfWork, IAuthenticationRepository authenticationRepository, IPasswordRepository passwordRepository)
         {
             _unitOfWork = unitOfWork;
             _authenticationRepository = authenticationRepository;
+            _passwordRepository = passwordRepository;
         }
         
         public async Task<string> LoginUser(LoginRequest loginRequest)
         {
-            string token = "";
+
             var loginResult = await _unitOfWork.userRepository.LoginUser(loginRequest);
 
-
-            if(loginResult != null)
+            if(loginResult == null)
             {
-                return token = await _authenticationRepository.GenerateJwtToken(loginResult);
+                return string.Empty;
             }
-                return token;
+            
+            bool isPasswordValid = _passwordRepository.VerifyPassword(loginRequest.Password, loginResult.Password);
+
+            //Test login khong can check ma hoa
+            //bool isPasswordValid = true;
+
+            if (!isPasswordValid)
+            {
+                return string.Empty;
+            }
+
+            return _authenticationRepository.GenerateJwtToken(loginResult);
         }
     }
 }

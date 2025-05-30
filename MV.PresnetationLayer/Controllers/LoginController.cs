@@ -19,7 +19,7 @@ namespace MV.PresnetationLayer.Controllers
             _loginService = loginService;
         }
 
-        [HttpPost("Login")]
+        [HttpPost]
         public async Task<ActionResult<string>> LoginUser([FromBody] LoginRequest loginRequest)
         {
           
