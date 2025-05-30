@@ -30,9 +30,12 @@ namespace MV.InfrastructureLayer.Configuration
             //Repo injection
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+            services.AddSingleton<IPasswordRepository, PasswordRepository>();
+
 
             //Service injection
-            services.AddScoped<ILoginService, LoginService>();
+            services.AddScoped<ILoginService,LoginService>();
+            services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IEmailService, EmailService>();
 
             //Unit of work

@@ -32,7 +32,7 @@ namespace MV.InfrastructureLayer.Repositories
             }
         }
 
-        public async Task<string> GenerateJwtToken(LoginResponse loginResponse)
+        public string GenerateJwtToken(LoginResponse loginResponse)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -42,7 +42,6 @@ namespace MV.InfrastructureLayer.Repositories
                 new Claim(JwtRegisteredClaimNames.Sub, loginResponse.Username), 
                 new Claim(JwtRegisteredClaimNames.Email, loginResponse.Email),
                 new Claim(ClaimTypes.MobilePhone, loginResponse.Phone),
-                //new Claim("Join Date", user.JoinDate),
                 new Claim(ClaimTypes.Role, loginResponse.Role)
             };
 
