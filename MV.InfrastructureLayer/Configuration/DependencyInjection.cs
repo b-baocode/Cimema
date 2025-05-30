@@ -36,8 +36,6 @@ namespace MV.InfrastructureLayer.Configuration
             //Service injection
             services.AddScoped<ILoginService,LoginService>();
             services.AddScoped<IRegisterService, RegisterService>();
-
-            
             services.AddScoped<IEmailService, EmailService>();
 
             //Unit of work
