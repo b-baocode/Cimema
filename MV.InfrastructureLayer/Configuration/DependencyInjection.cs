@@ -8,6 +8,7 @@ using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.DBContext;
 //using MV.InfrastructureLayer.Interfaces;
 using MV.InfrastructureLayer.Repositories;
+using MV.InfrastructureLayer.Services;
 
 namespace MV.InfrastructureLayer.Configuration
 {
@@ -23,12 +24,16 @@ namespace MV.InfrastructureLayer.Configuration
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
             );
 
+            // Configure SmtpSettings
+            services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
+
             //Repo injection
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 
             //Service injection
-            services.AddScoped<ILoginService,LoginService>();
+            services.AddScoped<ILoginService, LoginService>();
+            services.AddScoped<IEmailService, EmailService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
