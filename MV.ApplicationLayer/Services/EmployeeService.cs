@@ -16,11 +16,13 @@ namespace MV.ApplicationLayer.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IPasswordRepository _passwordRepository;
 
-        public EmployeeService(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher)
+        public EmployeeService(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, IPasswordRepository passwordRepository)
         {
             _unitOfWork = unitOfWork;
             _passwordHasher = passwordHasher;
+            _passwordRepository = passwordRepository;
         }
 
         public async Task<PagedResult<EmployeeResponse>> GetEmployeesAsync(EmployeeSearchRequest request)
@@ -71,7 +73,8 @@ namespace MV.ApplicationLayer.Services
                 Email = request.Email,
                 Phone = request.Phone,
                 Address = request.Address,
-                Password = _passwordHasher.HashPassword(request.Password),
+                Password = _passwordRepository.HashPassword(request.Password),
+                //Password = _passwordHasher.HashPassword(request.Password),
                 Joindate = DateTime.Now,
                 Roleid = 3, // Employee role
                 Status = 1, // Active
@@ -116,7 +119,8 @@ namespace MV.ApplicationLayer.Services
             // Update password if provided
             if (!string.IsNullOrEmpty(request.Password))
             {
-                employee.Password = _passwordHasher.HashPassword(request.Password);
+                employee.Password = _passwordRepository.HashPassword(request.Password);
+                //employee.Password = _passwordHasher.HashPassword(request.Password);
             }
 
             var updatedEmployee = await _unitOfWork.employeeRepository.UpdateEmployeeAsync(employee);
