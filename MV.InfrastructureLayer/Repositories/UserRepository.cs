@@ -28,6 +28,7 @@ namespace MV.InfrastructureLayer.Repositories
                 .Where(x => x.Username == loginRequest.Username)
                 .Select(u => new LoginResponse
                 {
+                    Userid = u.Userid,
                     Username = u.Username,
                     Password = u.Password,
                     Email = u.Email,

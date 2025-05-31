@@ -39,7 +39,8 @@ namespace MV.InfrastructureLayer.Repositories
 
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, loginResponse.Username), 
+                new Claim(JwtRegisteredClaimNames.NameId, loginResponse.Userid),
+                new Claim(JwtRegisteredClaimNames.Sub, loginResponse.Username),
                 new Claim(JwtRegisteredClaimNames.Email, loginResponse.Email),
                 new Claim(ClaimTypes.MobilePhone, loginResponse.Phone),
                 new Claim(ClaimTypes.Role, loginResponse.Role)
