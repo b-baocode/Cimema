@@ -1,6 +1,7 @@
 ﻿using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
+using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,17 +22,17 @@ namespace MV.ApplicationLayer.Services
             _authenticationRepository = authenticationRepository;
             _passwordRepository = passwordRepository;
         }
-        
+
         public async Task<string> LoginUser(LoginRequest loginRequest)
         {
 
             var loginResult = await _unitOfWork.userRepository.LoginUser(loginRequest);
 
-            if(loginResult == null)
+            if (loginResult == null)
             {
                 return string.Empty;
             }
-            
+
             bool isPasswordValid = _passwordRepository.VerifyPassword(loginRequest.Password, loginResult.Password);
 
             //Test login khong can check ma hoa
@@ -44,5 +45,30 @@ namespace MV.ApplicationLayer.Services
 
             return _authenticationRepository.GenerateJwtToken(loginResult);
         }
+
+        public async Task<string> ChangePassword(ChangePasswordRequest changePasswordRequest)
+        {
+            var getUser = await _unitOfWork.userRepository.GetUserByUsername(changePasswordRequest.Username);
+
+            if(getUser == null)
+            {
+                return "User not exist";
+            }
+
+            var checkOldPass = _passwordRepository.VerifyPassword(changePasswordRequest.OldPassword, getUser.Password);
+
+            if (!checkOldPass)
+            {
+                return "Wrong old password";
+            }
+
+            getUser.Password = _passwordRepository.HashPassword(changePasswordRequest.NewPassword);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return string.Empty;
+        }
+
+        
     }
 }

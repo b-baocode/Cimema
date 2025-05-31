@@ -116,5 +116,19 @@ namespace MV.InfrastructureLayer.Repositories
             return await Task.FromResult(true);
         }
 
+        public async Task<User> GetUserByUsername(string userName)
+        {
+            var getUser = await _context.Set<User>()
+                .Where(u => u.Username == userName)
+                .FirstOrDefaultAsync();
+
+            if (getUser == null)
+            {
+                return null;
+            }
+
+            return getUser;
+        }
+
     }
 }
