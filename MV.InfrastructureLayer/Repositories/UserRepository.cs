@@ -28,6 +28,7 @@ namespace MV.InfrastructureLayer.Repositories
                 .Where(x => x.Username == loginRequest.Username)
                 .Select(u => new LoginResponse
                 {
+                    Userid = u.Userid,
                     Username = u.Username,
                     Password = u.Password,
                     Email = u.Email,
@@ -114,6 +115,20 @@ namespace MV.InfrastructureLayer.Repositories
 
             _context.Users.Add(newUser);
             return await Task.FromResult(true);
+        }
+
+        public async Task<User> GetUserByUsername(string userName)
+        {
+            var getUser = await _context.Set<User>()
+                .Where(u => u.Username == userName)
+                .FirstOrDefaultAsync();
+
+            if (getUser == null)
+            {
+                return null;
+            }
+
+            return getUser;
         }
 
     }

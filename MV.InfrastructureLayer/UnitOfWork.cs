@@ -16,6 +16,10 @@ namespace MV.InfrastructureLayer
     {
         private readonly MovieTheaterContext _context;
 
+        private IEmployeeRepository _employeeRepository;
+        public IEmployeeRepository employeeRepository =>
+       _employeeRepository ??= new EmployeeRepository(_context);
+
 
         // Repository fields should be of the INTERFACE type
         private IUserRepository _userRepository;
