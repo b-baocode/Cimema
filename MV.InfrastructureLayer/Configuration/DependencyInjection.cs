@@ -7,9 +7,8 @@ using MV.ApplicationLayer.Services;
 using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.DBContext;
 using MV.InfrastructureLayer.Repositories;
-using MV.InfrastructureLayer.Services;
-using MV.InfrastructureLayer.Service;
 using MV.InfrastructureLayer.Configuration;
+using MV.Infrastructure.Services;
 // using MV.InfrastructureLayer.Interfaces;
 
 namespace MV.InfrastructureLayer.Configuration
@@ -30,7 +29,6 @@ namespace MV.InfrastructureLayer.Configuration
             // Add new services
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IEmployeeService, EmployeeService>();
-            services.AddScoped<IPasswordHasher, PasswordHasher>();
 
             // Configure SmtpSettings
             services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));

@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using MV.ApplicationLayer.Models;
+using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using System.Text;

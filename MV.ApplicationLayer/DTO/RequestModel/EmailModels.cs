@@ -1,4 +1,4 @@
-﻿namespace MV.ApplicationLayer.Models
+﻿namespace MV.ApplicationLayer.DTO.RequestModel
 {
     public class EmailRequest
     {

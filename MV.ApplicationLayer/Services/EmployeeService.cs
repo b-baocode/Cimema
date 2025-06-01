@@ -15,13 +15,11 @@ namespace MV.ApplicationLayer.Services
     public class EmployeeService : IEmployeeService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IPasswordHasher _passwordHasher;
         private readonly IPasswordRepository _passwordRepository;
 
-        public EmployeeService(IUnitOfWork unitOfWork, IPasswordHasher passwordHasher, IPasswordRepository passwordRepository)
+        public EmployeeService(IUnitOfWork unitOfWork, IPasswordRepository passwordRepository)
         {
             _unitOfWork = unitOfWork;
-            _passwordHasher = passwordHasher;
             _passwordRepository = passwordRepository;
         }
 
@@ -74,7 +72,6 @@ namespace MV.ApplicationLayer.Services
                 Phone = request.Phone,
                 Address = request.Address,
                 Password = _passwordRepository.HashPassword(request.Password),
-                //Password = _passwordHasher.HashPassword(request.Password),
                 Joindate = DateTime.Now,
                 Roleid = 3, // Employee role
                 Status = 1, // Active

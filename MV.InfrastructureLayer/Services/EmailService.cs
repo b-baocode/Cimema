@@ -4,7 +4,7 @@ using System.Net;
 using System.Net.Mail;
 using MV.ApplicationLayer.ServiceInterfaces;
 
-namespace MV.InfrastructureLayer.Services
+namespace MV.Infrastructure.Services
 {
     public class EmailService : IEmailService
     {
