@@ -43,7 +43,7 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<(bool, string)> ValidateRegister(RegisterRequest registerRequest, string? existingUserId)
         {
-            
+
 
             var duplicateName = await _context.Set<User>()
                 .AsNoTracking()
@@ -110,7 +110,7 @@ namespace MV.InfrastructureLayer.Repositories
                 Address = registerRequest.Address,
                 Accumulatedpoints = 0,
                 Status = 1,
-                Roleid = 1,
+                Roleid = 4,
             };
 
             _context.Users.Add(newUser);
@@ -130,6 +130,30 @@ namespace MV.InfrastructureLayer.Repositories
 
             return getUser;
         }
+        public async Task<User?> GetByIdAsync(string userId)
+        {
+            return await _context.Users.FindAsync(userId);
+        }
 
+
+        public async Task<List<User>> GetAllCustomer()
+        {
+            return await _context.Users
+                .Where(u => u.Roleid == 4) // chỉ lấy RoleID = 4 (khách hàng)
+                .ToListAsync();
+        }
+
+
+        public void Update(User user)
+        {
+            _context.Users.Update(user);
+        }
+
+
+
+       
+
+
+        }
     }
-}
+

@@ -7,7 +7,6 @@
 .env
 
 # appsettings
-MV.PresnetationLayer/appsettings.json
 
 
 # User-specific files
@@ -486,4 +485,3 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
-/OJTMovieTheater.sln

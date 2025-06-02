@@ -43,6 +43,8 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<ILoginService,LoginService>();
             services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<IUserService, UserService>();
+
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
