@@ -36,7 +36,7 @@ namespace MV.InfrastructureLayer.Repositories
             }
 
             return await query
-                .OrderBy(u => u.Fullname)
+                
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();
