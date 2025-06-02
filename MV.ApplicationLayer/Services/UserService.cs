@@ -71,6 +71,25 @@ namespace MV.ApplicationLayer.Services
                 Address = user.Address,
                 Image = user.Image
             };
+
+       
+    }
+        public async Task<List<UserEditRespons>> GetAllCustomer()
+        {
+            var customers = await _UnitOfWork.userRepository.GetAllCustomer();
+
+            return customers.Select(user => new UserEditRespons
+            {
+                Userid = user.Userid,
+                Fullname = user.Fullname,
+                Birthdate = user.Birthdate,
+                Gender = user.Gender,
+                Identitynumber = user.Identitynumber,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                Image = user.Image
+            }).ToList();
         }
 
     }

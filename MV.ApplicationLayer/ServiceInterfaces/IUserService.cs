@@ -12,5 +12,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
     {
         Task<UserEditRespons> EditProfileAsync(UserEditRequest request);
         Task<UserEditRespons?> GetUserByIdAsync(string userId);
+        Task<List<UserEditRespons>> GetAllCustomer();
     }
 }
