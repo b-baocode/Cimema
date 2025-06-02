@@ -10,6 +10,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 {
     public interface IAuthenticationRepository
     {
-        Task<string> GenerateJwtToken(LoginResponse loginResponse);
+        string GenerateJwtToken(LoginResponse loginResponse);
     }
 }

@@ -12,5 +12,16 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
     public interface IUserRepository
     {
         Task<LoginResponse> LoginUser(LoginRequest loginRequest);
+
+        Task<bool> RegisterUser(RegisterRequest registerRequest, string hashedPassword);
+
+        Task<(bool, string)> ValidateRegister(RegisterRequest registerRequest, string? existingId);
+
+        //Task<bool> ChangePassword(string newPassword, User user);
+        
+        Task<User> GetUserByUsername(string username);
+
+        Task<User?> GetByIdAsync(string userId);
+        void Update(User user);
     }
 }
