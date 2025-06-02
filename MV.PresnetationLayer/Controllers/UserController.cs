@@ -53,5 +53,12 @@ namespace MV.PresnetationLayer.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("allCustomer")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userService.GetAllCustomer();
+            return Ok(users);
+        }
     }
 }
