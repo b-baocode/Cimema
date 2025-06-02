@@ -9,8 +9,8 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 {
     public interface IEmployeeRepository
     {
-        Task<List<User>> GetEmployeesAsync(string? keyword, int skip, int take);
-        Task<int> GetTotalEmployeesAsync(string? keyword);
+        Task<List<User>> GetEmployeesAsync(string? keyword, int skip, int take, bool isAdmin);
+        Task<int> GetTotalEmployeesAsync(string? keyword, bool isAdmin);
         Task<User?> GetEmployeeByIdAsync(string id);
         Task<User> CreateEmployeeAsync(User employee);
         Task<User> UpdateEmployeeAsync(User employee);

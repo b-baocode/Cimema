@@ -3,6 +3,7 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
+// using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,6 +17,9 @@ namespace MV.ApplicationLayer.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordRepository _passwordRepository;
+        // private readonly
+        //
+        // IHttpContextAccessor _httpContextAccessor;
 
         public EmployeeService(IUnitOfWork unitOfWork, IPasswordRepository passwordRepository)
         {
@@ -28,9 +32,10 @@ namespace MV.ApplicationLayer.Services
             var employees = await _unitOfWork.employeeRepository.GetEmployeesAsync(
                 request.Keyword,
                 (request.Page - 1) * request.PageSize,
-                request.PageSize);
+                request.PageSize,
+                true); // Always show all employees and managers
 
-            var totalItems = await _unitOfWork.employeeRepository.GetTotalEmployeesAsync(request.Keyword);
+            var totalItems = await _unitOfWork.employeeRepository.GetTotalEmployeesAsync(request.Keyword, true);
 
             return new PagedResult<EmployeeResponse>
             {
@@ -73,7 +78,7 @@ namespace MV.ApplicationLayer.Services
                 Address = request.Address,
                 Password = _passwordRepository.HashPassword(request.Password),
                 Joindate = DateTime.Now,
-                Roleid = 3, // Employee role
+                Roleid = request.RoleId,
                 Status = 1, // Active
                 Birthdate = DateOnly.FromDateTime(request.DateOfBirth),
                 Gender = request.Sex ? 1 : 0 // 1 for male, 0 for female
@@ -88,10 +93,6 @@ namespace MV.ApplicationLayer.Services
             var employee = await _unitOfWork.employeeRepository.GetEmployeeByIdAsync(id);
             if (employee == null)
                 throw new ValidationException("Employee not found");
-
-            // Ensure we're only updating employees (role ID 3)
-            if (employee.Roleid != 3)
-                throw new ValidationException("Cannot update non-employee user");
 
             // Check if email is already used by another employee
             if (await _unitOfWork.employeeRepository.IsEmailExistsAsync(request.Email) &&
@@ -111,7 +112,7 @@ namespace MV.ApplicationLayer.Services
             employee.Address = request.Address;
             employee.Birthdate = DateOnly.FromDateTime(request.DateOfBirth);
             employee.Gender = request.Sex ? 1 : 0;
-            employee.Roleid = 3; // Ensure role ID is preserved
+            employee.Roleid = request.RoleId; // Update role ID
 
             // Update password if provided
             if (!string.IsNullOrEmpty(request.Password))
@@ -129,9 +130,6 @@ namespace MV.ApplicationLayer.Services
             var employee = await _unitOfWork.employeeRepository.GetEmployeeByIdAsync(id);
             if (employee == null)
                 throw new ValidationException("Employee not found");
-
-            if (employee.Roleid != 3)
-                throw new ValidationException("Cannot delete non-employee user");
 
             await _unitOfWork.employeeRepository.DeleteEmployeeAsync(id);
         }

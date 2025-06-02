@@ -40,5 +40,9 @@ namespace MV.ApplicationLayer.DTO.RequestModel
 
         [Compare("Password", ErrorMessage = "Password and confirm password do not match")]
         public string? ConfirmPassword { get; set; }
+
+        [Required(ErrorMessage = "Role ID is required")]
+        [Range(2, 3, ErrorMessage = "Role ID must be 2 (Manager) or 3 (Employee)")]
+        public int RoleId { get; set; }
     }
 }
