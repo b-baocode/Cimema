@@ -13,5 +13,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 
         //Single commit point
         Task<int> SaveChangesAsync();
+
+        IEmployeeRepository employeeRepository { get; }
     }
 }

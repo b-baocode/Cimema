@@ -19,25 +19,24 @@ namespace MV.PresnetationLayer.Controllers
             _loginService = loginService;
         }
 
-        [HttpPost("Login")]
+        [HttpPost]
         public async Task<ActionResult<string>> LoginUser([FromBody] LoginRequest loginRequest)
         {
-          
-                var loginResult = await _loginService.LoginUser(loginRequest);
+
+            var loginResult = await _loginService.LoginUser(loginRequest);
 
 
 
-                if (!String.IsNullOrEmpty(loginResult))
-                {
-                    return Ok(loginResult);
-                }
-                else
-                {
-                    return Unauthorized("Wrong username or password");
-                }
-
+            if (!String.IsNullOrEmpty(loginResult))
+            {
+                return Ok(loginResult);
             }
-
+            else
+            {
+                return Unauthorized("Wrong username or password");
+            }
         }
+
     }
+}
 
