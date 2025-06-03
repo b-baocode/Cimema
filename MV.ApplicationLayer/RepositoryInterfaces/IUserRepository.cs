@@ -18,12 +18,15 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<(bool, string)> ValidateRegister(RegisterRequest registerRequest, string? existingId);
 
         //Task<bool> ChangePassword(string newPassword, User user);
+        
 
         Task<List<User>> GetAllCustomer();
         Task<User> GetUserByUsername(string username);
      
         Task<User?> GetByIdAsync(string userId);
         void Update(User user);
+
+        Task<IEnumerable<User>> GetAllUsersAsync();
      
     }
 }

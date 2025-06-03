@@ -139,8 +139,12 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<List<User>> GetAllCustomer()
         {
             return await _context.Users
-                .Where(u => u.Roleid == 4) // chỉ lấy RoleID = 4 (khách hàng)
+                .Where(u => u.Roleid == 4) // chỉ lấy RoleID = 4 
                 .ToListAsync();
+        }
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _context.Users.ToListAsync();
         }
 
 
