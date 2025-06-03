@@ -19,11 +19,11 @@ namespace MV.InfrastructureLayer.Repositories
             _context = context;
         }
 
-        public async Task<List<User>> GetEmployeesAsync(string? keyword, int skip, int take)
+        public async Task<List<User>> GetEmployeesAsync(string? keyword, int skip, int take, bool isAdmin)
         {
             var query = _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Roleid == 3); // Only get employees (role ID 3)
+                .Where(u => u.Roleid == 2 || u.Roleid == 3); // Show both managers and employees
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -36,15 +36,15 @@ namespace MV.InfrastructureLayer.Repositories
             }
 
             return await query
-               
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();
         }
 
-        public async Task<int> GetTotalEmployeesAsync(string? keyword)
+        public async Task<int> GetTotalEmployeesAsync(string? keyword, bool isAdmin)
         {
-            var query = _context.Users.Where(u => u.Roleid == 3); // Only count employees (role ID 3)
+            var query = _context.Users
+                .Where(u => u.Roleid == 2 || u.Roleid == 3); // Count both managers and employees
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {

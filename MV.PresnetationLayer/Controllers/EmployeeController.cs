@@ -33,16 +33,29 @@ namespace MV.PresnetationLayer.Controllers
             var employee = await _employeeService.GetEmployeeByIdAsync(id);
             if (employee == null)
                 return NotFound();
+
+            // Check if current user is Manager and trying to view a Manager
+            if (User.IsInRole("Manager") && employee.Role == "Manager")
+            {
+                return Forbid("Managers can only view regular employees");
+            }
+
             return Ok(employee);
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<EmployeeResponse>> CreateEmployee(
             [FromBody] EmployeeCreateRequest request)
         {
             try
             {
+                // Check if current user is Manager and trying to create a Manager
+                if (User.IsInRole("Manager") && request.RoleId == 2) // Assuming 2 is Manager role ID
+                {
+                    return Forbid("Managers can only create regular employees");
+                }
+
                 var employee = await _employeeService.CreateEmployeeAsync(request);
                 return CreatedAtAction(nameof(GetEmployee), new { id = employee.UserId }, employee);
             }
@@ -53,14 +66,30 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<EmployeeResponse>> UpdateEmployee(
             string id, [FromBody] EmployeeUpdateRequest request)
         {
             try
             {
-                var employee = await _employeeService.UpdateEmployeeAsync(id, request);
-                if (employee == null)
+                // Get current employee to check role
+                var currentEmployee = await _employeeService.GetEmployeeByIdAsync(id);
+                if (currentEmployee == null)
                     return NotFound();
+
+                // Check if current user is Manager
+                if (User.IsInRole("Manager"))
+                {
+                    // Manager can't update Managers
+                    if (currentEmployee.Role == "Manager")
+                        return Forbid("Managers can only update regular employees");
+
+                    // Manager can't change role to Manager
+                    if (request.RoleId == 2)
+                        return Forbid("Managers can't change role to Manager");
+                }
+
+                var employee = await _employeeService.UpdateEmployeeAsync(id, request);
                 return Ok(employee);
             }
             catch (ValidationException ex)
@@ -73,8 +102,20 @@ namespace MV.PresnetationLayer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeleteEmployee(string id)
         {
-            await _employeeService.DeleteEmployeeAsync(id);
-            return NoContent();
+            try
+            {
+                // Get current employee to check if exists
+                var currentEmployee = await _employeeService.GetEmployeeByIdAsync(id);
+                if (currentEmployee == null)
+                    return NotFound();
+
+                await _employeeService.DeleteEmployeeAsync(id);
+                return NoContent();
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
