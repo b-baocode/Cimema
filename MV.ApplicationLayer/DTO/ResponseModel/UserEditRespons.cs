@@ -16,6 +16,8 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public string? Email { get; set; }
         public string? Phone { get; set; }
         public string? Address { get; set; }
-        public string? Image { get; set; }  
+        public string? Image { get; set; }
+        public int? Roleid { get; set; }
+        public int? Status { get; set; }
     }
 }

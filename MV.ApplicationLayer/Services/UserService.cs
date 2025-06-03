@@ -90,7 +90,28 @@ namespace MV.ApplicationLayer.Services
                 Address = user.Address,
                 Image = user.Image
             }).ToList();
+
         }
+            public async Task<IEnumerable<UserEditRespons>> GetAllUsersAsync()
+        {
+            var users = await _UnitOfWork.userRepository.GetAllUsersAsync();
+            var userResponses = users.Select(u => new UserEditRespons
+            {
+                Userid = u.Userid,
+                Fullname = u.Fullname,
+                Birthdate = u.Birthdate,
+                Gender = u.Gender,
+                Identitynumber = u.Identitynumber,
+                Email = u.Email,
+                Phone = u.Phone,
+                Address = u.Address,
+                Image = u.Image,
+                Roleid = u.Roleid,
+                Status = u.Status
+            });
+
+            return userResponses;
+        }
+    }
 
     }
-}

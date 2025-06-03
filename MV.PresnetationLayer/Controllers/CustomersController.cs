@@ -9,12 +9,12 @@ namespace MV.PresnetationLayer.Controllers
     [Route("api/[controller]")]
     [ApiController]
     
-    public class UserController : Controller
+    public class CustomersController : Controller
     {
         private readonly ILoginService _loginService;
         private readonly IUserService _userService;
 
-        public UserController(ILoginService loginService , IUserService userService)
+        public CustomersController(ILoginService loginService , IUserService userService)
         {
             _loginService = loginService;
             _userService = userService;
@@ -44,9 +44,9 @@ namespace MV.PresnetationLayer.Controllers
 
             return Ok(user);
         }
-        [Authorize(Roles = "customer")]
+       
 
-        [HttpPut("edit-profile")]
+        [HttpPut("profile")]
         public async Task<IActionResult> EditProfile([FromBody] UserEditRequest request)
         {
             // Lấy ID nhân viên chỉnh sửa (ở đây có thể chính là customer tự sửa)
@@ -61,7 +61,7 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
         
-        [HttpGet("allCustomer")]
+        [HttpGet("all")]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllCustomer();
