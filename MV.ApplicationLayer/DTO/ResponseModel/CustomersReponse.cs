@@ -8,7 +8,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
 {
  public class CustomersReponse
     {
-        public string Userid { get; set; } = null!;
+        
         public string? Fullname { get; set; }
         public DateOnly? Birthdate { get; set; }
         public int? Gender { get; set; }

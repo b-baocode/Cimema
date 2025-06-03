@@ -40,7 +40,7 @@ namespace MV.ApplicationLayer.Services
 
             return new CustomersReponse
             {
-                Userid = user.Userid,
+                
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -61,7 +61,7 @@ namespace MV.ApplicationLayer.Services
 
             return new CustomersReponse
             {
-                Userid = user.Userid,
+                
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -80,7 +80,7 @@ namespace MV.ApplicationLayer.Services
 
             return customers.Select(user => new CustomersReponse
             {
-                Userid = user.Userid,
+               
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
