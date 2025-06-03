@@ -6,6 +6,9 @@ using MV.ApplicationLayer.Services;
 
 namespace MV.PresnetationLayer.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
+    
     public class UserController : Controller
     {
         private readonly ILoginService _loginService;
@@ -41,19 +44,23 @@ namespace MV.PresnetationLayer.Controllers
 
             return Ok(user);
         }
-
-
+        [Authorize(Roles = "customer")]
 
         [HttpPut("edit-profile")]
         public async Task<IActionResult> EditProfile([FromBody] UserEditRequest request)
         {
+            // Lấy ID nhân viên chỉnh sửa (ở đây có thể chính là customer tự sửa)
+            var employeeId = User.FindFirst("UserId")?.Value ?? "unknown";
+
+
+
             var result = await _userService.EditProfileAsync(request);
             if (result == null)
                 return NotFound("User not found");
 
             return Ok(result);
         }
-
+        
         [HttpGet("allCustomer")]
         public async Task<IActionResult> GetAllUsers()
         {
