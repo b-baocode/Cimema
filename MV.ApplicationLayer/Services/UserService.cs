@@ -18,7 +18,7 @@ namespace MV.ApplicationLayer.Services
             _UnitOfWork = unitOfWork;
         }
 
-        public async Task<UserEditRespons?> EditProfileAsync(UserEditRequest request)
+        public async Task<CustomersReponse?> EditProfileAsync(CustomersRequest request)
         {
             var user = await _UnitOfWork.userRepository.GetByIdAsync(request.Userid);
 
@@ -38,9 +38,9 @@ namespace MV.ApplicationLayer.Services
             _UnitOfWork.userRepository.Update(user);
             await _UnitOfWork.SaveChangesAsync();
 
-            return new UserEditRespons
+            return new CustomersReponse
             {
-                Userid = user.Userid,
+                
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -53,15 +53,15 @@ namespace MV.ApplicationLayer.Services
 
 
         }
-        public async Task<UserEditRespons?> GetUserByIdAsync(string userId)
+        public async Task<CustomersReponse?> GetUserByIdAsync(string userId)
         {
             var user = await _UnitOfWork.userRepository.GetByIdAsync(userId);
 
             if (user == null) return null;
 
-            return new UserEditRespons
+            return new CustomersReponse
             {
-                Userid = user.Userid,
+                
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -74,13 +74,13 @@ namespace MV.ApplicationLayer.Services
 
        
     }
-        public async Task<List<UserEditRespons>> GetAllCustomer()
+        public async Task<List<CustomersReponse>> GetAllCustomer()
         {
             var customers = await _UnitOfWork.userRepository.GetAllCustomer();
 
-            return customers.Select(user => new UserEditRespons
+            return customers.Select(user => new CustomersReponse
             {
-                Userid = user.Userid,
+               
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -92,10 +92,10 @@ namespace MV.ApplicationLayer.Services
             }).ToList();
 
         }
-            public async Task<IEnumerable<UserEditRespons>> GetAllUsersAsync()
+            public async Task<IEnumerable<UserRepons>> GetAllUsersAsync()
         {
             var users = await _UnitOfWork.userRepository.GetAllUsersAsync();
-            var userResponses = users.Select(u => new UserEditRespons
+            var userResponses = users.Select(u => new UserRepons
             {
                 Userid = u.Userid,
                 Fullname = u.Fullname,
@@ -106,8 +106,11 @@ namespace MV.ApplicationLayer.Services
                 Phone = u.Phone,
                 Address = u.Address,
                 Image = u.Image,
-                Roleid = u.Roleid,
-                Status = u.Status
+                Roleid = u.Roleid ,
+                Status = u.Status ,
+
+
+
             });
 
             return userResponses;

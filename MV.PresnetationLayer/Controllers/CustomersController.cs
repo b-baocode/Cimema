@@ -44,15 +44,13 @@ namespace MV.PresnetationLayer.Controllers
 
             return Ok(user);
         }
-       
 
-        [HttpPut("profile")]
-        public async Task<IActionResult> EditProfile([FromBody] UserEditRequest request)
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] CustomersRequest request)
         {
-            // Lấy ID nhân viên chỉnh sửa (ở đây có thể chính là customer tự sửa)
-            var employeeId = User.FindFirst("UserId")?.Value ?? "unknown";
-
-
+            if (string.IsNullOrEmpty(id))
+                return BadRequest("Invalid user ID");
 
             var result = await _userService.EditProfileAsync(request);
             if (result == null)
@@ -61,7 +59,8 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
         
-        [HttpGet("all")]
+        
+        [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllCustomer();
