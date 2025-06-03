@@ -46,8 +46,8 @@ namespace MV.PresnetationLayer.Controllers
         }
        
 
-        [HttpPut("profile")]
-        public async Task<IActionResult> EditProfile([FromBody] UserEditRequest request)
+        [HttpPut]
+        public async Task<IActionResult> EditProfile([FromBody] CustomersRequest request)
         {
             // Lấy ID nhân viên chỉnh sửa (ở đây có thể chính là customer tự sửa)
             var employeeId = User.FindFirst("UserId")?.Value ?? "unknown";
@@ -61,7 +61,7 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
         
-        [HttpGet("all")]
+        [HttpGet]
         public async Task<IActionResult> GetAllUsers()
         {
             var users = await _userService.GetAllCustomer();
