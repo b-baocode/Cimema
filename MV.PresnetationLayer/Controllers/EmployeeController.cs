@@ -27,6 +27,17 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
 
+        [HttpGet("search")]
+        public async Task<ActionResult<PagedResult<EmployeeResponse>>> SearchEmployees(
+            [FromQuery] EmployeeSearchRequest request)
+        {
+            // Both Admin and Manager can see all employees
+            //request.IsManager = false; // Show all employees (both managers and regular employees)
+
+            var result = await _employeeService.GetEmployeesAsync(request);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<EmployeeResponse>> GetEmployee(string id)
         {
