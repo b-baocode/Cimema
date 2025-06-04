@@ -32,10 +32,10 @@ namespace MV.ApplicationLayer.Services
             var employees = await _unitOfWork.employeeRepository.GetEmployeesAsync(
                 request.Keyword,
                 (request.Page - 1) * request.PageSize,
-                request.PageSize,
-                true); // Always show all employees and managers
+                request.PageSize);
 
-            var totalItems = await _unitOfWork.employeeRepository.GetTotalEmployeesAsync(request.Keyword, true);
+            var totalItems = await _unitOfWork.employeeRepository.GetTotalEmployeesAsync(
+                request.Keyword);
 
             return new PagedResult<EmployeeResponse>
             {
