@@ -12,9 +12,9 @@ namespace MV.InfrastructureLayer.Repositories
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly MovieTheaterContext _context;
+        private readonly MovietheatermanagementContext _context;
 
-        public EmployeeRepository(MovieTheaterContext context)
+        public EmployeeRepository(MovietheatermanagementContext context)
         {
             _context = context;
         }

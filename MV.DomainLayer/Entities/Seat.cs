@@ -5,19 +5,23 @@ namespace MV.DomainLayer.Entities;
 
 public partial class Seat
 {
-    public int Seatid { get; set; }
+    public int SeatId { get; set; }
 
-    public string? Rowlabel { get; set; }
+    public string RowLabel { get; set; } = null!;
 
-    public int? Columnnumber { get; set; }
+    public int ColumnNumber { get; set; }
 
-    public int? Seattype { get; set; }
+    public int? SeatTypeId { get; set; }
 
-    public int? Roomid { get; set; }
+    public int? RoomId { get; set; }
 
-    public virtual Cinemaroom? Room { get; set; }
+    public virtual CoupleSeat? CoupleSeatSeatId1Navigation { get; set; }
 
-    public virtual ICollection<Showtimeseat> Showtimeseats { get; set; } = new List<Showtimeseat>();
+    public virtual CoupleSeat? CoupleSeatSeatId2Navigation { get; set; }
 
-    public virtual ICollection<Ticketdetail> Ticketdetails { get; set; } = new List<Ticketdetail>();
+    public virtual CinemaRoom? Room { get; set; }
+
+    public virtual SeatType? SeatType { get; set; }
+
+    public virtual ICollection<TicketDetail> TicketDetails { get; set; } = new List<TicketDetail>();
 }
