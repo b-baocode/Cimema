@@ -4,7 +4,9 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-//using MV.DomainLayer.Entities;
+//using MV.InfrastructureLayer.Entities;
+
+using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,9 +17,9 @@ namespace MV.InfrastructureLayer.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly MovieTheaterContext _context;
+        private readonly MovietheatermanagementContext _context;
 
-        public UserRepository(MovieTheaterContext context)
+        public UserRepository(MovietheatermanagementContext context)
         {
             _context = context;
         }
@@ -108,7 +110,7 @@ namespace MV.InfrastructureLayer.Repositories
                 Gender = registerRequest.Gender,
                 Identitynumber = registerRequest.Identitynumber,
                 Address = registerRequest.Address,
-                Accumulatedpoints = 0,
+                //Accumulatedpoints = 0,
                 Status = 1,
                 Roleid = 4,
             };

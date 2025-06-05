@@ -5,19 +5,21 @@ namespace MV.DomainLayer.Entities;
 
 public partial class Promotion
 {
-    public string Promotionid { get; set; } = null!;
+    public int PromotionId { get; set; }
 
-    public string? Image { get; set; }
+    public string PromotionName { get; set; } = null!;
 
-    public DateTime? Startdate { get; set; }
+    public string Image { get; set; } = null!;
 
-    public DateTime? Enddate { get; set; }
+    public DateTime StartDate { get; set; }
 
-    public decimal? Discountrate { get; set; }
+    public DateTime EndDate { get; set; }
 
-    public string? Description { get; set; }
+    public decimal DiscountRate { get; set; }
 
-    public bool? Isactive { get; set; }
+    public string Description { get; set; } = null!;
 
-    public virtual ICollection<Ticketinvoice> Ticketinvoices { get; set; } = new List<Ticketinvoice>();
+    public string? Status { get; set; }
+
+    public virtual ICollection<TicketInvoice> TicketInvoices { get; set; } = new List<TicketInvoice>();
 }
