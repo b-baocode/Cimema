@@ -41,7 +41,7 @@ namespace MV.ApplicationLayer.Services
 
             return new CustomersReponse
             {
-                
+
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -62,7 +62,7 @@ namespace MV.ApplicationLayer.Services
 
             return new CustomersReponse
             {
-                
+
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -73,15 +73,15 @@ namespace MV.ApplicationLayer.Services
                 Image = user.Image
             };
 
-       
-    }
+
+        }
         public async Task<List<CustomersReponse>> GetAllCustomer()
         {
             var customers = await _UnitOfWork.userRepository.GetAllCustomer();
 
             return customers.Select(user => new CustomersReponse
             {
-               
+
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -93,7 +93,7 @@ namespace MV.ApplicationLayer.Services
             }).ToList();
 
         }
-            public async Task<IEnumerable<UserRepons>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserRepons>> GetAllUsersAsync()
         {
             var users = await _UnitOfWork.userRepository.GetAllUsersAsync();
             var userResponses = users.Select(u => new UserRepons
@@ -107,8 +107,8 @@ namespace MV.ApplicationLayer.Services
                 Phone = u.Phone,
                 Address = u.Address,
                 Image = u.Image,
-                Roleid = u.Roleid ,
-                Status = u.Status ,
+                Roleid = u.Roleid,
+                Status = u.Status,
 
 
 
@@ -116,8 +116,8 @@ namespace MV.ApplicationLayer.Services
 
             return userResponses;
         }
-    
-            public async Task<List<CustomersReponse>> SearchUsersByFullnameAsync(string fullname)
+
+        public async Task<List<CustomersReponse>> SearchUsersByFullnameAsync(string fullname)
         {
             var users = await _UnitOfWork.userRepository.SearchByFullnameAsync(fullname);
 

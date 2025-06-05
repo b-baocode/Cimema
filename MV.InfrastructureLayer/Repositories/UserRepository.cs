@@ -153,7 +153,6 @@ namespace MV.InfrastructureLayer.Repositories
             _context.Users.Update(user);
         }
 
-
         public async Task<List<User>> SearchByFullnameAsync(string fullname)
         {
             return await _context.Users
@@ -178,6 +177,27 @@ namespace MV.InfrastructureLayer.Repositories
                 .Where(u => u.Phone != null && u.Phone.Contains(phone))
                 .ToListAsync();
         }
+
+        public async Task<List<User>> SearchByEmailAsync(string email)
+        {
+            return await _context.Users
+                .Where(u => u.Email.Contains(email))
+                .ToListAsync();
+        }
+
+        public async Task DeleteAsync(User user)
+        {
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
+
+
+            if (!string.IsNullOrEmpty(phone))
+                query = query.Where(u => u.Phone != null && u.Phone.Contains(phone));
+
+    }
+    }
 
         public async Task<List<User>> SearchByEmailAsync(string email)
         {
