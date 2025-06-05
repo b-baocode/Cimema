@@ -153,11 +153,47 @@ namespace MV.InfrastructureLayer.Repositories
             _context.Users.Update(user);
         }
 
-
-
-       
-
-
+        public async Task<List<User>> SearchByFullnameAsync(string fullname)
+        {
+            return await _context.Users
+                .Where(cus => cus.Fullname != null && cus.Fullname.Contains(fullname))
+                .ToListAsync();
         }
+
+        public async Task<List<User>> SearchUsersAsync(string? fullname, string? phone)
+        {
+            var query = _context.Users.AsQueryable();
+
+
+            if (!string.IsNullOrEmpty(phone))
+                query = query.Where(u => u.Phone != null && u.Phone.Contains(phone));
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<List<User>> SearchByPhoneAsync(string phone)
+        {
+            return await _context.Users
+                .Where(u => u.Phone != null && u.Phone.Contains(phone))
+                .ToListAsync();
+        }
+
+        public async Task<List<User>> SearchByEmailAsync(string email)
+        {
+            return await _context.Users
+                .Where(u => u.Email.Contains(email))
+                .ToListAsync();
+        }
+
+        public async Task DeleteAsync(User user)
+        {
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+        }
+
+
     }
+
+}
+    
 
