@@ -153,47 +153,44 @@ namespace MV.InfrastructureLayer.Repositories
             _context.Users.Update(user);
         }
 
-        public async Task<List<User>> SearchByFullnameAsync(string fullname)
+        public async Task<List<User>> SearchUsersByFullnameAsync(string fullname)
         {
             return await _context.Users
-                .Where(cus => cus.Fullname != null && cus.Fullname.Contains(fullname))
+                .Where(u => u.Fullname.ToLower().Contains(fullname.ToLower()))
                 .ToListAsync();
-        }
-
-        public async Task<List<User>> SearchUsersAsync(string? fullname, string? phone)
-        {
-            var query = _context.Users.AsQueryable();
-
-
-            if (!string.IsNullOrEmpty(phone))
-                query = query.Where(u => u.Phone != null && u.Phone.Contains(phone));
-
-            return await query.ToListAsync();
         }
 
         public async Task<List<User>> SearchByPhoneAsync(string phone)
         {
             return await _context.Users
-                .Where(u => u.Phone != null && u.Phone.Contains(phone))
+                .Where(u => u.Phone.Contains(phone))
                 .ToListAsync();
         }
 
         public async Task<List<User>> SearchByEmailAsync(string email)
         {
             return await _context.Users
-                .Where(u => u.Email.Contains(email))
+                .Where(u => u.Email.ToLower().Contains(email.ToLower()))
                 .ToListAsync();
         }
 
-        public async Task DeleteAsync(User user)
+        public async Task<bool> DeleteCustomerAsync(string id)
         {
-            _context.Users.Remove(user);
+            var customer = await _context.Users.FindAsync(id);
+            if (customer == null)
+                return false;
+
+            _context.Users.Remove(customer);
             await _context.SaveChangesAsync();
+            return true;
         }
 
-
+        public async Task<User> CreateCustomerAsync(User customer)
+        {
+            _context.Users.Add(customer);
+            await _context.SaveChangesAsync();
+            return customer;
+        }
     }
-
 }
-    
 
