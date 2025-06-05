@@ -10,7 +10,7 @@ namespace MV.PresnetationLayer.Controllers
     [Route("api/[controller]")]
     [ApiController]
 
-    public class CustomersController : Controller
+    public class CustomersController : ControllerBase
     {
         private readonly ILoginService _loginService;
         private readonly IUserService _userService;
@@ -21,7 +21,7 @@ namespace MV.PresnetationLayer.Controllers
             _userService = userService;
         }
 
-
+       
         [HttpPost("ChangePassword")]
         [Authorize]
         public async Task<ActionResult<string>> ChangePassword([FromBody] ChangePasswordRequest changePasswordRequest)
@@ -45,7 +45,7 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 var user = await _userService.GetUserByIdAsync(id);
-                return Ok(user);
+                //return Ok(user);
 
 
                 if (user == null)
