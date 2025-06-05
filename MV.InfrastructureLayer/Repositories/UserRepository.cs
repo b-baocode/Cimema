@@ -192,28 +192,7 @@ namespace MV.InfrastructureLayer.Repositories
         }
 
 
-
-            if (!string.IsNullOrEmpty(phone))
-                query = query.Where(u => u.Phone != null && u.Phone.Contains(phone));
-
     }
-    }
-
-        public async Task<List<User>> SearchByEmailAsync(string email)
-        {
-            return await _context.Users
-                .Where(u => u.Email.Contains(email))
-                .ToListAsync();
-        }
-
-        public async Task DeleteAsync(User user)
-        {
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-        }
-    }
-
-
 
 }
     

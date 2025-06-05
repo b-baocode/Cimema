@@ -79,17 +79,24 @@ namespace MV.ApplicationLayer.Services
         {
             var customers = await _UnitOfWork.userRepository.GetAllCustomer();
 
-            return customers.Select(user => new CustomersReponse
+            return customers.Select(cus => new CustomersReponse
             {
+                Userid = cus.Userid,
+                Username = cus.Username,
+                Password = cus.Password,
+                Fullname = cus.Fullname,
+                Birthdate = cus.Birthdate,
+                Gender = cus.Gender,
+                Identitynumber = cus.Identitynumber,
+                Email = cus.Email,
+                Phone = cus.Phone,
+                Address = cus.Address,
+                Image = cus.Image,
+                Accumulatedpoints = cus.Accumulatedpoints,
+                Joindate = cus.Joindate,
+                Roleid = cus.Roleid,
+                Status = cus.Status,
 
-                Fullname = user.Fullname,
-                Birthdate = user.Birthdate,
-                Gender = user.Gender,
-                Identitynumber = user.Identitynumber,
-                Email = user.Email,
-                Phone = user.Phone,
-                Address = user.Address,
-                Image = user.Image
             }).ToList();
 
         }
@@ -99,6 +106,8 @@ namespace MV.ApplicationLayer.Services
             var userResponses = users.Select(u => new UserRepons
             {
                 Userid = u.Userid,
+                Username = u.Username,
+                Password = u.Password,
                 Fullname = u.Fullname,
                 Birthdate = u.Birthdate,
                 Gender = u.Gender,
@@ -107,6 +116,8 @@ namespace MV.ApplicationLayer.Services
                 Phone = u.Phone,
                 Address = u.Address,
                 Image = u.Image,
+                Accumulatedpoints = u.Accumulatedpoints,
+                Joindate = u.Joindate,
                 Roleid = u.Roleid,
                 Status = u.Status,
 
