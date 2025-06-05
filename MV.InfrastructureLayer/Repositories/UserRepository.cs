@@ -7,6 +7,7 @@ using MV.InfrastructureLayer.DBContext;
 //using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -152,14 +153,6 @@ namespace MV.InfrastructureLayer.Repositories
         {
             _context.Users.Update(user);
         }
-
-        public async Task<List<User>> SearchByFullnameAsync(string fullname)
-        {
-            return await _context.Users
-                .Where(cus => cus.Fullname != null && cus.Fullname.Contains(fullname))
-                .ToListAsync();
-        }
-
         public async Task<List<User>> SearchUsersAsync(string? fullname, string? phone)
         {
             var query = _context.Users.AsQueryable();
@@ -171,18 +164,33 @@ namespace MV.InfrastructureLayer.Repositories
             return await query.ToListAsync();
         }
 
+
+        public async Task<List<User>> SearchByFullnameAsync(string fullname)
+        {
+            return await _context.Users
+                .Where(cus => cus.Fullname != null && cus.Fullname.Contains(fullname))
+                .ToListAsync();
+
+        }
+
+       
         public async Task<List<User>> SearchByPhoneAsync(string phone)
         {
             return await _context.Users
                 .Where(u => u.Phone != null && u.Phone.Contains(phone))
                 .ToListAsync();
+
+
         }
 
         public async Task<List<User>> SearchByEmailAsync(string email)
         {
             return await _context.Users
                 .Where(u => u.Email.Contains(email))
-                .ToListAsync();
+                .ToListAsync()
+                ;
+
+   
         }
 
         public async Task DeleteAsync(User user)
