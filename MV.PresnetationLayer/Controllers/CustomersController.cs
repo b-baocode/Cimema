@@ -9,13 +9,9 @@ namespace MV.PresnetationLayer.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-<<<<<<< HEAD
-
-    public class CustomersController : ControllerBase
-=======
     [Authorize]
-    public class CustomersController : Controller
->>>>>>> origin/main
+    public class CustomersController : ControllerBase
+
     {
         private readonly ILoginService _loginService;
         private readonly IUserService _userService;
@@ -26,10 +22,6 @@ namespace MV.PresnetationLayer.Controllers
             _userService = userService;
         }
 
-<<<<<<< HEAD
-       
-=======
->>>>>>> origin/main
         [HttpPost("ChangePassword")]
         public async Task<ActionResult<string>> ChangePassword([FromBody] ChangePasswordRequest changePasswordRequest)
         {
@@ -57,12 +49,9 @@ namespace MV.PresnetationLayer.Controllers
                     return BadRequest("Invalid user ID");
 
                 var user = await _userService.GetUserByIdAsync(id);
-<<<<<<< HEAD
                 //return Ok(user);
 
 
-=======
->>>>>>> origin/main
                 if (user == null)
                     return NotFound("User not found");
 
