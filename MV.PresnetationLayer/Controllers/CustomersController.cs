@@ -10,7 +10,8 @@ namespace MV.PresnetationLayer.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class CustomersController : Controller
+    public class CustomersController : ControllerBase
+
     {
         private readonly ILoginService _loginService;
         private readonly IUserService _userService;
@@ -48,6 +49,9 @@ namespace MV.PresnetationLayer.Controllers
                     return BadRequest("Invalid user ID");
 
                 var user = await _userService.GetUserByIdAsync(id);
+                //return Ok(user);
+
+
                 if (user == null)
                     return NotFound("User not found");
 
