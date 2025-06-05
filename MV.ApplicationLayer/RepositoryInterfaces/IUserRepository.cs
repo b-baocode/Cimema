@@ -27,6 +27,10 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         void Update(User user);
 
         Task<IEnumerable<User>> GetAllUsersAsync();
-     
+       
+        Task<List<User>> SearchByFullnameAsync(string fullname);
+        Task<List<User>> SearchByPhoneAsync(string phone);
+        Task<List<User>> SearchByEmailAsync(string email);
+        Task DeleteAsync(User user);
     }
 }
