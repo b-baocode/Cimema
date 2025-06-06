@@ -101,7 +101,7 @@ namespace MV.PresnetationLayer.Controllers
 
 
         [HttpPut("profile")]
-        public async Task<IActionResult> EditProfile([FromBody] CustomersRequest request)
+        public async Task<IActionResult> EditProfile([FromBody] CustomerUpdateRequest request)
         {
             // Lấy ID nhân viên chỉnh sửa (ở đây có thể chính là customer tự sửa)
             var employeeId = User.FindFirst("UserId")?.Value ?? "unknown";
