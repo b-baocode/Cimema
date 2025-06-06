@@ -4,7 +4,9 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-//using MV.DomainLayer.Entities;
+//using MV.InfrastructureLayer.Entities;
+
+using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -16,9 +18,9 @@ namespace MV.InfrastructureLayer.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly MovieTheaterContext _context;
+        private readonly MovietheatermanagementContext _context;
 
-        public UserRepository(MovieTheaterContext context)
+        public UserRepository(MovietheatermanagementContext context)
         {
             _context = context;
         }
@@ -109,7 +111,7 @@ namespace MV.InfrastructureLayer.Repositories
                 Gender = registerRequest.Gender,
                 Identitynumber = registerRequest.Identitynumber,
                 Address = registerRequest.Address,
-                Accumulatedpoints = 0,
+                //Accumulatedpoints = 0,
                 Status = 1,
                 Roleid = 4,
             };
@@ -177,7 +179,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<List<User>> SearchByPhoneAsync(string phone)
         {
             return await _context.Users
-                .Where(u => u.Phone != null && u.Phone.Contains(phone))
+                .Where(u => u.Phone.Contains(phone))
                 .ToListAsync();
 
 
@@ -193,15 +195,23 @@ namespace MV.InfrastructureLayer.Repositories
    
         }
 
-        public async Task DeleteAsync(User user)
+        public async Task<bool> DeleteCustomerAsync(string id)
         {
-            _context.Users.Remove(user);
+            var customer = await _context.Users.FindAsync(id);
+            if (customer == null)
+                return false;
+
+            _context.Users.Remove(customer);
             await _context.SaveChangesAsync();
+            return true;
         }
 
-
+        public async Task<User> CreateCustomerAsync(User customer)
+        {
+            _context.Users.Add(customer);
+            await _context.SaveChangesAsync();
+            return customer;
+        }
     }
-
 }
-    
 

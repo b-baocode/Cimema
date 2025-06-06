@@ -33,7 +33,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             else
             {
-                return Unauthorized("Wrong username or password");
+                return BadRequest("Wrong username or password");
             }
         }
 

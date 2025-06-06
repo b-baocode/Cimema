@@ -3,33 +3,25 @@ using System.Collections.Generic;
 
 namespace MV.DomainLayer.Entities;
 
-public partial class Ticketinvoice
+public partial class TicketInvoice
 {
-    public string Invoiceid { get; set; } = null!;
+    public int InvoiceId { get; set; }
 
-    public DateTime? Createdat { get; set; }
+    public DateTime CreatedAt { get; set; }
 
-    public decimal? Usedpoints { get; set; }
+    public decimal TotalPrice { get; set; }
 
-    public int? Exchangedtickets { get; set; }
-
-    public decimal? Totalprice { get; set; }
-
-    public int? Showtimeid { get; set; }
-
-    public string? Promotionid { get; set; }
-
-    public int? Status { get; set; }
+    public int? PromotionId { get; set; }
 
     public string? Userid { get; set; }
+
+    public string? Status { get; set; }
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual Promotion? Promotion { get; set; }
 
-    public virtual Showtime? Showtime { get; set; }
-
-    public virtual ICollection<Ticketdetail> Ticketdetails { get; set; } = new List<Ticketdetail>();
+    public virtual ICollection<TicketDetail> TicketDetails { get; set; } = new List<TicketDetail>();
 
     public virtual User? User { get; set; }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +7,7 @@ using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
+using MV.DomainLayer.Entities;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -41,7 +41,6 @@ namespace MV.ApplicationLayer.Services
 
             return new CustomerUpdateResponse
             {
-
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -51,9 +50,8 @@ namespace MV.ApplicationLayer.Services
                 Address = user.Address,
                 Image = user.Image
             };
-
-
         }
+
         public async Task<CustomersReponse?> GetUserByIdAsync(string userId)
         {
             var user = await _UnitOfWork.userRepository.GetByIdAsync(userId);
@@ -78,42 +76,31 @@ namespace MV.ApplicationLayer.Services
                 Roleid = user.Roleid,
                 Status = user.Status,
             };
-
-
         }
+
         public async Task<List<CustomersReponse>> GetAllCustomer()
         {
             var customers = await _UnitOfWork.userRepository.GetAllCustomer();
 
-            return customers.Select(cus => new CustomersReponse
+            return customers.Select(user => new CustomersReponse
             {
-                Userid = cus.Userid,
-                Username = cus.Username,
-                Password = cus.Password,
-                Fullname = cus.Fullname,
-                Birthdate = cus.Birthdate,
-                Gender = cus.Gender,
-                Identitynumber = cus.Identitynumber,
-                Email = cus.Email,
-                Phone = cus.Phone,
-                Address = cus.Address,
-                Image = cus.Image,
-                Accumulatedpoints = cus.Accumulatedpoints,
-                Joindate = cus.Joindate,
-                Roleid = cus.Roleid,
-                Status = cus.Status,
-
+                Fullname = user.Fullname,
+                Birthdate = user.Birthdate,
+                Gender = user.Gender,
+                Identitynumber = user.Identitynumber,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                Image = user.Image
             }).ToList();
-
         }
+
         public async Task<IEnumerable<UserRepons>> GetAllUsersAsync()
         {
             var users = await _UnitOfWork.userRepository.GetAllUsersAsync();
             var userResponses = users.Select(u => new UserRepons
             {
                 Userid = u.Userid,
-                Username = u.Username,
-                Password = u.Password,
                 Fullname = u.Fullname,
                 Birthdate = u.Birthdate,
                 Gender = u.Gender,
@@ -122,13 +109,8 @@ namespace MV.ApplicationLayer.Services
                 Phone = u.Phone,
                 Address = u.Address,
                 Image = u.Image,
-                Accumulatedpoints = u.Accumulatedpoints,
-                Joindate = u.Joindate,
                 Roleid = u.Roleid,
                 Status = u.Status,
-
-
-
             });
 
             return userResponses;
@@ -136,102 +118,89 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<List<CustomersReponse>> SearchUsersByFullnameAsync(string fullname)
         {
-            var users = await _UnitOfWork.userRepository.SearchByFullnameAsync(fullname);
-
-            // Chỉ trả về user role = 4 (customer)
-            var customers = users.Where(cus => cus.Roleid == 4).ToList();
-
-            return customers.Select(cus => new CustomersReponse
+            var users = await _UnitOfWork.userRepository.SearchUsersByFullnameAsync(fullname);
+            return users.Select(user => new CustomersReponse
             {
-                Userid = cus.Userid,
-                Username = cus.Username,
-                Password = cus.Password,
-                Fullname = cus.Fullname,
-                Birthdate = cus.Birthdate,
-                Gender = cus.Gender,
-                Identitynumber = cus.Identitynumber,
-                Email = cus.Email,
-                Phone = cus.Phone,
-                Address = cus.Address,
-                Image = cus.Image,
-                Accumulatedpoints = cus.Accumulatedpoints,
-                Joindate = cus.Joindate,
-                Roleid = cus.Roleid,
-                Status = cus.Status,
+                Fullname = user.Fullname,
+                Birthdate = user.Birthdate,
+                Gender = user.Gender,
+                Identitynumber = user.Identitynumber,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                Image = user.Image
             }).ToList();
         }
 
         public async Task<List<CustomersReponse>> SearchByPhoneAsync(string phone)
         {
             var users = await _UnitOfWork.userRepository.SearchByPhoneAsync(phone);
-
-            var customers = users.Where(u => u.Roleid == 4).ToList();
-
-            return customers.Select(cus => new CustomersReponse
+            return users.Select(user => new CustomersReponse
             {
-                Userid = cus.Userid,
-                Username = cus.Username,
-                Password = cus.Password,
-                Fullname = cus.Fullname,
-                Birthdate = cus.Birthdate,
-                Gender = cus.Gender,
-                Identitynumber = cus.Identitynumber,
-                Email = cus.Email,
-                Phone = cus.Phone,
-                Address = cus.Address,
-                Image = cus.Image,
-                Accumulatedpoints = cus.Accumulatedpoints,
-                Joindate = cus.Joindate,
-                Roleid = cus.Roleid,
-                Status = cus.Status,
+                Fullname = user.Fullname,
+                Birthdate = user.Birthdate,
+                Gender = user.Gender,
+                Identitynumber = user.Identitynumber,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                Image = user.Image
             }).ToList();
         }
 
         public async Task<List<CustomersReponse>> SearchByEmailAsync(string email)
         {
             var users = await _UnitOfWork.userRepository.SearchByEmailAsync(email);
-            var customers = users.Where(u => u.Roleid == 4).ToList();
-
-            return customers.Select(cus => new CustomersReponse
+            return users.Select(user => new CustomersReponse
             {
-                Userid = cus.Userid,
-                Username = cus.Username,
-                Password = cus.Password,
-                Fullname = cus.Fullname,
-                Birthdate = cus.Birthdate,
-                Gender = cus.Gender,
-                Identitynumber = cus.Identitynumber,
-                Email = cus.Email,
-                Phone = cus.Phone,
-                Address = cus.Address,
-                Image = cus.Image,
-                Accumulatedpoints = cus.Accumulatedpoints,
-                Joindate = cus.Joindate,
-                Roleid = cus.Roleid,
-                Status = cus.Status,
+                Fullname = user.Fullname,
+                Birthdate = user.Birthdate,
+                Gender = user.Gender,
+                Identitynumber = user.Identitynumber,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                Image = user.Image
             }).ToList();
         }
-        public async Task<CustomersReponse> DeleteCustomerAsync(string id)
+
+        public async Task<bool> DeleteCustomerAsync(string id)
         {
-            var customer = await _UnitOfWork.userRepository.GetByIdAsync(id);
-            if (customer == null)
-                throw new ValidationException("Customer not found");
+            return await _UnitOfWork.userRepository.DeleteCustomerAsync(id);
+        }
 
-            if (customer.Roleid != 4)
-                throw new ValidationException("User is not a customer");
+        public async Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request)
+        {
+            var user = new User
+            {
+                Userid = Guid.NewGuid().ToString(),
+                Fullname = request.Fullname,
+                Birthdate = request.Birthdate,
+                Gender = request.Gender,
+                Identitynumber = request.Identitynumber,
+                Email = request.Email,
+                Phone = request.Phone,
+                Address = request.Address,
+                Image = request.Image,
+                Roleid = 4, // Customer role
+                Status = 1, // Active status
+                Joindate = DateTime.Now
+            };
 
-            await _UnitOfWork.userRepository.DeleteAsync(customer);
+            var createdUser = await _UnitOfWork.userRepository.CreateCustomerAsync(user);
+            await _UnitOfWork.SaveChangesAsync();
+
             return new CustomersReponse
             {
-                Userid = customer.Userid,
-                Fullname = customer.Fullname,
-                Email = customer.Email,
-                Phone = customer.Phone,
-                Roleid = customer.Roleid,
-                Status = customer.Status
+                Fullname = createdUser.Fullname,
+                Birthdate = createdUser.Birthdate,
+                Gender = createdUser.Gender,
+                Identitynumber = createdUser.Identitynumber,
+                Email = createdUser.Email,
+                Phone = createdUser.Phone,
+                Address = createdUser.Address,
+                Image = createdUser.Image
             };
         }
     }
-
-
 }

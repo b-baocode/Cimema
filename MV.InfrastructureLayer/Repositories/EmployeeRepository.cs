@@ -12,18 +12,18 @@ namespace MV.InfrastructureLayer.Repositories
 {
     public class EmployeeRepository : IEmployeeRepository
     {
-        private readonly MovieTheaterContext _context;
+        private readonly MovietheatermanagementContext _context;
 
-        public EmployeeRepository(MovieTheaterContext context)
+        public EmployeeRepository(MovietheatermanagementContext context)
         {
             _context = context;
         }
 
-        public async Task<List<User>> GetEmployeesAsync(string? keyword, int skip, int take, bool isAdmin)
+        public async Task<IEnumerable<User>> GetEmployeesAsync(string? keyword, int skip, int take)
         {
             var query = _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Roleid == 2 || u.Roleid == 3); // Show both managers and employees
+                .Where(u => u.Roleid == 2 || u.Roleid == 3); // Only get Manager (2) and Employee (3)
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -41,10 +41,10 @@ namespace MV.InfrastructureLayer.Repositories
                 .ToListAsync();
         }
 
-        public async Task<int> GetTotalEmployeesAsync(string? keyword, bool isAdmin)
+        public async Task<int> GetTotalEmployeesAsync(string? keyword)
         {
             var query = _context.Users
-                .Where(u => u.Roleid == 2 || u.Roleid == 3); // Count both managers and employees
+                .Where(u => u.Roleid == 2 || u.Roleid == 3); // Only count Manager (2) and Employee (3)
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {

@@ -14,7 +14,7 @@ namespace MV.InfrastructureLayer
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly MovieTheaterContext _context;
+        private readonly MovietheatermanagementContext _context;
 
         private IEmployeeRepository _employeeRepository;
         public IEmployeeRepository employeeRepository =>
@@ -30,7 +30,7 @@ namespace MV.InfrastructureLayer
         
 
         // CONSTRUCTOR INJECTION for DbContext
-        public UnitOfWork(MovieTheaterContext context)
+        public UnitOfWork(MovietheatermanagementContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }

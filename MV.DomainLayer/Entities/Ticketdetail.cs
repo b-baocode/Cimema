@@ -3,15 +3,19 @@ using System.Collections.Generic;
 
 namespace MV.DomainLayer.Entities;
 
-public partial class Ticketdetail
+public partial class TicketDetail
 {
-    public string Invoiceid { get; set; } = null!;
+    public int SeatId { get; set; }
 
-    public int Seatid { get; set; }
+    public int ShowtimeId { get; set; }
 
-    public decimal? Ticketprice { get; set; }
+    public decimal TicketPrice { get; set; }
 
-    public virtual Ticketinvoice Invoice { get; set; } = null!;
+    public int? InvoiceId { get; set; }
+
+    public virtual TicketInvoice? Invoice { get; set; }
 
     public virtual Seat Seat { get; set; } = null!;
+
+    public virtual Showtime Showtime { get; set; } = null!;
 }

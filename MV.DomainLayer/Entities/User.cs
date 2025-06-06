@@ -29,15 +29,11 @@ public partial class User
 
     public string? Address { get; set; }
 
-    public decimal? Accumulatedpoints { get; set; }
-
     public int? Status { get; set; }
 
     public int? Roleid { get; set; }
 
     public virtual Role? Role { get; set; }
 
-    public virtual ICollection<Scorehistory> Scorehistories { get; set; } = new List<Scorehistory>();
-
-    public virtual ICollection<Ticketinvoice> Ticketinvoices { get; set; } = new List<Ticketinvoice>();
+    public virtual ICollection<TicketInvoice> TicketInvoices { get; set; } = new List<TicketInvoice>();
 }

@@ -21,7 +21,7 @@ namespace MV.InfrastructureLayer.Configuration
             IConfiguration configuration)
         {
 
-            services.AddDbContext<MovieTheaterContext>(options =>
+            services.AddDbContext<MovietheatermanagementContext>(options =>
                 options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
             );
 
