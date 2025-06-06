@@ -103,16 +103,26 @@ namespace MV.PresnetationLayer.Controllers
         [HttpPut("profile")]
         public async Task<IActionResult> EditProfile([FromBody] CustomerUpdateRequest request)
         {
-            // Lấy ID nhân viên chỉnh sửa (ở đây có thể chính là customer tự sửa)
-            var employeeId = User.FindFirst("UserId")?.Value ?? "unknown";
-
+            try
+            {
+                if (request == null)
+                    return BadRequest("Invalid request data");
 
 
             var result = await _userService.EditProfileAsync(request);
             if (result == null)
                 return NotFound("User not found");
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An unexpected error occurred");
+            }
         }
 
         [HttpGet("all")]
