@@ -19,7 +19,7 @@ namespace MV.ApplicationLayer.Services
             _UnitOfWork = unitOfWork;
         }
 
-        public async Task<CustomersReponse?> EditProfileAsync(CustomersRequest request)
+        public async Task<CustomerUpdateResponse> EditProfileAsync(CustomerUpdateRequest request)
         {
             var user = await _UnitOfWork.userRepository.GetByIdAsync(request.Userid);
 
@@ -39,7 +39,7 @@ namespace MV.ApplicationLayer.Services
             _UnitOfWork.userRepository.Update(user);
             await _UnitOfWork.SaveChangesAsync();
 
-            return new CustomersReponse
+            return new CustomerUpdateResponse
             {
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,

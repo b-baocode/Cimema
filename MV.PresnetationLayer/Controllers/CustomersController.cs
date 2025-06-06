@@ -124,7 +124,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPut("profile")]
-        public async Task<IActionResult> EditProfile([FromBody] CustomersRequest request)
+        public async Task<IActionResult> EditProfile([FromBody] CustomerUpdateRequest request)
         {
             try
             {
@@ -139,7 +139,7 @@ namespace MV.PresnetationLayer.Controllers
                     return NotFound("User not found");
 
                 return Ok(result);
-            }
+            }   
             catch (ValidationException ex)
             {
                 return BadRequest(ex.Message);
