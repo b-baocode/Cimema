@@ -19,7 +19,7 @@ namespace MV.ApplicationLayer.Services
             _UnitOfWork = unitOfWork;
         }
 
-        public async Task<CustomerUpdateResponse?> EditProfileAsync(CustomerUpdateRequest request)
+        public async Task<CustomersReponse?> EditProfileAsync(CustomersRequest request)
         {
             var user = await _UnitOfWork.userRepository.GetByIdAsync(request.Userid);
 
@@ -39,7 +39,7 @@ namespace MV.ApplicationLayer.Services
             _UnitOfWork.userRepository.Update(user);
             await _UnitOfWork.SaveChangesAsync();
 
-            return new CustomerUpdateResponse
+            return new CustomersReponse
             {
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
@@ -60,6 +60,23 @@ namespace MV.ApplicationLayer.Services
 
             return new CustomersReponse
             {
+                Fullname = user.Fullname,
+                Birthdate = user.Birthdate,
+                Gender = user.Gender,
+                Identitynumber = user.Identitynumber,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                Image = user.Image
+            };
+        }
+
+        public async Task<List<CustomersReponse>> GetAllCustomer()
+        {
+            var customers = await _UnitOfWork.userRepository.GetAllCustomer();
+
+            return customers.Select(user => new CustomersReponse
+            {
                 Userid = user.Userid,
                 Username = user.Username,
                 Password = user.Password,
@@ -70,28 +87,11 @@ namespace MV.ApplicationLayer.Services
                 Email = user.Email,
                 Phone = user.Phone,
                 Address = user.Address,
-                Image = user.Image,
-                Accumulatedpoints = user.Accumulatedpoints,
+                // Image = user.Image,
                 Joindate = user.Joindate,
-                Roleid = user.Roleid,
                 Status = user.Status,
-            };
-        }
-
-        public async Task<List<CustomersReponse>> GetAllCustomer()
-        {
-            var customers = await _UnitOfWork.userRepository.GetAllCustomer();
-
-            return customers.Select(user => new CustomersReponse
-            {
-                Fullname = user.Fullname,
-                Birthdate = user.Birthdate,
-                Gender = user.Gender,
-                Identitynumber = user.Identitynumber,
-                Email = user.Email,
-                Phone = user.Phone,
-                Address = user.Address,
-                Image = user.Image
+                Roleid = user.Roleid,
+                // ScoreHistory = user.scoreHistory
             }).ToList();
         }
 

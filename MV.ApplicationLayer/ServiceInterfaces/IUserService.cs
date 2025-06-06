@@ -10,7 +10,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
 {
    public interface IUserService
     {
-        Task<CustomerUpdateResponse> EditProfileAsync(CustomerUpdateRequest request);
+        Task<CustomersReponse> EditProfileAsync(CustomersRequest request);
         Task<CustomersReponse?> GetUserByIdAsync(string userId);
         Task<List<CustomersReponse>> GetAllCustomer();
         Task<IEnumerable<UserRepons>> GetAllUsersAsync();

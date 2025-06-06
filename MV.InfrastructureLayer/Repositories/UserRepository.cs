@@ -9,7 +9,6 @@ using MV.InfrastructureLayer.DBContext;
 using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -113,7 +112,7 @@ namespace MV.InfrastructureLayer.Repositories
                 Address = registerRequest.Address,
                 //Accumulatedpoints = 0,
                 Status = 1,
-                Roleid = 4,
+                Roleid = 1,
             };
 
             _context.Users.Add(newUser);
@@ -142,7 +141,26 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<List<User>> GetAllCustomer()
         {
             return await _context.Users
+                .Include(u => u.Role)
                 .Where(u => u.Roleid == 4) // chỉ lấy RoleID = 4 
+                .Select(u => new User
+                {
+                    Userid = u.Userid,
+                    Username = u.Username,
+                    Password = u.Password,
+                    Fullname = u.Fullname,
+                    Birthdate = u.Birthdate,
+                    Gender = u.Gender,
+                    Identitynumber = u.Identitynumber,
+                    Email = u.Email,
+                    Phone = u.Phone,
+                    Address = u.Address,
+                    // Image = u.Image,
+                    Joindate = u.Joindate,
+                    Status = u.Status,
+                    Roleid = u.Roleid,
+                    // ScoreHistory = user.scoreHistory
+                })
                 .ToListAsync();
         }
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -155,44 +173,26 @@ namespace MV.InfrastructureLayer.Repositories
         {
             _context.Users.Update(user);
         }
-        public async Task<List<User>> SearchUsersAsync(string? fullname, string? phone)
-        {
-            var query = _context.Users.AsQueryable();
 
-
-            if (!string.IsNullOrEmpty(phone))
-                query = query.Where(u => u.Phone != null && u.Phone.Contains(phone));
-
-            return await query.ToListAsync();
-        }
-
-
-        public async Task<List<User>> SearchByFullnameAsync(string fullname)
+        public async Task<List<User>> SearchUsersByFullnameAsync(string fullname)
         {
             return await _context.Users
-                .Where(cus => cus.Fullname != null && cus.Fullname.Contains(fullname))
+                .Where(u => u.Fullname.ToLower().Contains(fullname.ToLower()))
                 .ToListAsync();
-
         }
 
-       
         public async Task<List<User>> SearchByPhoneAsync(string phone)
         {
             return await _context.Users
                 .Where(u => u.Phone.Contains(phone))
                 .ToListAsync();
-
-
         }
 
         public async Task<List<User>> SearchByEmailAsync(string email)
         {
             return await _context.Users
-                .Where(u => u.Email.Contains(email))
-                .ToListAsync()
-                ;
-
-   
+                .Where(u => u.Email.ToLower().Contains(email.ToLower()))
+                .ToListAsync();
         }
 
         public async Task<bool> DeleteCustomerAsync(string id)

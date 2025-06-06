@@ -124,7 +124,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPut("profile")]
-        public async Task<IActionResult> EditProfile([FromBody] CustomerUpdateRequest request)
+        public async Task<IActionResult> EditProfile([FromBody] CustomersRequest request)
         {
             try
             {
@@ -137,68 +137,6 @@ namespace MV.PresnetationLayer.Controllers
                 var result = await _userService.EditProfileAsync(request);
                 if (result == null)
                     return NotFound("User not found");
-
-                return Ok(result);
-            }   
-            catch (ValidationException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An unexpected error occurred");
-            }
-
-
-        }
-
-
-        [HttpGet("Fullname")]
-        public async Task<IActionResult> SearchByFullname([FromQuery] string fullname)
-        {
-            var result = await _userService.SearchUsersByFullnameAsync(fullname);
-
-            if (result == null || result.Count == 0)
-                return NotFound("No users found with that name");
-
-            return Ok(result);
-        }
-
-
-        [HttpGet("Phone")]
-        public async Task<IActionResult> SearchByPhone([FromQuery] string phone)
-        {
-            var result = await _userService.SearchByPhoneAsync(phone);
-
-            if (result == null || result.Count == 0)
-                return NotFound("No customers found with that phone number.");
-
-            return Ok(result);
-        }
-
-        [HttpGet("Email")]
-        public async Task<IActionResult> SearchByEmail([FromQuery] string email)
-        {
-            var result = await _userService.SearchByEmailAsync(email);
-            if (result == null || result.Count == 0)
-                return NotFound("No customers found with that email.");
-
-            return Ok(result);
-        }
-
-
-        [HttpPut("profile")]
-        public async Task<IActionResult> EditProfile([FromBody] CustomerUpdateRequest request)
-        {
-            try
-            {
-                if (request == null)
-                    return BadRequest("Invalid request data");
-
-
-            var result = await _userService.EditProfileAsync(request);
-            if (result == null)
-                return NotFound("User not found");
 
                 return Ok(result);
             }
