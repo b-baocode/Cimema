@@ -19,7 +19,7 @@ namespace MV.ApplicationLayer.Services
             _UnitOfWork = unitOfWork;
         }
 
-        public async Task<CustomerUpdateResponse> EditProfileAsync(CustomerUpdateRequest request)
+        public async Task<CustomerUpdateResponse?> EditProfileAsync(CustomerUpdateRequest request)
         {
             var user = await _UnitOfWork.userRepository.GetByIdAsync(request.Userid);
 
@@ -60,6 +60,9 @@ namespace MV.ApplicationLayer.Services
 
             return new CustomersReponse
             {
+                Userid = user.Userid,
+                Username = user.Username,
+                Password = user.Password,
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -67,7 +70,11 @@ namespace MV.ApplicationLayer.Services
                 Email = user.Email,
                 Phone = user.Phone,
                 Address = user.Address,
-                Image = user.Image
+                Image = user.Image,
+                Accumulatedpoints = user.Accumulatedpoints,
+                Joindate = user.Joindate,
+                Roleid = user.Roleid,
+                Status = user.Status,
             };
         }
 

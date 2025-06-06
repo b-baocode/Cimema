@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class CustomerUpdateResponse
+
     {
         public string Userid { get; set; } = null!;
         public string? Fullname { get; set; }
