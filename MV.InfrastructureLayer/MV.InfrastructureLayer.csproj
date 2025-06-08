@@ -22,6 +22,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="9.0.3" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
+    <PackageReference Include="FirebaseStorage.net" Version="4.0.0" />
+    <PackageReference Include="Google.Apis.Auth" Version="1.60.0" />
   </ItemGroup>
 
   <ItemGroup>
