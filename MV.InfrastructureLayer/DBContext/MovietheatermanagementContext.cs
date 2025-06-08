@@ -92,9 +92,9 @@ public partial class MovietheatermanagementContext : DbContext
         {
             entity.HasKey(e => e.MovieId).HasName("Movies_pkey");
 
-            entity.Property(e => e.MovieId)
-                .UseIdentityColumn()
-                .HasColumnName("MovieId");
+            //entity.Property(e => e.MovieId)
+            //    .UseIdentityColumn()
+            //    .HasColumnName("MovieId");
 
             entity.HasIndex(e => e.Title, "Movies_Title_key").IsUnique();
 

@@ -95,11 +95,46 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<Movie> CreateMovieAsync(Movie movie)
         {
+            //try
+            //{
+            //    // First check if the movie with this title already exists
+            //    var existingMovie = await _context.Movies
+            //        .FirstOrDefaultAsync(m => m.Title == movie.Title);
+
+            //    if (existingMovie != null)
+            //    {
+            //        throw new InvalidOperationException($"A movie with title '{movie.Title}' already exists.");
+            //    }
+
+            //    _context.Movies.Add(movie);
+            //    await _context.SaveChangesAsync();
+
+            //    // Reload the movie to get the generated ID and ensure all relationships are loaded
+            //    var createdMovie = await _context.Movies
+            //        .Include(m => m.Genres)
+            //        .FirstOrDefaultAsync(m => m.Title == movie.Title);
+
+            //    if (createdMovie == null)
+            //    {
+            //        throw new InvalidOperationException("Movie was created but could not be retrieved.");
+            //    }
+
+            //    return createdMovie;
+            //}
+            //catch (Exception ex)
+            //{
+            //    // Log the error
+            //    Console.WriteLine($"Error in CreateMovieAsync: {ex.Message}");
+            //    if (ex.InnerException != null)
+            //    {
+            //        Console.WriteLine($"Inner error: {ex.InnerException.Message}");
+            //    }
+            //    throw;
+            //}
+
             _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
-            return await _context.Movies
-                .Include(m => m.Genres)
-                .FirstOrDefaultAsync(m => m.MovieId == movie.MovieId);
+            return movie;
         }
 
         public async Task<Movie> UpdateMovieAsync(Movie movie)

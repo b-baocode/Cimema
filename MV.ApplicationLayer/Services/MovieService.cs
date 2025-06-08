@@ -57,15 +57,16 @@ namespace MV.ApplicationLayer.Services
             if (await _unitOfWork.movieRepository.IsTitleExistsAsync(request.Title))
                 throw new ValidationException("A movie with this title already exists");
 
-            // Get the next available MovieId
+            // Get the last movie ID and increment it
             var lastMovie = await _unitOfWork.movieRepository.GetLastMovieAsync();
-            var nextMovieId = (lastMovie?.MovieId ?? 0) + 1;
+            var newMovieId = lastMovie?.MovieId + 1 ?? 1;
 
             var movie = new Movie
             {
-                MovieId = nextMovieId,
+                MovieId = newMovieId,
                 Title = request.Title,
-                Poster = request.Poster,
+                // Poster = request.Poster,
+                Poster = "e",
                 PublishDate = request.PublishDate,
                 FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Unspecified),
                 ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Unspecified),
@@ -86,8 +87,23 @@ namespace MV.ApplicationLayer.Services
             
             movie.Genres = genres.ToList();
 
-            var createdMovie = await _unitOfWork.movieRepository.CreateMovieAsync(movie);
-            return MapToResponse(createdMovie);
+            try
+            {
+                // Add Movie
+                var createdMovie = await _unitOfWork.movieRepository.CreateMovieAsync(movie);
+                return MapToResponse(createdMovie);
+            }
+            catch (Exception ex)
+            {
+                // Log the actual error
+                Console.WriteLine($"Error creating movie: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner error: {ex.InnerException.Message}");
+                    throw new ValidationException($"Failed to create movie: {ex.InnerException.Message}");
+                }
+                throw new ValidationException($"Failed to create movie: {ex.Message}");
+            }
         }
 
         public async Task<MovieResponse> UpdateMovieAsync(int id, MovieUpdateRequest request)
@@ -222,19 +238,33 @@ namespace MV.ApplicationLayer.Services
 
         private void ValidateDates(DateTime fromDate, DateTime toDate, DateOnly? publishDate)
         {
-            if (fromDate >= toDate)
+            // Convert to Vietnam timezone (UTC+7)
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var currentVietnamTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, vietnamTimeZone);
+            var fromDateVietnam = TimeZoneInfo.ConvertTime(fromDate, vietnamTimeZone);
+            var toDateVietnam = TimeZoneInfo.ConvertTime(toDate, vietnamTimeZone);
+
+            if (fromDateVietnam >= toDateVietnam)
             {
                 throw new ValidationException("From date must be before to date");
             }
 
-            if (fromDate < DateTime.Now && fromDate.Date != DateTime.Now.Date)
+            // Allow same day but not past dates
+            if (fromDateVietnam.Date < currentVietnamTime.Date)
             {
                 throw new ValidationException("From date cannot be in the past");
             }
 
-            if (publishDate.HasValue && publishDate.Value > DateOnly.FromDateTime(toDate))
+            if (publishDate.HasValue)
             {
-                throw new ValidationException("Publish date cannot be after to date");
+                var publishDateVietnam = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(
+                    publishDate.Value.ToDateTime(TimeOnly.MinValue), 
+                    vietnamTimeZone));
+                
+                if (publishDateVietnam > DateOnly.FromDateTime(toDateVietnam))
+                {
+                    throw new ValidationException("Publish date cannot be after to date");
+                }
             }
         }
 
