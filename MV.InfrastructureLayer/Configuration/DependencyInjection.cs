@@ -30,6 +30,17 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IEmployeeService, EmployeeService>();
 
+            // Add Movie services
+            services.AddScoped<IMovieRepository, MovieRepository>();
+            services.AddScoped<IMovieService, MovieService>();
+
+            // Add Genre services
+            services.AddScoped<IGenreRepository, GenreRepository>();
+
+            // Add Promotion services
+            services.AddScoped<IPromotionRepository, PromotionRepository>();
+            services.AddScoped<IPromotionService, PromotionService>();
+
             // Configure SmtpSettings
             services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
 
