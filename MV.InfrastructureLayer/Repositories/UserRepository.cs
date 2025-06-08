@@ -177,21 +177,21 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<List<User>> SearchUsersByFullnameAsync(string fullname)
         {
             return await _context.Users
-                .Where(u => u.Fullname.ToLower().Contains(fullname.ToLower()))
+                .Where(u => u.Fullname.ToLower().Contains(fullname.ToLower()) && u.Roleid == 4)
                 .ToListAsync();
         }
 
         public async Task<List<User>> SearchByPhoneAsync(string phone)
         {
             return await _context.Users
-                .Where(u => u.Phone.Contains(phone))
+                .Where(u => u.Phone.Contains(phone) && u.Roleid == 4)
                 .ToListAsync();
         }
 
         public async Task<List<User>> SearchByEmailAsync(string email)
         {
             return await _context.Users
-                .Where(u => u.Email.ToLower().Contains(email.ToLower()))
+                .Where(u => u.Email.ToLower().Contains(email.ToLower())&& u.Roleid == 4)
                 .ToListAsync();
         }
 

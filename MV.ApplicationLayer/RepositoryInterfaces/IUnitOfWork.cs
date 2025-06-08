@@ -10,10 +10,12 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
     {
         //Repo interfaces
         IUserRepository userRepository { get; }
+        IEmployeeRepository employeeRepository { get; }
+        IMovieRepository movieRepository { get; }
+        IGenreRepository genreRepository { get; }
+        IPromotionRepository promotionRepository { get; }
 
         //Single commit point
         Task<int> SaveChangesAsync();
-
-        IEmployeeRepository employeeRepository { get; }
     }
 }

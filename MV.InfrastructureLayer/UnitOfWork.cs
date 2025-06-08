@@ -20,6 +20,17 @@ namespace MV.InfrastructureLayer
         public IEmployeeRepository employeeRepository =>
        _employeeRepository ??= new EmployeeRepository(_context);
 
+        private IMovieRepository _movieRepository;
+        public IMovieRepository movieRepository =>
+            _movieRepository ??= new MovieRepository(_context);
+
+        private IGenreRepository _genreRepository;
+        public IGenreRepository genreRepository =>
+            _genreRepository ??= new GenreRepository(_context);
+
+        private IPromotionRepository _promotionRepository;
+        public IPromotionRepository promotionRepository =>
+            _promotionRepository ??= new PromotionRepository(_context);
 
         // Repository fields should be of the INTERFACE type
         private IUserRepository _userRepository;

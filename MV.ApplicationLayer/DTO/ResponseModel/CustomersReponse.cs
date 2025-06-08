@@ -10,7 +10,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
     public class CustomersReponse
     {
         [JsonPropertyName("userid")]
-        public string Userid { get; set; } = null!;
+        public string Userid { get; set; }
 
         [JsonPropertyName("username")]
         public string? Username { get; set; }
