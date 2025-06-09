@@ -188,7 +188,7 @@ namespace MV.ApplicationLayer.Services
         {
             var movies = await _unitOfWork.movieRepository.GetMoviesByCustomerCriteriaAsync(
                 request.Title,
-                request.Poster,
+                request.Genre,
                 request.Actors,
                 request.PublishDate,
                 (request.Page - 1) * request.PageSize,
@@ -196,7 +196,7 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.movieRepository.GetTotalMoviesByCustomerCriteriaAsync(
                 request.Title,
-                request.Poster,
+                request.Genre,
                 request.Actors,
                 request.PublishDate);
 

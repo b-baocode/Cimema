@@ -20,7 +20,9 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<IEnumerable<Promotion>> GetPromotionsAsync(string? keyword, int skip, int take)
         {
-            var query = _context.Promotions.AsQueryable();
+            var query = _context.Promotions
+                .Where(p => p.Status != "UnActive")
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -38,7 +40,9 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<int> GetTotalPromotionsAsync(string? keyword)
         {
-            var query = _context.Promotions.AsQueryable();
+            var query = _context.Promotions
+                .Where(p => p.Status != "UnActive")
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -87,7 +91,8 @@ namespace MV.InfrastructureLayer.Repositories
                 {
                     throw new InvalidOperationException("Cannot delete promotion because it is associated with ticket invoices.");
                 }
-                _context.Promotions.Remove(promotion);
+                promotion.Status = "UnActive";
+                _context.Promotions.Update(promotion);
                 await _context.SaveChangesAsync();
             }
         }
