@@ -37,6 +37,8 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddSingleton<IPasswordRepository, PasswordRepository>();
+            services.AddScoped<IRoomRepository, RoomRepository>();
+            services.AddScoped<ISeatRepository, SeatRepository>();
 
 
             //Service injection
@@ -44,6 +46,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoomService, RoomService>();
 
 
             //Unit of work

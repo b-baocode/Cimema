@@ -10,6 +10,8 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
     {
         //Repo interfaces
         IUserRepository userRepository { get; }
+        IRoomRepository roomRepository { get; }
+        ISeatRepository seatRepository { get; }
 
         //Single commit point
         Task<int> SaveChangesAsync();
