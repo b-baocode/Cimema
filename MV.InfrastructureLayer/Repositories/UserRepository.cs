@@ -174,27 +174,7 @@ namespace MV.InfrastructureLayer.Repositories
             _context.Users.Update(user);
         }
 
-        public async Task<List<User>> SearchUsersByFullnameAsync(string fullname)
-        {
-            return await _context.Users
-                .Where(u => u.Fullname.ToLower().Contains(fullname.ToLower()) && u.Roleid == 4)
-                .ToListAsync();
-        }
-
-        public async Task<List<User>> SearchByPhoneAsync(string phone)
-        {
-            return await _context.Users
-                .Where(u => u.Phone.Contains(phone) && u.Roleid == 4)
-                .ToListAsync();
-        }
-
-        public async Task<List<User>> SearchByEmailAsync(string email)
-        {
-            return await _context.Users
-                .Where(u => u.Email.ToLower().Contains(email.ToLower())&& u.Roleid == 4)
-                .ToListAsync();
-        }
-
+       
         public async Task<bool> DeleteCustomerAsync(string id)
         {
             var customer = await _context.Users.FindAsync(id);
@@ -211,6 +191,46 @@ namespace MV.InfrastructureLayer.Repositories
             _context.Users.Add(customer);
             await _context.SaveChangesAsync();
             return customer;
+        }
+
+        public async Task<IEnumerable<User>> GetUsersAsync(string? keyword, int skip, int take)
+        {
+            var query = _context.Users
+                .Include(u => u.Role)
+                .Where(u => u.Roleid == 4); // Chỉ lấy Customer (RoleId = 4)
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower();
+                query = query.Where(u =>
+                    u.Fullname.ToLower().Contains(keyword) ||
+                   // u.Identitynumber.ToLower().Contains(keyword) ||
+                    u.Email.ToLower().Contains(keyword) ||
+                    u.Phone.ToLower().Contains(keyword));
+            }
+
+            return await query
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalUsersAsync(string? keyword)
+        {
+            var query = _context.Users
+                .Where(u => u.Roleid == 4 ); // Chỉ đếm Customer (RoleId = 4)
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower();
+                query = query.Where(u =>
+                    u.Fullname.ToLower().Contains(keyword) ||
+                   // u.Identitynumber.ToLower().Contains(keyword) ||
+                    u.Email.ToLower().Contains(keyword) ||
+                    u.Phone.ToLower().Contains(keyword));
+            }
+
+            return await query.CountAsync();
         }
     }
 }

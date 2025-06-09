@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
+using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services;
 
@@ -63,65 +64,8 @@ namespace MV.PresnetationLayer.Controllers
             }
         }
 
-        [HttpGet("search/fullname")]
-        public async Task<IActionResult> SearchByFullname([FromQuery] string fullname)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(fullname))
-                    return BadRequest("Fullname search parameter is required");
-
-                var result = await _userService.SearchUsersByFullnameAsync(fullname);
-                if (result == null || !result.Any())
-                    return NotFound("No users found with that name");
-
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An unexpected error occurred");
-            }
-        }
-
-        [HttpGet("search/phone")]
-        public async Task<IActionResult> SearchByPhone([FromQuery] string phone)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(phone))
-                    return BadRequest("Phone number search parameter is required");
-
-                var result = await _userService.SearchByPhoneAsync(phone);
-                if (result == null || !result.Any())
-                    return NotFound("No customers found with that phone number");
-
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An unexpected error occurred");
-            }
-        }
-
-        [HttpGet("search/email")]
-        public async Task<IActionResult> SearchByEmail([FromQuery] string email)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(email))
-                    return BadRequest("Email search parameter is required");
-
-                var result = await _userService.SearchByEmailAsync(email);
-                if (result == null || !result.Any())
-                    return NotFound("No customers found with that email");
-
-                return Ok(result);
-            }
-            catch (Exception)
-            {
-                return StatusCode(500, "An unexpected error occurred");
-            }
-        }
+       
+        
 
         [HttpPut("profile")]
         public async Task<IActionResult> EditProfile([FromBody] CustomersRequest request)
@@ -207,5 +151,20 @@ namespace MV.PresnetationLayer.Controllers
                 return StatusCode(500, "An unexpected error occurred");
             }
         }
-    }
-}
+
+        [HttpGet("search")]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<ActionResult<PagedResult<CustomersReponse>>> SearchUsers(
+            [FromQuery] UserSearchRequest request)
+        {
+            try
+            {
+                var result = await _userService.GetUsersAsync(request);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An unexpected error occurred");
+            }
+        }
+    } }
