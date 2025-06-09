@@ -26,14 +26,17 @@ namespace MV.InfrastructureLayer.Repositories
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                keyword = keyword.ToLower();
+                keyword = keyword.ToLower().Trim();
                 query = query.Where(m =>
-                    m.Title.ToLower().Contains(keyword) ||
-                    m.Director.ToLower().Contains(keyword) ||
-                    m.Actors.ToLower().Contains(keyword) ||
-                    m.Studio.ToLower().Contains(keyword) ||
-                    m.Poster.ToLower().Contains(keyword) ||
-                    m.PublishDate.ToString().ToLower().Contains(keyword));
+                    EF.Functions.Like(m.Title.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
+                    // m.Title.ToLower().Contains(keyword) ||
+                    // m.Director.ToLower().Contains(keyword) ||
+                    // m.Actors.ToLower().Contains(keyword) ||
+                    // m.Studio.ToLower().Contains(keyword) ||
+                    // m.PublishDate.ToString().ToLower().Contains(keyword));
             }
 
             return await query
@@ -41,6 +44,7 @@ namespace MV.InfrastructureLayer.Repositories
                 .Take(take)
                 .ToListAsync();
         }
+        
 
         public async Task<int> GetTotalMoviesAsync(string? keyword)
         {
@@ -48,14 +52,17 @@ namespace MV.InfrastructureLayer.Repositories
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
-                keyword = keyword.ToLower();
+                keyword = keyword.ToLower().Trim();
                 query = query.Where(m =>
-                    m.Title.ToLower().Contains(keyword) ||
-                    m.Director.ToLower().Contains(keyword) ||
-                    m.Actors.ToLower().Contains(keyword) ||
-                    m.Studio.ToLower().Contains(keyword) ||
-                    m.Poster.ToLower().Contains(keyword) ||
-                    m.PublishDate.ToString().ToLower().Contains(keyword));
+                    EF.Functions.Like(m.Title.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
+                    // m.Title.ToLower().Contains(keyword) ||
+                    // m.Director.ToLower().Contains(keyword) ||
+                    // m.Actors.ToLower().Contains(keyword) ||
+                    // m.Studio.ToLower().Contains(keyword) ||
+                    // m.PublishDate.ToString().ToLower().Contains(keyword));
             }
 
             return await query.CountAsync();
@@ -169,7 +176,7 @@ namespace MV.InfrastructureLayer.Repositories
                 .FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<Movie>> GetMoviesByCustomerCriteriaAsync(string? title, string? poster, string? actors, DateOnly? publishDate, int skip, int take)
+        public async Task<IEnumerable<Movie>> GetMoviesByCustomerCriteriaAsync(string? title, string? genre, string? actors, DateOnly? publishDate, int skip, int take)
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
@@ -180,9 +187,9 @@ namespace MV.InfrastructureLayer.Repositories
                 query = query.Where(m => m.Title.ToLower().Contains(title.ToLower()));
             }
 
-            if (!string.IsNullOrWhiteSpace(poster))
+            if (!string.IsNullOrWhiteSpace(genre))
             {
-                query = query.Where(m => m.Poster.ToLower().Contains(poster.ToLower()));
+                query = query.Where(m => m.Genres.Any(g => g.Name.ToLower().Contains(genre.ToLower())));
             }
 
             if (!string.IsNullOrWhiteSpace(actors))
@@ -201,18 +208,20 @@ namespace MV.InfrastructureLayer.Repositories
                 .ToListAsync();
         }
 
-        public async Task<int> GetTotalMoviesByCustomerCriteriaAsync(string? title, string? poster, string? actors, DateOnly? publishDate)
+        public async Task<int> GetTotalMoviesByCustomerCriteriaAsync(string? title, string? genre, string? actors, DateOnly? publishDate)
         {
-            var query = _context.Movies.AsQueryable();
+            var query = _context.Movies
+                .Include(m => m.Genres)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(title))
             {
                 query = query.Where(m => m.Title.ToLower().Contains(title.ToLower()));
             }
 
-            if (!string.IsNullOrWhiteSpace(poster))
+            if (!string.IsNullOrWhiteSpace(genre))
             {
-                query = query.Where(m => m.Poster.ToLower().Contains(poster.ToLower()));
+                query = query.Where(m => m.Genres.Any(g => g.Name.ToLower().Contains(genre.ToLower())));
             }
 
             if (!string.IsNullOrWhiteSpace(actors))
