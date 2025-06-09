@@ -8,20 +8,24 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace MV.ApplicationLayer.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUnitOfWork _UnitOfWork;
-        public UserService(IUnitOfWork unitOfWork)
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IFirebaseStorageService _firebaseStorageService;
+
+        public UserService(IUnitOfWork unitOfWork, IFirebaseStorageService firebaseStorageService)
         {
-            _UnitOfWork = unitOfWork;
+            _unitOfWork = unitOfWork;
+            _firebaseStorageService = firebaseStorageService;
         }
 
         public async Task<CustomersReponse?> EditProfileAsync(CustomersRequest request)
         {
-            var user = await _UnitOfWork.userRepository.GetByIdAsync(request.Userid);
+            var user = await _unitOfWork.userRepository.GetByIdAsync(request.Userid);
 
             if (user == null)
                 return null;
@@ -36,8 +40,8 @@ namespace MV.ApplicationLayer.Services
             user.Address = request.Address;
             user.Image = request.Image;
 
-            _UnitOfWork.userRepository.Update(user);
-            await _UnitOfWork.SaveChangesAsync();
+            _unitOfWork.userRepository.Update(user);
+            await _unitOfWork.SaveChangesAsync();
 
             return new CustomersReponse
             {
@@ -54,7 +58,7 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<CustomersReponse?> GetUserByIdAsync(string userId)
         {
-            var user = await _UnitOfWork.userRepository.GetByIdAsync(userId);
+            var user = await _unitOfWork.userRepository.GetByIdAsync(userId);
 
             if (user == null) return null;
 
@@ -73,7 +77,7 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<List<CustomersReponse>> GetAllCustomer()
         {
-            var customers = await _UnitOfWork.userRepository.GetAllCustomer();
+            var customers = await _unitOfWork.userRepository.GetAllCustomer();
 
             return customers.Select(user => new CustomersReponse
             {
@@ -95,10 +99,10 @@ namespace MV.ApplicationLayer.Services
             }).ToList();
         }
 
-        public async Task<IEnumerable<UserRepons>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserResponse>> GetAllUsersAsync()
         {
-            var users = await _UnitOfWork.userRepository.GetAllUsersAsync();
-            var userResponses = users.Select(u => new UserRepons
+            var users = await _unitOfWork.userRepository.GetAllUsersAsync();
+            var userResponses = users.Select(u => new UserResponse
             {
                 Userid = u.Userid,
                 Fullname = u.Fullname,
@@ -118,7 +122,7 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<List<CustomersReponse>> SearchUsersByFullnameAsync(string fullname)
         {
-            var users = await _UnitOfWork.userRepository.SearchUsersByFullnameAsync(fullname);
+            var users = await _unitOfWork.userRepository.SearchUsersByFullnameAsync(fullname);
             return users.Select(user => new CustomersReponse
             {
                 Fullname = user.Fullname,
@@ -134,7 +138,7 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<List<CustomersReponse>> SearchByPhoneAsync(string phone)
         {
-            var users = await _UnitOfWork.userRepository.SearchByPhoneAsync(phone);
+            var users = await _unitOfWork.userRepository.SearchByPhoneAsync(phone);
             return users.Select(user => new CustomersReponse
             {
                 Fullname = user.Fullname,
@@ -150,7 +154,7 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<List<CustomersReponse>> SearchByEmailAsync(string email)
         {
-            var users = await _UnitOfWork.userRepository.SearchByEmailAsync(email);
+            var users = await _unitOfWork.userRepository.SearchByEmailAsync(email);
             return users.Select(user => new CustomersReponse
             {
                 Fullname = user.Fullname,
@@ -166,7 +170,7 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<bool> DeleteCustomerAsync(string id)
         {
-            return await _UnitOfWork.userRepository.DeleteCustomerAsync(id);
+            return await _unitOfWork.userRepository.DeleteCustomerAsync(id);
         }
 
         public async Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request)
@@ -187,8 +191,8 @@ namespace MV.ApplicationLayer.Services
                 Joindate = DateTime.Now
             };
 
-            var createdUser = await _UnitOfWork.userRepository.CreateCustomerAsync(user);
-            await _UnitOfWork.SaveChangesAsync();
+            var createdUser = await _unitOfWork.userRepository.CreateCustomerAsync(user);
+            await _unitOfWork.SaveChangesAsync();
 
             return new CustomersReponse
             {
@@ -200,6 +204,78 @@ namespace MV.ApplicationLayer.Services
                 Phone = createdUser.Phone,
                 Address = createdUser.Address,
                 Image = createdUser.Image
+            };
+        }
+
+        public async Task<UserResponse> UpdateUserAsync(string id, UserRequest request)
+        {
+            var user = await _unitOfWork.userRepository.GetByIdAsync(id);
+            if (user == null)
+                throw new ValidationException("User not found");
+
+            // Update avatar if provided
+            if (!string.IsNullOrEmpty(request.Image))
+            {
+                var imageBytes = Convert.FromBase64String(request.Image);
+                var fileName = $"user_{id}_{DateTime.UtcNow.Ticks}.jpg";
+                user.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, user.Image);
+            }
+
+            // Update other user information
+            user.Fullname = request.Fullname;
+            user.Birthdate = request.Birthdate;
+            user.Gender = request.Gender;
+            user.Identitynumber = request.Identitynumber;
+            user.Email = request.Email;
+            user.Phone = request.Phone;
+            user.Address = request.Address;
+            user.Roleid = request.Roleid;
+            user.Status = request.Status;
+
+            _unitOfWork.userRepository.Update(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            return MapToResponse(user);
+        }
+
+        public async Task DeleteUserAsync(string id)
+        {
+            var user = await _unitOfWork.userRepository.GetByIdAsync(id);
+            if (user == null)
+                throw new ValidationException("User not found");
+
+            try
+            {
+                // Delete user avatar from Firebase Storage
+                if (!string.IsNullOrEmpty(user.Image))
+                {
+                    await _firebaseStorageService.DeleteImageAsync(user.Image);
+                }
+                
+                // Delete user from database
+                await _unitOfWork.userRepository.DeleteCustomerAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting user: {ex.Message}");
+            }
+        }
+
+        private UserResponse MapToResponse(User user)
+        {
+            return new UserResponse
+            {
+                Userid = user.Userid,
+                Fullname = user.Fullname,
+                Birthdate = user.Birthdate,
+                Gender = user.Gender,
+                Identitynumber = user.Identitynumber,
+                Email = user.Email,
+                Phone = user.Phone,
+                Address = user.Address,
+                Image = user.Image,
+                Roleid = user.Roleid,
+                Status = user.Status
             };
         }
     }

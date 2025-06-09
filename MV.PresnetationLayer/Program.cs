@@ -1,5 +1,10 @@
 using Microsoft.OpenApi.Models;
 using MV.InfrastructureLayer.Configuration;
+using MV.ApplicationLayer.ServiceInterfaces;
+using MV.ApplicationLayer.Services;
+using MV.InfrastructureLayer;
+using MV.InfrastructureLayer.Repositories;
+using MV.ApplicationLayer.RepositoryInterfaces;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -64,6 +69,11 @@ builder.Services.AddSwaggerGen(options =>
 // Configure JWT Authentication using the extension method
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IMovieService, MovieService>();
+builder.Services.AddScoped<IPromotionService, PromotionService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
 
 var app = builder.Build();
 

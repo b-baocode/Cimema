@@ -10,14 +10,16 @@ namespace MV.ApplicationLayer.ServiceInterfaces
 {
    public interface IUserService
     {
-        Task<CustomersReponse> EditProfileAsync(CustomersRequest request);
+        Task<CustomersReponse?> EditProfileAsync(CustomersRequest request);
         Task<CustomersReponse?> GetUserByIdAsync(string userId);
         Task<List<CustomersReponse>> GetAllCustomer();
-        Task<IEnumerable<UserRepons>> GetAllUsersAsync();
+        Task<IEnumerable<UserResponse>> GetAllUsersAsync();
         Task<List<CustomersReponse>> SearchUsersByFullnameAsync(string fullname);
         Task<List<CustomersReponse>> SearchByPhoneAsync(string phone);
         Task<List<CustomersReponse>> SearchByEmailAsync(string email);
         Task<bool> DeleteCustomerAsync(string id);
         Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request);
+        Task<UserResponse> UpdateUserAsync(string id, UserRequest request);
+        Task DeleteUserAsync(string id);
     }
 }
