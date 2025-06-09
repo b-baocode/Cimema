@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -142,7 +143,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Roleid == 4) // chỉ lấy RoleID = 4 
+                .Where(u => u.Roleid == 4 && u.Status == 1) // chỉ lấy RoleID = 4 và Status = Active (1 for integer)
                 .Select(u => new User
                 {
                     Userid = u.Userid,
@@ -177,33 +178,46 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<List<User>> SearchUsersByFullnameAsync(string fullname)
         {
             return await _context.Users
-                .Where(u => u.Fullname.ToLower().Contains(fullname.ToLower()) && u.Roleid == 4)
+                .Where(u => u.Fullname.ToLower().Contains(fullname.ToLower()) && u.Roleid == 4 && u.Status == 1)
                 .ToListAsync();
         }
 
         public async Task<List<User>> SearchByPhoneAsync(string phone)
         {
             return await _context.Users
-                .Where(u => u.Phone.Contains(phone) && u.Roleid == 4)
+                .Where(u => u.Phone.Contains(phone) && u.Roleid == 4 && u.Status == 1)
                 .ToListAsync();
         }
 
         public async Task<List<User>> SearchByEmailAsync(string email)
         {
             return await _context.Users
-                .Where(u => u.Email.ToLower().Contains(email.ToLower())&& u.Roleid == 4)
+                .Where(u => u.Email.ToLower().Contains(email.ToLower()) && u.Roleid == 4 && u.Status == 1)
                 .ToListAsync();
         }
 
         public async Task<bool> DeleteCustomerAsync(string id)
         {
             var customer = await _context.Users.FindAsync(id);
-            if (customer == null)
+            // Soft Delete
+            if (customer != null)
+            {
+                customer.Status = 0; // Set Status to InActive (0 for integer)
+                _context.Users.Update(customer);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            return false;
+
+            // Hard Delete
+            /*
+                if (customer == null)
                 return false;
 
-            _context.Users.Remove(customer);
-            await _context.SaveChangesAsync();
-            return true;
+                _context.Users.Remove(customer);
+                await _context.SaveChangesAsync();
+                return true;
+            */
         }
 
         public async Task<User> CreateCustomerAsync(User customer)
