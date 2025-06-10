@@ -13,6 +13,8 @@ public partial class TicketDetail
 
     public int? InvoiceId { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual TicketInvoice? Invoice { get; set; }
 
     public virtual Seat Seat { get; set; } = null!;

@@ -11,5 +11,7 @@ public partial class SeatType
 
     public decimal SeatTypePrice { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual ICollection<Seat> Seats { get; set; } = new List<Seat>();
 }

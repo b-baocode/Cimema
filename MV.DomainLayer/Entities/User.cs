@@ -33,7 +33,11 @@ public partial class User
 
     public int? Roleid { get; set; }
 
+    public virtual ICollection<CommentRating> CommentRatings { get; set; } = new List<CommentRating>();
+
     public virtual Role? Role { get; set; }
+
+    public virtual Score? Score { get; set; }
 
     public virtual ICollection<TicketInvoice> TicketInvoices { get; set; } = new List<TicketInvoice>();
 }
