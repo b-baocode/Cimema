@@ -14,10 +14,12 @@ namespace MV.ApplicationLayer.Services
     public class PromotionService : IPromotionService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFirebaseStorageService _firebaseStorageService;
 
-        public PromotionService(IUnitOfWork unitOfWork)
+        public PromotionService(IUnitOfWork unitOfWork, IFirebaseStorageService firebaseStorageService)
         {
             _unitOfWork = unitOfWork;
+            _firebaseStorageService = firebaseStorageService;
         }
 
         public async Task<PagedResult<PromotionResponse>> GetPromotionsAsync(PromotionSearchRequest request)
@@ -61,12 +63,24 @@ namespace MV.ApplicationLayer.Services
             var lastPromotion = await _unitOfWork.promotionRepository.GetLastPromotionAsync();
             var newPromotionId = lastPromotion?.PromotionId + 1 ?? 1;
 
+            // Upload image to Firebase Storage
+            string imageUrl;
+            if (!string.IsNullOrEmpty(request.Image))
+            {
+                var imageBytes = Convert.FromBase64String(request.Image);
+                var fileName = $"promotion_{newPromotionId}_{DateTime.UtcNow.Ticks}.jpg";
+                imageUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+            }
+            else
+            {
+                throw new ValidationException("Image is required");
+            }
+
             var promotion = new Promotion
             {
                 PromotionId = newPromotionId,
                 PromotionName = request.PromotionName,
-                // Image = request.Image,
-                Image = "e",
+                Image = imageUrl,
                 StartDate = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Unspecified),
                 EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Unspecified),
                 DiscountRate = (decimal)request.DiscountRate,
@@ -74,8 +88,17 @@ namespace MV.ApplicationLayer.Services
                 Status = request.Status
             };
 
+            try
+            {
             var createdPromotion = await _unitOfWork.promotionRepository.CreatePromotionAsync(promotion);
             return MapToResponse(createdPromotion);
+            }
+            catch (Exception ex)
+            {
+                // If promotion creation fails, delete the uploaded image
+                await _firebaseStorageService.DeleteImageAsync(imageUrl);
+                throw new Exception($"Error creating promotion: {ex.Message}");
+            }
         }
 
         public async Task<PromotionResponse> UpdatePromotionAsync(int id, PromotionUpdateRequest request)
@@ -92,10 +115,16 @@ namespace MV.ApplicationLayer.Services
                 promotion.PromotionName != request.PromotionName)
                 throw new ValidationException("A promotion with this name already exists.");
 
+            // Update image if provided
+            if (!string.IsNullOrEmpty(request.Image))
+            {
+                var imageBytes = Convert.FromBase64String(request.Image);
+                var fileName = $"promotion_{id}_{DateTime.UtcNow.Ticks}.jpg";
+                promotion.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, promotion.Image);
+            }
+
             // Update basic information
             promotion.PromotionName = request.PromotionName;
-            //promotion.Image = request.Image;
-            promotion.Image = "e";
             promotion.StartDate = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Unspecified);
             promotion.EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Unspecified);
             promotion.DiscountRate = (decimal)request.DiscountRate;
@@ -116,7 +145,18 @@ namespace MV.ApplicationLayer.Services
             if (promotion.StartDate <= DateTime.Now && promotion.EndDate >= DateTime.Now)
                 throw new ValidationException("Cannot delete an active promotion.");
 
+            try
+            {
+                // Delete promotion image from Firebase Storage
+                await _firebaseStorageService.DeleteImageAsync(promotion.Image);
+                
+                // Delete promotion from database
             await _unitOfWork.promotionRepository.DeletePromotionAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting promotion: {ex.Message}");
+            }
         }
 
         private PromotionResponse MapToResponse(Promotion promotion)

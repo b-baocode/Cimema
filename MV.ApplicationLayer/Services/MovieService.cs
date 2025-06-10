@@ -14,10 +14,12 @@ namespace MV.ApplicationLayer.Services
     public class MovieService : IMovieService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IFirebaseStorageService _firebaseStorageService;
 
-        public MovieService(IUnitOfWork unitOfWork)
+        public MovieService(IUnitOfWork unitOfWork, IFirebaseStorageService firebaseStorageService)
         {
             _unitOfWork = unitOfWork;
+            _firebaseStorageService = firebaseStorageService;
         }
 
         public async Task<PagedResult<MovieResponse>> GetMoviesAsync(MovieSearchRequest request)
@@ -61,12 +63,31 @@ namespace MV.ApplicationLayer.Services
             var lastMovie = await _unitOfWork.movieRepository.GetLastMovieAsync();
             var newMovieId = lastMovie?.MovieId + 1 ?? 1;
 
+            // Upload poster to Firebase Storage
+            string posterUrl;
+            if (!string.IsNullOrEmpty(request.Poster))
+            {
+                // Remove data URL prefix if exists
+                string base64Data = request.Poster;
+                if (base64Data.Contains(","))
+                {
+                    base64Data = base64Data.Split(',')[1];
+                }
+
+                var imageBytes = Convert.FromBase64String(base64Data);
+                var fileName = $"movie_{newMovieId}_{DateTime.UtcNow.Ticks}.jpg";
+                posterUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+            }
+            else
+            {
+                throw new ValidationException("Poster is required");
+            }
+
             var movie = new Movie
             {
                 MovieId = newMovieId,
                 Title = request.Title,
-                // Poster = request.Poster,
-                Poster = "e",
+                Poster = posterUrl,
                 PublishDate = request.PublishDate,
                 FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Unspecified),
                 ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Unspecified),
@@ -95,34 +116,43 @@ namespace MV.ApplicationLayer.Services
             }
             catch (Exception ex)
             {
-                // Log the actual error
-                Console.WriteLine($"Error creating movie: {ex.Message}");
-                if (ex.InnerException != null)
-                {
-                    Console.WriteLine($"Inner error: {ex.InnerException.Message}");
-                    throw new ValidationException($"Failed to create movie: {ex.InnerException.Message}");
-                }
-                throw new ValidationException($"Failed to create movie: {ex.Message}");
+                // If movie creation fails, delete the uploaded image
+                await _firebaseStorageService.DeleteImageAsync(posterUrl);
+                throw new Exception($"Error creating movie: {ex.Message}");
             }
         }
 
         public async Task<MovieResponse> UpdateMovieAsync(int id, MovieUpdateRequest request)
         {
-            ValidateMovieData(request);
-            ValidateDates(request.FromDate, request.ToDate, request.PublishDate);
+          
 
             var movie = await _unitOfWork.movieRepository.GetMovieByIdAsync(id);
             if (movie == null)
                 throw new ValidationException("Movie not found");
 
-            // Check if title is already used by another movie
-            if (await _unitOfWork.movieRepository.IsTitleExistsAsync(request.Title) &&
-                movie.Title != request.Title)
+            ValidateMovieData(request);
+            ValidateDates(request.FromDate, request.ToDate, request.PublishDate);
+
+            if (movie.Title != request.Title && await _unitOfWork.movieRepository.IsTitleExistsAsync(request.Title))
                 throw new ValidationException("A movie with this title already exists");
+
+            // Update poster if provided
+            if (!string.IsNullOrEmpty(request.Poster))
+            {
+                // Remove data URL prefix if exists
+                string base64Data = request.Poster;
+                if (base64Data.Contains(","))
+                {
+                    base64Data = base64Data.Split(',')[1];
+                }
+
+                var imageBytes = Convert.FromBase64String(base64Data);
+                var fileName = $"movie_{id}_{DateTime.UtcNow.Ticks}.jpg";
+                movie.Poster = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, movie.Poster);
+            }
 
             // Update basic information
             movie.Title = request.Title;
-            movie.Poster = request.Poster;
             movie.PublishDate = request.PublishDate;
             movie.FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Unspecified);
             movie.ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Unspecified);
@@ -157,7 +187,18 @@ namespace MV.ApplicationLayer.Services
             if (movie.FromDate <= DateTime.Now && movie.ToDate >= DateTime.Now)
                 throw new ValidationException("Cannot delete a movie that is currently showing");
 
+            try
+            {
+                // Delete movie poster from Firebase Storage
+                await _firebaseStorageService.DeleteImageAsync(movie.Poster);
+                
+                // Delete movie from database
             await _unitOfWork.movieRepository.DeleteMovieAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting movie: {ex.Message}");
+            }
         }
 
         public async Task<PagedResult<MovieResponse>> SearchMoviesByTimeAsync(MovieSearchByTimeRequest request)

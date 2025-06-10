@@ -18,4 +18,10 @@
     <ProjectReference Include="..\MV.InfrastructureLayer\MV.InfrastructureLayer.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="firebase-credentials.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
