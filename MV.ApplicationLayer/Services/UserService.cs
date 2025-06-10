@@ -30,7 +30,29 @@ namespace MV.ApplicationLayer.Services
             if (user == null)
                 return null;
 
-            // Gán giá trị mới từ request
+            // Handle image update if provided
+            if (!string.IsNullOrEmpty(request.Image))
+            {
+                try
+                {
+                    // Remove data URL prefix if exists
+                    string base64Data = request.Image;
+                    if (base64Data.Contains(","))
+                    {
+                        base64Data = base64Data.Split(',')[1];
+                    }
+
+                    var imageBytes = Convert.FromBase64String(base64Data);
+                    var fileName = $"customer_{user.Userid}_{DateTime.UtcNow.Ticks}.jpg";
+                    user.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, user.Image);
+                }
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
+            }
+
+            // Update other user information
             user.Fullname = request.Fullname;
             user.Birthdate = request.Birthdate;
             user.Gender = request.Gender;
@@ -38,22 +60,29 @@ namespace MV.ApplicationLayer.Services
             user.Email = request.Email;
             user.Phone = request.Phone;
             user.Address = request.Address;
-            user.Image = request.Image;
 
-            _unitOfWork.userRepository.Update(user);
-            await _unitOfWork.SaveChangesAsync();
-
-            return new CustomersReponse
+            try
             {
-                Fullname = user.Fullname,
-                Birthdate = user.Birthdate,
-                Gender = user.Gender,
-                Identitynumber = user.Identitynumber,
-                Email = user.Email,
-                Phone = user.Phone,
-                Address = user.Address,
-                Image = user.Image
-            };
+                _unitOfWork.userRepository.Update(user);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new CustomersReponse
+                {
+                    Userid = user.Userid,
+                    Fullname = user.Fullname,
+                    Birthdate = user.Birthdate,
+                    Gender = user.Gender,
+                    Identitynumber = user.Identitynumber,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                    Address = user.Address,
+                    Image = user.Image
+                };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating profile: {ex.Message}");
+            }
         }
 
         public async Task<CustomersReponse?> GetUserByIdAsync(string userId)
@@ -175,6 +204,28 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request)
         {
+            string imageUrl = null;
+            if (!string.IsNullOrEmpty(request.Image))
+            {
+                try
+                {
+                    // Remove data URL prefix if exists
+                    string base64Data = request.Image;
+                    if (base64Data.Contains(","))
+                    {
+                        base64Data = base64Data.Split(',')[1];
+                    }
+
+                    var imageBytes = Convert.FromBase64String(base64Data);
+                    var fileName = $"customer_{Guid.NewGuid()}_{DateTime.UtcNow.Ticks}.jpg";
+                    imageUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+                }
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
+            }
+
             var user = new User
             {
                 Userid = Guid.NewGuid().ToString(),
@@ -185,26 +236,39 @@ namespace MV.ApplicationLayer.Services
                 Email = request.Email,
                 Phone = request.Phone,
                 Address = request.Address,
-                Image = request.Image,
+                Image = imageUrl,
                 Roleid = 4, // Customer role
                 Status = 1, // Active status
                 Joindate = DateTime.Now
             };
 
-            var createdUser = await _unitOfWork.userRepository.CreateCustomerAsync(user);
-            await _unitOfWork.SaveChangesAsync();
-
-            return new CustomersReponse
+            try
             {
-                Fullname = createdUser.Fullname,
-                Birthdate = createdUser.Birthdate,
-                Gender = createdUser.Gender,
-                Identitynumber = createdUser.Identitynumber,
-                Email = createdUser.Email,
-                Phone = createdUser.Phone,
-                Address = createdUser.Address,
-                Image = createdUser.Image
-            };
+                var createdUser = await _unitOfWork.userRepository.CreateCustomerAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new CustomersReponse
+                {
+                    Userid = createdUser.Userid,
+                    Fullname = createdUser.Fullname,
+                    Birthdate = createdUser.Birthdate,
+                    Gender = createdUser.Gender,
+                    Identitynumber = createdUser.Identitynumber,
+                    Email = createdUser.Email,
+                    Phone = createdUser.Phone,
+                    Address = createdUser.Address,
+                    Image = createdUser.Image
+                };
+            }
+            catch (Exception ex)
+            {
+                // If user creation fails, delete the uploaded image
+                if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    await _firebaseStorageService.DeleteImageAsync(imageUrl);
+                }
+                throw new Exception($"Error creating customer: {ex.Message}");
+            }
         }
 
         public async Task<UserResponse> UpdateUserAsync(string id, UserRequest request)

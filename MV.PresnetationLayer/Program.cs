@@ -5,7 +5,7 @@ using MV.ApplicationLayer.Services;
 using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.Repositories;
 using MV.ApplicationLayer.RepositoryInterfaces;
-
+using MV.InfrastructureLayer.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 

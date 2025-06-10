@@ -8,7 +8,7 @@ using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.DBContext;
 using MV.InfrastructureLayer.Repositories;
 using MV.InfrastructureLayer.Configuration;
-using MV.Infrastructure.Services;
+using MV.InfrastructureLayer.Services;
 // using MV.InfrastructureLayer.Interfaces;
 
 namespace MV.InfrastructureLayer.Configuration
@@ -55,6 +55,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
 
 
             //Unit of work

@@ -4,18 +4,20 @@ using System.Threading.Tasks;
 using Google.Cloud.Storage.V1;
 using Google.Apis.Auth.OAuth2;
 using MV.ApplicationLayer.ServiceInterfaces;
+using Microsoft.Extensions.Configuration;
 
-namespace MV.ApplicationLayer.Services
+namespace MV.InfrastructureLayer.Services
 {
     public class FirebaseStorageService : IFirebaseStorageService
     {
         private readonly StorageClient _storageClient;
-        private const string BucketName = "swp391-2004";
+        private readonly string _bucketName;
 
-        public FirebaseStorageService()
+        public FirebaseStorageService(IConfiguration configuration)
         {
             var credentialsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "firebase-credentials.json");
             _storageClient = StorageClient.Create(GoogleCredential.FromFile(credentialsPath));
+            _bucketName = configuration["Firebase:StorageBucket"] ?? throw new ArgumentNullException("Firebase:StorageBucket configuration is missing");
         }
 
         public async Task<string> UploadImageAsync(byte[] imageBytes, string fileName)
@@ -23,9 +25,9 @@ namespace MV.ApplicationLayer.Services
             try
             {
                 var stream = new MemoryStream(imageBytes);
-                var objectName = $"movie-posters/{fileName}";
-                await _storageClient.UploadObjectAsync(BucketName, objectName, "image/jpeg", stream);
-                return $"https://storage.googleapis.com/{BucketName}/{objectName}";
+                var objectName = $"images/{fileName}";
+                await _storageClient.UploadObjectAsync(_bucketName, objectName, "image/jpeg", stream);
+                return $"https://storage.googleapis.com/{_bucketName}/{objectName}";
             }
             catch (Exception ex)
             {
@@ -59,8 +61,8 @@ namespace MV.ApplicationLayer.Services
                 if (string.IsNullOrEmpty(imageUrl)) return;
 
                 var fileName = Path.GetFileName(new Uri(imageUrl).LocalPath);
-                var objectName = $"movie-posters/{fileName}";
-                await _storageClient.DeleteObjectAsync(BucketName, objectName);
+                var objectName = $"images/{fileName}";
+                await _storageClient.DeleteObjectAsync(_bucketName, objectName);
             }
             catch (Exception ex)
             {

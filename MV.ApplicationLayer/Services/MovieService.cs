@@ -67,7 +67,14 @@ namespace MV.ApplicationLayer.Services
             string posterUrl;
             if (!string.IsNullOrEmpty(request.Poster))
             {
-                var imageBytes = Convert.FromBase64String(request.Poster);
+                // Remove data URL prefix if exists
+                string base64Data = request.Poster;
+                if (base64Data.Contains(","))
+                {
+                    base64Data = base64Data.Split(',')[1];
+                }
+
+                var imageBytes = Convert.FromBase64String(base64Data);
                 var fileName = $"movie_{newMovieId}_{DateTime.UtcNow.Ticks}.jpg";
                 posterUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
             }
@@ -132,7 +139,14 @@ namespace MV.ApplicationLayer.Services
             // Update poster if provided
             if (!string.IsNullOrEmpty(request.Poster))
             {
-                var imageBytes = Convert.FromBase64String(request.Poster);
+                // Remove data URL prefix if exists
+                string base64Data = request.Poster;
+                if (base64Data.Contains(","))
+                {
+                    base64Data = base64Data.Split(',')[1];
+                }
+
+                var imageBytes = Convert.FromBase64String(base64Data);
                 var fileName = $"movie_{id}_{DateTime.UtcNow.Ticks}.jpg";
                 movie.Poster = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, movie.Poster);
             }
