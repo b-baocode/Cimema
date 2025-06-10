@@ -306,12 +306,12 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<PagedResult<CustomersReponse>> GetUsersAsync(UserSearchRequest request)
         {
-            var users = await _UnitOfWork.userRepository.GetUsersAsync(
+            var users = await _unitOfWork.userRepository.GetUsersAsync(
                 request.Keyword,
                 (request.Page - 1) * request.PageSize,
                 request.PageSize);
 
-            var totalItems = await _UnitOfWork.userRepository.GetTotalUsersAsync(
+            var totalItems = await _unitOfWork.userRepository.GetTotalUsersAsync(
                 request.Keyword);
 
             return new PagedResult<CustomersReponse>

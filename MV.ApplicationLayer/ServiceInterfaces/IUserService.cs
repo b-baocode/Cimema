@@ -13,7 +13,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<CustomersReponse?> EditProfileAsync(CustomersRequest request);
         Task<CustomersReponse?> GetUserByIdAsync(string userId);
         Task<List<CustomersReponse>> GetAllCustomer();
-        Task<IEnumerable<UserRepons>> GetAllUsersAsync();
+        Task<IEnumerable<UserResponse>> GetAllUsersAsync();
         Task<PagedResult<CustomersReponse>> GetUsersAsync(UserSearchRequest request);
 
         Task<bool> DeleteCustomerAsync(string id);
