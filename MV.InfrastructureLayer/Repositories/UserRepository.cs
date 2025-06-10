@@ -226,6 +226,46 @@ namespace MV.InfrastructureLayer.Repositories
             await _context.SaveChangesAsync();
             return customer;
         }
+
+        public async Task<IEnumerable<User>> GetUsersAsync(string? keyword, int skip, int take)
+        {
+            var query = _context.Users
+                .Include(u => u.Role)
+                .Where(u => u.Roleid == 4); // Chỉ lấy Customer (RoleId = 4)
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower();
+                query = query.Where(u =>
+                    u.Fullname.ToLower().Contains(keyword) ||
+                   // u.Identitynumber.ToLower().Contains(keyword) ||
+                    u.Email.ToLower().Contains(keyword) ||
+                    u.Phone.ToLower().Contains(keyword));
+            }
+
+            return await query
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalUsersAsync(string? keyword)
+        {
+            var query = _context.Users
+                .Where(u => u.Roleid == 4 ); // Chỉ đếm Customer (RoleId = 4)
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower();
+                query = query.Where(u =>
+                    u.Fullname.ToLower().Contains(keyword) ||
+                   // u.Identitynumber.ToLower().Contains(keyword) ||
+                    u.Email.ToLower().Contains(keyword) ||
+                    u.Phone.ToLower().Contains(keyword));
+            }
+
+            return await query.CountAsync();
+        }
     }
 }
 

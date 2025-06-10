@@ -14,6 +14,8 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         IMovieRepository movieRepository { get; }
         IGenreRepository genreRepository { get; }
         IPromotionRepository promotionRepository { get; }
+        IRoomRepository roomRepository { get; }
+        ISeatRepository seatRepository { get; }
 
         //Single commit point
         Task<int> SaveChangesAsync();
