@@ -28,10 +28,10 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 
         Task<IEnumerable<User>> GetAllUsersAsync();
      
-        Task<List<User>> SearchUsersByFullnameAsync(string fullname);
-        Task<List<User>> SearchByPhoneAsync(string phone);
-        Task<List<User>> SearchByEmailAsync(string email);
+      
         Task<bool> DeleteCustomerAsync(string id);
         Task<User> CreateCustomerAsync(User customer);
+        Task<IEnumerable<User>> GetUsersAsync(string? keyword, int skip, int take);
+        Task<int> GetTotalUsersAsync(string? keyword);
     }
 }

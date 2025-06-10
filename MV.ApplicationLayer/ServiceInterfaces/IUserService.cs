@@ -13,10 +13,9 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<CustomersReponse?> EditProfileAsync(CustomersRequest request);
         Task<CustomersReponse?> GetUserByIdAsync(string userId);
         Task<List<CustomersReponse>> GetAllCustomer();
-        Task<IEnumerable<UserResponse>> GetAllUsersAsync();
-        Task<List<CustomersReponse>> SearchUsersByFullnameAsync(string fullname);
-        Task<List<CustomersReponse>> SearchByPhoneAsync(string phone);
-        Task<List<CustomersReponse>> SearchByEmailAsync(string email);
+        Task<IEnumerable<UserRepons>> GetAllUsersAsync();
+        Task<PagedResult<CustomersReponse>> GetUsersAsync(UserSearchRequest request);
+
         Task<bool> DeleteCustomerAsync(string id);
         Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request);
         Task<UserResponse> UpdateUserAsync(string id, UserRequest request);

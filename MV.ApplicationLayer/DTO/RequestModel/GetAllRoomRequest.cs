@@ -1,19 +1,19 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.DTO.RequestModel
 {
-    public class MovieSearchByCustomerRequest
+    public class GetAllRoomRequest
     {
-        public string? Title { get; set; }
-        public string? Genre { get; set; }
-        public string? Actors { get; set; }
-        public DateOnly? PublishDate { get; set; }
-
         [Range(1, int.MaxValue, ErrorMessage = "Page must be greater than 0")]
         public int Page { get; set; } = 1;
 
         [Range(1, 100, ErrorMessage = "Page size must be between 1 and 100")]
         public int PageSize { get; set; } = 10;
+
     }
-} 
+}

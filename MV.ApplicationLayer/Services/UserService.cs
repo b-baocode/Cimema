@@ -60,6 +60,7 @@ namespace MV.ApplicationLayer.Services
             user.Email = request.Email;
             user.Phone = request.Phone;
             user.Address = request.Address;
+            user.Image = request.Image;
 
             try
             {
@@ -93,6 +94,7 @@ namespace MV.ApplicationLayer.Services
 
             return new CustomersReponse
             {
+                Userid = user.Userid,
                 Fullname = user.Fullname,
                 Birthdate = user.Birthdate,
                 Gender = user.Gender,
@@ -149,53 +151,12 @@ namespace MV.ApplicationLayer.Services
             return userResponses;
         }
 
-        public async Task<List<CustomersReponse>> SearchUsersByFullnameAsync(string fullname)
-        {
-            var users = await _unitOfWork.userRepository.SearchUsersByFullnameAsync(fullname);
-            return users.Select(user => new CustomersReponse
-            {
-                Fullname = user.Fullname,
-                Birthdate = user.Birthdate,
-                Gender = user.Gender,
-                Identitynumber = user.Identitynumber,
-                Email = user.Email,
-                Phone = user.Phone,
-                Address = user.Address,
-                Image = user.Image
-            }).ToList();
-        }
 
-        public async Task<List<CustomersReponse>> SearchByPhoneAsync(string phone)
-        {
-            var users = await _unitOfWork.userRepository.SearchByPhoneAsync(phone);
-            return users.Select(user => new CustomersReponse
-            {
-                Fullname = user.Fullname,
-                Birthdate = user.Birthdate,
-                Gender = user.Gender,
-                Identitynumber = user.Identitynumber,
-                Email = user.Email,
-                Phone = user.Phone,
-                Address = user.Address,
-                Image = user.Image
-            }).ToList();
-        }
 
-        public async Task<List<CustomersReponse>> SearchByEmailAsync(string email)
-        {
-            var users = await _unitOfWork.userRepository.SearchByEmailAsync(email);
-            return users.Select(user => new CustomersReponse
-            {
-                Fullname = user.Fullname,
-                Birthdate = user.Birthdate,
-                Gender = user.Gender,
-                Identitynumber = user.Identitynumber,
-                Email = user.Email,
-                Phone = user.Phone,
-                Address = user.Address,
-                Image = user.Image
-            }).ToList();
-        }
+
+
+
+
 
         public async Task<bool> DeleteCustomerAsync(string id)
         {
@@ -315,7 +276,7 @@ namespace MV.ApplicationLayer.Services
                 {
                     await _firebaseStorageService.DeleteImageAsync(user.Image);
                 }
-                
+
                 // Delete user from database
                 await _unitOfWork.userRepository.DeleteCustomerAsync(id);
             }
@@ -340,6 +301,42 @@ namespace MV.ApplicationLayer.Services
                 Image = user.Image,
                 Roleid = user.Roleid,
                 Status = user.Status
+            };
+        }
+
+        public async Task<PagedResult<CustomersReponse>> GetUsersAsync(UserSearchRequest request)
+        {
+            var users = await _UnitOfWork.userRepository.GetUsersAsync(
+                request.Keyword,
+                (request.Page - 1) * request.PageSize,
+                request.PageSize);
+
+            var totalItems = await _UnitOfWork.userRepository.GetTotalUsersAsync(
+                request.Keyword);
+
+            return new PagedResult<CustomersReponse>
+            {
+                Items = users.Select(user => new CustomersReponse
+                {
+                    Userid = user.Userid,
+                    Username = user.Username,
+                    Fullname = user.Fullname,
+                    Password = user.Password,
+                    Birthdate = user.Birthdate,
+                    Gender = user.Gender,
+                    Identitynumber = user.Identitynumber,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                    Address = user.Address,
+                    Image = user.Image,
+                    Joindate = user.Joindate,
+                    Status = user.Status,
+                    Roleid = user.Roleid
+                }).ToList(),
+                TotalItems = totalItems,
+                Page = request.Page,
+                PageSize = request.PageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)request.PageSize)
             };
         }
     }
