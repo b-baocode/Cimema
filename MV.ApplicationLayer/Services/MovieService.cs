@@ -162,7 +162,8 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<PagedResult<MovieResponse>> SearchMoviesByTimeAsync(MovieSearchByTimeRequest request)
         {
-            ValidateDates(request.FromDate, request.ToDate, null);
+            // Bỏ validate ngày tháng cho chức năng tìm kiếm, vì có thể cần tìm kiếm phim trong quá khứ
+            // ValidateDates(request.FromDate, request.ToDate, null);
 
             var movies = await _unitOfWork.movieRepository.GetMoviesByDateRangeAsync(
                 request.FromDate,
