@@ -238,7 +238,7 @@ namespace MV.InfrastructureLayer.Repositories
                 keyword = keyword.ToLower();
                 query = query.Where(u =>
                     u.Fullname.ToLower().Contains(keyword) ||
-                    // u.Identitynumber.ToLower().Contains(keyword) ||
+                   // u.Identitynumber.ToLower().Contains(keyword) ||
                     u.Email.ToLower().Contains(keyword) ||
                     u.Phone.ToLower().Contains(keyword));
             }
@@ -252,14 +252,14 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<int> GetTotalUsersAsync(string? keyword)
         {
             var query = _context.Users
-                .Where(u => u.Roleid == 4); // Chỉ đếm Customer (RoleId = 4)
+                .Where(u => u.Roleid == 4 ); // Chỉ đếm Customer (RoleId = 4)
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
                 keyword = keyword.ToLower();
                 query = query.Where(u =>
                     u.Fullname.ToLower().Contains(keyword) ||
-                    // u.Identitynumber.ToLower().Contains(keyword) ||
+                   // u.Identitynumber.ToLower().Contains(keyword) ||
                     u.Email.ToLower().Contains(keyword) ||
                     u.Phone.ToLower().Contains(keyword));
             }
@@ -268,3 +268,4 @@ namespace MV.InfrastructureLayer.Repositories
         }
     }
 }
+

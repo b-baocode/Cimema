@@ -115,7 +115,7 @@ namespace MV.ApplicationLayer.Services
                 Email = user.Email,
                 Phone = user.Phone,
                 Address = user.Address,
-                // Image = user.Image,
+                Image = user.Image,
                 Joindate = user.Joindate,
                 Status = user.Status,
                 Roleid = user.Roleid,

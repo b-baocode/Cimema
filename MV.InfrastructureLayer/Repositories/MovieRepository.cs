@@ -22,6 +22,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
+                .Where(m => !EF.Functions.Like(m.Status, "InActive")) // Xóa đi nếu có trường IsDelete
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
@@ -48,8 +49,12 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<int> GetTotalMoviesAsync(string? keyword)
         {
-            var query = _context.Movies.AsQueryable(); // Giữ khi có trường IsDelete
-
+            //var query = _context.Movies.AsQueryable(); // Giữ khi có trường IsDelete
+            // Xóa đi nếu có trường IsDelete
+            var query = _context.Movies
+                .Include(m => m.Genres)
+                .Where(m => !EF.Functions.Like(m.Status, "InActive"))
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -74,6 +79,7 @@ namespace MV.InfrastructureLayer.Repositories
             var query = _context.Movies
                 .Include(m => m.Genres)
                 //.Where(m => m.FromDate >= fromDate && m.ToDate <= toDate) // Giữ khi có trường IsDelete
+                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && !EF.Functions.Like(m.Status, "InActive")) // Xóa đi nếu có trường IsDelete
                 .AsQueryable();
 
             return await query
