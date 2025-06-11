@@ -67,9 +67,23 @@ namespace MV.ApplicationLayer.Services
             string imageUrl;
             if (!string.IsNullOrEmpty(request.Image))
             {
-                var imageBytes = Convert.FromBase64String(request.Image);
-                var fileName = $"promotion_{newPromotionId}_{DateTime.UtcNow.Ticks}.jpg";
-                imageUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+git brsnbrsn                try
+                {
+                    // Remove data URL prefix if exists
+                    string base64Data = request.Image;
+                    if (base64Data.Contains(","))
+                    {
+                        base64Data = base64Data.Split(',')[1];
+                    }
+
+                    var imageBytes = Convert.FromBase64String(base64Data);
+                    var fileName = $"promotion_{newPromotionId}_{DateTime.UtcNow.Ticks}.jpg";
+                    imageUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+                }
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
             }
             else
             {
@@ -118,9 +132,23 @@ namespace MV.ApplicationLayer.Services
             // Update image if provided
             if (!string.IsNullOrEmpty(request.Image))
             {
-                var imageBytes = Convert.FromBase64String(request.Image);
-                var fileName = $"promotion_{id}_{DateTime.UtcNow.Ticks}.jpg";
-                promotion.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, promotion.Image);
+                try
+                {
+                    // Remove data URL prefix if exists
+                    string base64Data = request.Image;
+                    if (base64Data.Contains(","))
+                    {
+                        base64Data = base64Data.Split(',')[1];
+                    }
+
+                    var imageBytes = Convert.FromBase64String(base64Data);
+                    var fileName = $"promotion_{id}_{DateTime.UtcNow.Ticks}.jpg";
+                    promotion.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, promotion.Image);
+                }
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
             }
 
             // Update basic information
