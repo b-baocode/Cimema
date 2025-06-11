@@ -22,7 +22,6 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                .Where(m => m.IsDelete == false) // Only get non-deleted movies
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
@@ -49,10 +48,8 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<int> GetTotalMoviesAsync(string? keyword)
         {
-            var query = _context.Movies
-                .Include(m => m.Genres)
-                .Where(m => m.IsDelete == false) // Only get non-deleted movies
-                .AsQueryable();
+            var query = _context.Movies.AsQueryable(); // Giữ khi có trường IsDelete
+
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -76,7 +73,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && m.IsDelete == false) // Only get non-deleted movies
+                //.Where(m => m.FromDate >= fromDate && m.ToDate <= toDate) // Giữ khi có trường IsDelete
                 .AsQueryable();
 
             return await query
@@ -88,7 +85,8 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<int> GetTotalMoviesByDateRangeAsync(DateTime fromDate, DateTime toDate)
         {
             return await _context.Movies
-                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && m.IsDelete == false) // Only get non-deleted movies
+                //.Where(m => m.FromDate >= fromDate && m.ToDate <= toDate) // Giữ khi có trường IsDelete
+                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && !EF.Functions.Like(m.Status, "InActive")) // Xóa đi nếu có trường IsDelete
                 .CountAsync();
         }
 
@@ -96,12 +94,14 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.Movies
                 .Include(m => m.Genres)
-                .FirstOrDefaultAsync(m => m.MovieId == id && m.IsDelete == false); // Only get non-deleted movies
+                //.FirstOrDefaultAsync(m => m.MovieId == id); // Giữ khi có trường IsDelete
+                .FirstOrDefaultAsync(m => m.MovieId == id && !EF.Functions.Like(m.Status, "InActive")); // Xóa đi nếu có trường IsDelete
         }
 
         public async Task<bool> IsTitleExistsAsync(string title)
         {
-            return await _context.Movies.AnyAsync(m => m.Title == title && m.IsDelete == false); // Only check non-deleted movies
+            //return await _context.Movies.AnyAsync(m => m.Title == title); // Giữ khi có trường IsDelete
+            return await _context.Movies.AnyAsync(m => m.Title == title && !EF.Functions.Like(m.Status, "InActive")); // Xóa đi nếu có trường IsDelete
         }
 
         public async Task<Movie> CreateMovieAsync(Movie movie)
@@ -194,7 +194,7 @@ namespace MV.InfrastructureLayer.Repositories
 
             if (movie != null)
             {
-                movie.IsDelete = true; // Soft Delete: Set IsDelete to true (1)
+                movie.Status = "InActive"; // Soft Delete: Set Status to InActive
                 _context.Movies.Update(movie);
                 await _context.SaveChangesAsync();
             }
@@ -204,14 +204,16 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.Movies
                 .OrderByDescending(m => m.MovieId)
-                .FirstOrDefaultAsync(m => m.IsDelete == false); // Only get non-deleted movies
+                //.FirstOrDefaultAsync(); // Giữ khi có trường IsDelete
+                .FirstOrDefaultAsync(m => !EF.Functions.Like(m.Status, "InActive")); // Xóa đi nếu có trường IsDelete
         }
 
         public async Task<IEnumerable<Movie>> GetMoviesByCustomerCriteriaAsync(string? title, string? genre, string? actors, DateOnly? publishDate, int skip, int take)
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                .Where(m => m.IsDelete == false) // Only get non-deleted movies
+                //.Where(m => m.IsDeleted == true) // Giữ khi có trường IsDelete
+                .Where(m => !EF.Functions.Like(m.Status, "InActive")) // Xóa đi nếu có trường IsDelete
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(title))
@@ -244,7 +246,8 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                .Where(m => m.IsDelete == false) // Only get non-deleted movies
+                //.Where(m => m.IsDeleted == true) // Giữ khi có trường IsDelete
+                .Where(m => !EF.Functions.Like(m.Status, "InActive")) // Xóa đi nếu có trường IsDelete
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(title))
