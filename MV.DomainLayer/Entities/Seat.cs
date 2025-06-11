@@ -15,6 +15,8 @@ public partial class Seat
 
     public int? RoomId { get; set; }
 
+    public string? Status { get; set; }
+
     public virtual CoupleSeat? CoupleSeatSeatId1Navigation { get; set; }
 
     public virtual CoupleSeat? CoupleSeatSeatId2Navigation { get; set; }
