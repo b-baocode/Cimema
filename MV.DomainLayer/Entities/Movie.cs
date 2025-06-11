@@ -33,6 +33,10 @@ public partial class Movie
 
     public string? Status { get; set; }
 
+    public bool? IsDelete { get; set; }
+
+    public virtual ICollection<CommentRating> CommentRatings { get; set; } = new List<CommentRating>();
+
     public virtual ICollection<Showtime> Showtimes { get; set; } = new List<Showtime>();
 
     public virtual ICollection<Genre> Genres { get; set; } = new List<Genre>();
