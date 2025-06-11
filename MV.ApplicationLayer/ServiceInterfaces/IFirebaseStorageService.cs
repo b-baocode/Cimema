@@ -1,11 +1,12 @@
+using System.IO;
 using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.ServiceInterfaces
 {
     public interface IFirebaseStorageService
     {
-        Task<string> UploadImageAsync(byte[] imageBytes, string fileName);
+        Task<string> UploadImageAsync(Stream imageStream, string fileName);
         Task DeleteImageAsync(string imageUrl);
-        Task<string> UpdateImageAsync(byte[] imageBytes, string fileName, string oldImageUrl);
+        Task<string> UpdateImageAsync(Stream imageStream, string fileName, string oldImageUrl);
     }
 } 

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -65,18 +66,18 @@ namespace MV.ApplicationLayer.Services
 
             // Upload poster to Firebase Storage
             string posterUrl;
-            if (!string.IsNullOrEmpty(request.Poster))
+            if (request.Poster != null && request.Poster.Length > 0)
             {
-                // Remove data URL prefix if exists
-                string base64Data = request.Poster;
-                if (base64Data.Contains(","))
+                try
                 {
-                    base64Data = base64Data.Split(',')[1];
+                    using var stream = request.Poster.OpenReadStream();
+                    var fileName = $"movie_{newMovieId}_{DateTime.UtcNow.Ticks}.jpg";
+                    posterUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName);
                 }
-
-                var imageBytes = Convert.FromBase64String(base64Data);
-                var fileName = $"movie_{newMovieId}_{DateTime.UtcNow.Ticks}.jpg";
-                posterUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
             }
             else
             {
@@ -124,8 +125,6 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<MovieResponse> UpdateMovieAsync(int id, MovieUpdateRequest request)
         {
-          
-
             var movie = await _unitOfWork.movieRepository.GetMovieByIdAsync(id);
             if (movie == null)
                 throw new ValidationException("Movie not found");
@@ -137,18 +136,18 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("A movie with this title already exists");
 
             // Update poster if provided
-            if (!string.IsNullOrEmpty(request.Poster))
+            if (request.Poster != null && request.Poster.Length > 0)
             {
-                // Remove data URL prefix if exists
-                string base64Data = request.Poster;
-                if (base64Data.Contains(","))
+                try
                 {
-                    base64Data = base64Data.Split(',')[1];
+                    using var stream = request.Poster.OpenReadStream();
+                    var fileName = $"movie_{id}_{DateTime.UtcNow.Ticks}.jpg";
+                    movie.Poster = await _firebaseStorageService.UpdateImageAsync(stream, fileName, movie.Poster);
                 }
-
-                var imageBytes = Convert.FromBase64String(base64Data);
-                var fileName = $"movie_{id}_{DateTime.UtcNow.Ticks}.jpg";
-                movie.Poster = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, movie.Poster);
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
             }
 
             // Update basic information
@@ -315,7 +314,7 @@ namespace MV.ApplicationLayer.Services
             if (string.IsNullOrWhiteSpace(request.Title))
                 throw new ValidationException("Title is required");
 
-            if (string.IsNullOrWhiteSpace(request.Poster))
+            if (request.Poster == null || request.Poster.Length == 0)
                 throw new ValidationException("Poster is required");
 
             if (string.IsNullOrWhiteSpace(request.Actors))
@@ -351,7 +350,7 @@ namespace MV.ApplicationLayer.Services
             if (string.IsNullOrWhiteSpace(request.Title))
                 throw new ValidationException("Title is required");
 
-            if (string.IsNullOrWhiteSpace(request.Poster))
+            if (request.Poster == null || request.Poster.Length == 0)
                 throw new ValidationException("Poster is required");
 
             if (string.IsNullOrWhiteSpace(request.Actors))
