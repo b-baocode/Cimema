@@ -157,16 +157,14 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("Promotion not found.");
 
             // Check if promotion is currently active
-            if (promotion.StartDate <= DateTime.Now && promotion.EndDate >= DateTime.Now)
-                throw new ValidationException("Cannot delete an active promotion.");
-
+            // if (promotion.StartDate <= DateTime.Now && promotion.EndDate >= DateTime.Now)
+            //     throw new ValidationException("Cannot delete an active promotion.");
+            
             try
             {
-                // Delete promotion image from Firebase Storage
-                await _firebaseStorageService.DeleteImageAsync(promotion.Image);
-                
-                // Delete promotion from database
-            await _unitOfWork.promotionRepository.DeletePromotionAsync(id);
+                // Update promotion status to InActive
+                promotion.Status = "InActive";
+                await _unitOfWork.promotionRepository.UpdatePromotionAsync(promotion);
             }
             catch (Exception ex)
             {

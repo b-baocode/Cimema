@@ -183,16 +183,20 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("Movie not found");
 
             // Check if movie is currently showing
-            if (movie.FromDate <= DateTime.Now && movie.ToDate >= DateTime.Now)
-                throw new ValidationException("Cannot delete a movie that is currently showing");
+            // if (movie.FromDate <= DateTime.Now && movie.ToDate >= DateTime.Now)
+            //     throw new ValidationException("Cannot delete a movie that is currently showing");
 
             try
             {
                 // Delete movie poster from Firebase Storage
-                await _firebaseStorageService.DeleteImageAsync(movie.Poster);
+                // await _firebaseStorageService.DeleteImageAsync(movie.Poster);
                 
                 // Delete movie from database
-            await _unitOfWork.movieRepository.DeleteMovieAsync(id);
+                // await _unitOfWork.movieRepository.DeleteMovieAsync(id);
+
+                // Update movie IsDelete to true
+                movie.IsDelete = true;
+                await _unitOfWork.movieRepository.UpdateMovieAsync(movie);
             }
             catch (Exception ex)
             {
