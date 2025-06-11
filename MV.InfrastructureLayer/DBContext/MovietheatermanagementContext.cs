@@ -319,6 +319,7 @@ public partial class MovietheatermanagementContext : DbContext
             entity.HasIndex(e => new { e.RoomId, e.RowLabel, e.ColumnNumber }, "Seats_RoomId_RowLabel_ColumnNumber_key").IsUnique();
 
             entity.Property(e => e.RowLabel).HasMaxLength(10);
+            entity.Property(e => e.Status).HasMaxLength(25);
 
             entity.HasOne(d => d.Room).WithMany(p => p.Seats)
                 .HasForeignKey(d => d.RoomId)
