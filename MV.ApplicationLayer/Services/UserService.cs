@@ -9,6 +9,7 @@ using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -31,20 +32,13 @@ namespace MV.ApplicationLayer.Services
                 return null;
 
             // Handle image update if provided
-            if (!string.IsNullOrEmpty(request.Image))
+            if (request.Image != null && request.Image.Length > 0)
             {
                 try
                 {
-                    // Remove data URL prefix if exists
-                    string base64Data = request.Image;
-                    if (base64Data.Contains(","))
-                    {
-                        base64Data = base64Data.Split(',')[1];
-                    }
-
-                    var imageBytes = Convert.FromBase64String(base64Data);
+                    using var stream = request.Image.OpenReadStream();
                     var fileName = $"customer_{user.Userid}_{DateTime.UtcNow.Ticks}.jpg";
-                    user.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, user.Image);
+                    user.Image = await _firebaseStorageService.UpdateImageAsync(stream, fileName, user.Image);
                 }
                 catch (Exception ex)
                 {
@@ -60,7 +54,6 @@ namespace MV.ApplicationLayer.Services
             user.Email = request.Email;
             user.Phone = request.Phone;
             user.Address = request.Address;
-            user.Image = request.Image;
 
             try
             {
@@ -151,13 +144,6 @@ namespace MV.ApplicationLayer.Services
             return userResponses;
         }
 
-
-
-
-
-
-
-
         public async Task<bool> DeleteCustomerAsync(string id)
         {
             return await _unitOfWork.userRepository.DeleteCustomerAsync(id);
@@ -166,20 +152,13 @@ namespace MV.ApplicationLayer.Services
         public async Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request)
         {
             string imageUrl = null;
-            if (!string.IsNullOrEmpty(request.Image))
+            if (request.Image != null && request.Image.Length > 0)
             {
                 try
                 {
-                    // Remove data URL prefix if exists
-                    string base64Data = request.Image;
-                    if (base64Data.Contains(","))
-                    {
-                        base64Data = base64Data.Split(',')[1];
-                    }
-
-                    var imageBytes = Convert.FromBase64String(base64Data);
+                    using var stream = request.Image.OpenReadStream();
                     var fileName = $"customer_{Guid.NewGuid()}_{DateTime.UtcNow.Ticks}.jpg";
-                    imageUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+                    imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName);
                 }
                 catch (Exception ex)
                 {
@@ -239,11 +218,18 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("User not found");
 
             // Update avatar if provided
-            if (!string.IsNullOrEmpty(request.Image))
+            if (request.Image != null && request.Image.Length > 0)
             {
-                var imageBytes = Convert.FromBase64String(request.Image);
-                var fileName = $"user_{id}_{DateTime.UtcNow.Ticks}.jpg";
-                user.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, user.Image);
+                try
+                {
+                    using var stream = request.Image.OpenReadStream();
+                    var fileName = $"user_{id}_{DateTime.UtcNow.Ticks}.jpg";
+                    user.Image = await _firebaseStorageService.UpdateImageAsync(stream, fileName, user.Image);
+                }
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
             }
 
             // Update other user information

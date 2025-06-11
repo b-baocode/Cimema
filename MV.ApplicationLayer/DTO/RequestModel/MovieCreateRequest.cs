@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace MV.ApplicationLayer.DTO.RequestModel
 {
@@ -9,7 +10,7 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         public string Title { get; set; }
 
         [Required(ErrorMessage = "Poster is required")]
-        public string Poster { get; set; }
+        public IFormFile Poster { get; set; }
 
         [Required(ErrorMessage = "Publish date is required")]
         public DateOnly PublishDate { get; set; }

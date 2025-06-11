@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -65,20 +66,13 @@ namespace MV.ApplicationLayer.Services
 
             // Upload image to Firebase Storage
             string imageUrl;
-            if (!string.IsNullOrEmpty(request.Image))
+            if (request.Image != null && request.Image.Length > 0)
             {
-git brsnbrsn                try
+                try
                 {
-                    // Remove data URL prefix if exists
-                    string base64Data = request.Image;
-                    if (base64Data.Contains(","))
-                    {
-                        base64Data = base64Data.Split(',')[1];
-                    }
-
-                    var imageBytes = Convert.FromBase64String(base64Data);
+                    using var stream = request.Image.OpenReadStream();
                     var fileName = $"promotion_{newPromotionId}_{DateTime.UtcNow.Ticks}.jpg";
-                    imageUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+                    imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName);
                 }
                 catch (Exception ex)
                 {
@@ -104,8 +98,8 @@ git brsnbrsn                try
 
             try
             {
-            var createdPromotion = await _unitOfWork.promotionRepository.CreatePromotionAsync(promotion);
-            return MapToResponse(createdPromotion);
+                var createdPromotion = await _unitOfWork.promotionRepository.CreatePromotionAsync(promotion);
+                return MapToResponse(createdPromotion);
             }
             catch (Exception ex)
             {
@@ -130,20 +124,13 @@ git brsnbrsn                try
                 throw new ValidationException("A promotion with this name already exists.");
 
             // Update image if provided
-            if (!string.IsNullOrEmpty(request.Image))
+            if (request.Image != null && request.Image.Length > 0)
             {
                 try
                 {
-                    // Remove data URL prefix if exists
-                    string base64Data = request.Image;
-                    if (base64Data.Contains(","))
-                    {
-                        base64Data = base64Data.Split(',')[1];
-                    }
-
-                    var imageBytes = Convert.FromBase64String(base64Data);
+                    using var stream = request.Image.OpenReadStream();
                     var fileName = $"promotion_{id}_{DateTime.UtcNow.Ticks}.jpg";
-                    promotion.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, promotion.Image);
+                    promotion.Image = await _firebaseStorageService.UpdateImageAsync(stream, fileName, promotion.Image);
                 }
                 catch (Exception ex)
                 {
@@ -226,7 +213,7 @@ git brsnbrsn                try
             if (string.IsNullOrWhiteSpace(request.PromotionName))
                 throw new ValidationException("Promotion Name is required");
 
-            if (string.IsNullOrWhiteSpace(request.Image))
+            if (request.Image == null || request.Image.Length == 0)
                 throw new ValidationException("Image is required");
 
             if (request.DiscountRate < 0 || request.DiscountRate > 100)
@@ -241,7 +228,7 @@ git brsnbrsn                try
             if (string.IsNullOrWhiteSpace(request.PromotionName))
                 throw new ValidationException("Promotion Name is required");
 
-            if (string.IsNullOrWhiteSpace(request.Image))
+            if (request.Image == null || request.Image.Length == 0)
                 throw new ValidationException("Image is required");
 
             if (request.DiscountRate < 0 || request.DiscountRate > 100)
