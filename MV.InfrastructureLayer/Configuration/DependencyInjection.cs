@@ -36,6 +36,7 @@ namespace MV.InfrastructureLayer.Configuration
 
             // Add Genre services
             services.AddScoped<IGenreRepository, GenreRepository>();
+            services.AddScoped<IGenreService, GenreService>();
 
             // Add Promotion services
             services.AddScoped<IPromotionRepository, PromotionRepository>();
