@@ -23,54 +23,5 @@ namespace MV.InfrastructureLayer.Repositories
                 .Where(g => genreIds.Contains(g.GenreId))
                 .ToListAsync();
         }
-
-        public async Task<IEnumerable<Genre>> GetAllGenresAsync()
-        {
-            return await _context.Genres
-                .Where(g => g.Status != "UnActive")
-                .ToListAsync();
-        }
-
-        public async Task<IEnumerable<Genre>> GetAllGenresWithInactiveAsync()
-        {
-            return await _context.Genres.ToListAsync();
-        }
-
-        public async Task<Genre?> GetGenreByIdAsync(int id)
-        {
-            return await _context.Genres.FindAsync(id);
-        }
-
-        public async Task<Genre?> GetGenreByNameAsync(string name)
-        {
-            return await _context.Genres
-                .FirstOrDefaultAsync(g => g.Name.ToLower() == name.ToLower());
-        }
-
-        public async Task<Genre> CreateGenreAsync(Genre genre)
-        {
-            _context.Genres.Add(genre);
-            await _context.SaveChangesAsync();
-            return genre;
-        }
-
-        public async Task<Genre> UpdateGenreAsync(Genre genre)
-        {
-            _context.Genres.Update(genre);
-            await _context.SaveChangesAsync();
-            return genre;
-        }
-
-        public async Task DeleteGenreAsync(int id)
-        {
-            var genre = await _context.Genres.FindAsync(id);
-            if (genre != null)
-            {
-                // Soft delete by updating status to UnActive
-                genre.Status = "UnActive";
-                _context.Genres.Update(genre);
-                await _context.SaveChangesAsync();
-            }
-        }
     }
 } 

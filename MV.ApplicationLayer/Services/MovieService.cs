@@ -135,6 +135,9 @@ namespace MV.ApplicationLayer.Services
             if (movie.Title != request.Title && await _unitOfWork.movieRepository.IsTitleExistsAsync(request.Title))
                 throw new ValidationException("A movie with this title already exists");
 
+            string oldPosterUrl = movie.Poster;
+            string newPosterUrl = null;
+
             // Update poster if provided
             if (request.Poster != null && request.Poster.Length > 0)
             {
@@ -142,38 +145,62 @@ namespace MV.ApplicationLayer.Services
                 {
                     using var stream = request.Poster.OpenReadStream();
                     var fileName = $"movie_{id}_{DateTime.UtcNow.Ticks}.jpg";
-                    movie.Poster = await _firebaseStorageService.UpdateImageAsync(stream, fileName, movie.Poster);
+                    newPosterUrl = await _firebaseStorageService.UpdateImageAsync(stream, fileName, oldPosterUrl);
+                    movie.Poster = newPosterUrl;
                 }
                 catch (Exception ex)
                 {
-                    throw new ValidationException($"Error processing image: {ex.Message}");
+                    // If image update fails, keep the old poster URL in database
+                    movie.Poster = oldPosterUrl;
+                    Console.WriteLine($"Warning: Error updating movie poster: {ex.Message}");
                 }
             }
 
-            // Update basic information
-            movie.Title = request.Title;
-            movie.PublishDate = request.PublishDate;
-            movie.FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Unspecified);
-            movie.ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Unspecified);
-            movie.Actors = request.Actors;
-            movie.Director = request.Director;
-            movie.Studio = request.Studio;
-            movie.Duration = request.Duration;
-            movie.Version = request.Version;
-            movie.TrailerUrl = request.TrailerUrl;
-            movie.Description = request.Description;
-            movie.Status = request.Status;
+            try
+            {
+                // Update basic information
+                movie.Title = request.Title;
+                movie.PublishDate = request.PublishDate;
+                movie.FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Unspecified);
+                movie.ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Unspecified);
+                movie.Actors = request.Actors;
+                movie.Director = request.Director;
+                movie.Studio = request.Studio;
+                movie.Duration = request.Duration;
+                movie.Version = request.Version;
+                movie.TrailerUrl = request.TrailerUrl;
+                movie.Description = request.Description;
+                movie.Status = request.Status;
 
-            // Update genres
-            var genres = await _unitOfWork.genreRepository.GetGenresByIdsAsync(request.GenreIds);
-            if (!genres.Any())
-                throw new ValidationException("No valid genres found for the provided genre IDs");
-            
-            movie.Genres.Clear();
-            movie.Genres = genres.ToList();
+                // Update genres
+                var genres = await _unitOfWork.genreRepository.GetGenresByIdsAsync(request.GenreIds);
+                if (!genres.Any())
+                    throw new ValidationException("No valid genres found for the provided genre IDs");
+                
+                movie.Genres.Clear();
+                movie.Genres = genres.ToList();
 
-            var updatedMovie = await _unitOfWork.movieRepository.UpdateMovieAsync(movie);
-            return MapToResponse(updatedMovie);
+                var updatedMovie = await _unitOfWork.movieRepository.UpdateMovieAsync(movie);
+                return MapToResponse(updatedMovie);
+            }
+            catch (Exception ex)
+            {
+                // If database update fails, try to rollback the image update
+                if (newPosterUrl != null)
+                {
+                    try
+                    {
+                        await _firebaseStorageService.DeleteImageAsync(newPosterUrl);
+                        movie.Poster = oldPosterUrl;
+                    }
+                    catch
+                    {
+                        // Log the rollback failure but don't throw
+                        Console.WriteLine("Warning: Failed to rollback image update");
+                    }
+                }
+                throw new Exception($"Error updating movie: {ex.Message}");
+            }
         }
 
         public async Task DeleteMovieAsync(int id)
@@ -182,21 +209,25 @@ namespace MV.ApplicationLayer.Services
             if (movie == null)
                 throw new ValidationException("Movie not found");
 
-            // Check if movie is currently showing
-            // if (movie.FromDate <= DateTime.Now && movie.ToDate >= DateTime.Now)
-            //     throw new ValidationException("Cannot delete a movie that is currently showing");
-
             try
             {
-                // Delete movie poster from Firebase Storage
-                // await _firebaseStorageService.DeleteImageAsync(movie.Poster);
-                
-                // Delete movie from database
-                // await _unitOfWork.movieRepository.DeleteMovieAsync(id);
-
                 // Update movie IsDelete to true
                 movie.IsDelete = true;
                 await _unitOfWork.movieRepository.UpdateMovieAsync(movie);
+
+                // Delete movie poster from Firebase Storage if exists
+                if (!string.IsNullOrEmpty(movie.Poster))
+                {
+                    try
+                    {
+                        await _firebaseStorageService.DeleteImageAsync(movie.Poster);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the error but don't throw - the movie is already marked as deleted
+                        Console.WriteLine($"Warning: Error deleting movie poster: {ex.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
