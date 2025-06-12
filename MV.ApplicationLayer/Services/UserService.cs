@@ -115,7 +115,7 @@ namespace MV.ApplicationLayer.Services
                 Email = user.Email,
                 Phone = user.Phone,
                 Address = user.Address,
-                // Image = user.Image,
+                Image = user.Image,
                 Joindate = user.Joindate,
                 Status = user.Status,
                 Roleid = user.Roleid,
@@ -146,7 +146,24 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<bool> DeleteCustomerAsync(string id)
         {
-            return await _unitOfWork.userRepository.DeleteCustomerAsync(id);
+            var user = await _unitOfWork.userRepository.GetByIdAsync(id);
+            if (user == null)
+                return false;
+
+            try
+            {
+                // Delete user image from Firebase Storage if exists
+                if (!string.IsNullOrEmpty(user.Image))
+                {
+                    await _firebaseStorageService.DeleteImageAsync(user.Image);
+                }
+
+                return await _unitOfWork.userRepository.DeleteCustomerAsync(id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error deleting customer: {ex.Message}");
+            }
         }
 
         public async Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request)
