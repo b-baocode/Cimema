@@ -12,6 +12,7 @@ namespace MV.PresnetationLayer.Controllers
     [ApiController]
     [Authorize]
     public class CustomersController : ControllerBase
+
     {
         private readonly ILoginService _loginService;
         private readonly IUserService _userService;
@@ -49,6 +50,9 @@ namespace MV.PresnetationLayer.Controllers
                     return BadRequest("Invalid user ID");
 
                 var user = await _userService.GetUserByIdAsync(id);
+                //return Ok(user);
+
+
                 if (user == null)
                     return NotFound("User not found");
 
@@ -59,6 +63,9 @@ namespace MV.PresnetationLayer.Controllers
                 return StatusCode(500, "An unexpected error occurred");
             }
         }
+
+       
+        
 
         [HttpPut("profile")]
         public async Task<IActionResult> EditProfile([FromForm] CustomersRequest request)
@@ -126,6 +133,8 @@ namespace MV.PresnetationLayer.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateCustomer([FromForm] CustomersRequest request)
+        [Authorize(Roles = "Admin,Manager,Staff")]
+        public async Task<IActionResult> CreateCustomer([FromForm] CustomersRequest request)
         {
             try
             {
@@ -160,5 +169,4 @@ namespace MV.PresnetationLayer.Controllers
                 return StatusCode(500, "An unexpected error occurred");
             }
         }
-    }
-}
+    } }

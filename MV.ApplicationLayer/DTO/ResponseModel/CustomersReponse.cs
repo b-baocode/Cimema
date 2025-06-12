@@ -40,7 +40,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public string? Address { get; set; }
 
         [JsonPropertyName("image")]
-        public string Image { get; set; } = "e";
+        public string? Image { get; set; }
 
         [JsonPropertyName("joindate")]
         public DateTime? Joindate { get; set; }
