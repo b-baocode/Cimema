@@ -72,7 +72,7 @@ namespace MV.PresnetationLayer.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<MovieResponse>> CreateMovie(
-            [FromBody] MovieCreateRequest request)
+            [FromForm] MovieCreateRequest request)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace MV.PresnetationLayer.Controllers
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<MovieResponse>> UpdateMovie(
-            int id, [FromBody] MovieUpdateRequest request)
+            int id, [FromForm] MovieUpdateRequest request)
         {
             try
             {

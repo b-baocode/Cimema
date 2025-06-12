@@ -20,14 +20,13 @@ namespace MV.InfrastructureLayer.Services
             _bucketName = configuration["Firebase:StorageBucket"] ?? throw new ArgumentNullException("Firebase:StorageBucket configuration is missing");
         }
 
-        public async Task<string> UploadImageAsync(byte[] imageBytes, string fileName)
+        public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
         {
             try
             {
-                var stream = new MemoryStream(imageBytes);
                 var objectName = $"images/{fileName}";
-                await _storageClient.UploadObjectAsync(_bucketName, objectName, "image/jpeg", stream);
-                return $"https://storage.googleapis.com/{_bucketName}/{objectName}";
+                await _storageClient.UploadObjectAsync(_bucketName, objectName, "image/jpeg", imageStream);
+                return $"https://firebasestorage.googleapis.com/v0/b/{_bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media";
             }
             catch (Exception ex)
             {
@@ -35,7 +34,7 @@ namespace MV.InfrastructureLayer.Services
             }
         }
 
-        public async Task<string> UpdateImageAsync(byte[] imageBytes, string fileName, string oldImageUrl)
+        public async Task<string> UpdateImageAsync(Stream imageStream, string fileName, string oldImageUrl)
         {
             try
             {
@@ -46,7 +45,7 @@ namespace MV.InfrastructureLayer.Services
                 }
 
                 // Upload new image
-                return await UploadImageAsync(imageBytes, fileName);
+                return await UploadImageAsync(imageStream, fileName);
             }
             catch (Exception ex)
             {
@@ -60,8 +59,10 @@ namespace MV.InfrastructureLayer.Services
             {
                 if (string.IsNullOrEmpty(imageUrl)) return;
 
-                var fileName = Path.GetFileName(new Uri(imageUrl).LocalPath);
-                var objectName = $"images/{fileName}";
+                // Extract object name from Firebase Storage URL
+                var uri = new Uri(imageUrl);
+                var pathSegments = uri.AbsolutePath.Split('/');
+                var objectName = string.Join("/", pathSegments.Skip(pathSegments.Length - 2));
                 await _storageClient.DeleteObjectAsync(_bucketName, objectName);
             }
             catch (Exception ex)

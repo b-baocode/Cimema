@@ -39,7 +39,7 @@ namespace MV.PresnetationLayer.Controllers
 
         [HttpPost]
         public async Task<ActionResult<PromotionResponse>> CreatePromotion(
-            [FromBody] PromotionCreateRequest request)
+            [FromForm] PromotionCreateRequest request)
         {
             try
             {
@@ -54,7 +54,7 @@ namespace MV.PresnetationLayer.Controllers
 
         [HttpPut("{id}")]
         public async Task<ActionResult<PromotionResponse>> UpdatePromotion(
-            int id, [FromBody] PromotionUpdateRequest request)
+            int id, [FromForm] PromotionUpdateRequest request)
         {
             try
             {

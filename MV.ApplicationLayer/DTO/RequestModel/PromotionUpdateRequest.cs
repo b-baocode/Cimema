@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace MV.ApplicationLayer.DTO.RequestModel
 {
@@ -9,7 +10,7 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         public string PromotionName { get; set; }
 
         [Required(ErrorMessage = "Image is required")]
-        public string Image { get; set; }
+        public IFormFile Image { get; set; }
 
         [Required(ErrorMessage = "Start Date is required")]
         public DateTime StartDate { get; set; }

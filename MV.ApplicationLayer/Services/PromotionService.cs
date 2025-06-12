@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -65,11 +66,18 @@ namespace MV.ApplicationLayer.Services
 
             // Upload image to Firebase Storage
             string imageUrl;
-            if (!string.IsNullOrEmpty(request.Image))
+            if (request.Image != null && request.Image.Length > 0)
             {
-                var imageBytes = Convert.FromBase64String(request.Image);
-                var fileName = $"promotion_{newPromotionId}_{DateTime.UtcNow.Ticks}.jpg";
-                imageUrl = await _firebaseStorageService.UploadImageAsync(imageBytes, fileName);
+                try
+                {
+                    using var stream = request.Image.OpenReadStream();
+                    var fileName = $"promotion_{newPromotionId}_{DateTime.UtcNow.Ticks}.jpg";
+                    imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName);
+                }
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
             }
             else
             {
@@ -90,8 +98,8 @@ namespace MV.ApplicationLayer.Services
 
             try
             {
-            var createdPromotion = await _unitOfWork.promotionRepository.CreatePromotionAsync(promotion);
-            return MapToResponse(createdPromotion);
+                var createdPromotion = await _unitOfWork.promotionRepository.CreatePromotionAsync(promotion);
+                return MapToResponse(createdPromotion);
             }
             catch (Exception ex)
             {
@@ -116,11 +124,18 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("A promotion with this name already exists.");
 
             // Update image if provided
-            if (!string.IsNullOrEmpty(request.Image))
+            if (request.Image != null && request.Image.Length > 0)
             {
-                var imageBytes = Convert.FromBase64String(request.Image);
-                var fileName = $"promotion_{id}_{DateTime.UtcNow.Ticks}.jpg";
-                promotion.Image = await _firebaseStorageService.UpdateImageAsync(imageBytes, fileName, promotion.Image);
+                try
+                {
+                    using var stream = request.Image.OpenReadStream();
+                    var fileName = $"promotion_{id}_{DateTime.UtcNow.Ticks}.jpg";
+                    promotion.Image = await _firebaseStorageService.UpdateImageAsync(stream, fileName, promotion.Image);
+                }
+                catch (Exception ex)
+                {
+                    throw new ValidationException($"Error processing image: {ex.Message}");
+                }
             }
 
             // Update basic information
@@ -142,16 +157,14 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("Promotion not found.");
 
             // Check if promotion is currently active
-            if (promotion.StartDate <= DateTime.Now && promotion.EndDate >= DateTime.Now)
-                throw new ValidationException("Cannot delete an active promotion.");
-
+            // if (promotion.StartDate <= DateTime.Now && promotion.EndDate >= DateTime.Now)
+            //     throw new ValidationException("Cannot delete an active promotion.");
+            
             try
             {
-                // Delete promotion image from Firebase Storage
-                await _firebaseStorageService.DeleteImageAsync(promotion.Image);
-                
-                // Delete promotion from database
-            await _unitOfWork.promotionRepository.DeletePromotionAsync(id);
+                // Update promotion status to InActive
+                promotion.Status = "InActive";
+                await _unitOfWork.promotionRepository.UpdatePromotionAsync(promotion);
             }
             catch (Exception ex)
             {
@@ -198,7 +211,7 @@ namespace MV.ApplicationLayer.Services
             if (string.IsNullOrWhiteSpace(request.PromotionName))
                 throw new ValidationException("Promotion Name is required");
 
-            if (string.IsNullOrWhiteSpace(request.Image))
+            if (request.Image == null || request.Image.Length == 0)
                 throw new ValidationException("Image is required");
 
             if (request.DiscountRate < 0 || request.DiscountRate > 100)
@@ -213,7 +226,7 @@ namespace MV.ApplicationLayer.Services
             if (string.IsNullOrWhiteSpace(request.PromotionName))
                 throw new ValidationException("Promotion Name is required");
 
-            if (string.IsNullOrWhiteSpace(request.Image))
+            if (request.Image == null || request.Image.Length == 0)
                 throw new ValidationException("Image is required");
 
             if (request.DiscountRate < 0 || request.DiscountRate > 100)
