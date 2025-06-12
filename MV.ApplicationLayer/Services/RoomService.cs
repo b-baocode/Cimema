@@ -135,7 +135,7 @@ namespace MV.ApplicationLayer.Services
                 RoomName = roomResult.Name,
                 Rows = roomResult.Rows,
                 Columns = roomResult.Columns,
-                Status = roomResult.Status,
+                RoomStatus = roomResult.Status,
                 StandardSeatCount = seatsOfRoomList.Count(s => s.SeatTypeName == "Standard"),
                 VipSeatCount = seatsOfRoomList.Count(s => s.SeatTypeName == "VIP"),
                 CoupleSeatCount = seatsOfRoomList.Count(s => s.SeatTypeName == "Couple") / 2,

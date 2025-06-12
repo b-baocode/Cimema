@@ -16,7 +16,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
 
         public int Columns { get; set; }
 
-        public string? Status { get; set; }
+        public string? RoomStatus { get; set; }
 
         public int StandardSeatCount { get; set; } = 0;
 
