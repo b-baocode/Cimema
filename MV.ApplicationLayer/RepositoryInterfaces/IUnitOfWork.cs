@@ -16,6 +16,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         IPromotionRepository promotionRepository { get; }
         IRoomRepository roomRepository { get; }
         ISeatRepository seatRepository { get; }
+        ICoupleSeatRepository coupleSeatRepository { get; }
 
         //Single commit point
         Task<int> SaveChangesAsync();

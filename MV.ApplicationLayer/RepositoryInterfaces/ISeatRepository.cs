@@ -1,4 +1,5 @@
 ﻿using MV.DomainLayer.CustomQueryModels;
+using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,5 +12,10 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
     {
         Task<IEnumerable<SeatsOfRoomCustom>> GetSeatsForRoomAsync(int roomId);
 
+        Task<IEnumerable<Seat>> GetExistingSeatsForRoomUpdateCheckAsync(int roomId);
+
+        Task AddAsync(Seat seat);
+
+        
     }
 }
