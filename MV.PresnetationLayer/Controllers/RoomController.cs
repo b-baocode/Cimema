@@ -110,14 +110,14 @@ namespace MV.PresnetationLayer.Controllers
 
 
         //Delete room
-        [HttpDelete("{deleteRoomId}/DeleteRoom")]
+        [HttpDelete("DeleteRoom/{DeleteRoomId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<ActionResult> DeleteRoomById(int deleteRoomId)
+        public async Task<ActionResult> DeleteRoomById([FromRoute] int DeleteRoomId)
         {
             try
             {
-                var deleteResult = await _roomService.DeleteRoomAsync(deleteRoomId);
+                var deleteResult = await _roomService.DeleteRoomAsync(DeleteRoomId);
 
                 if (!deleteResult)
                 {
@@ -126,7 +126,7 @@ namespace MV.PresnetationLayer.Controllers
                         {
                             Title = "Room not found",
                             Status = StatusCodes.Status404NotFound,
-                            Detail = $"Room with ID {deleteRoomId} does not exist.",
+                            Detail = $"Room with ID {DeleteRoomId} does not exist.",
                             Instance = HttpContext.Request.Path
                         }
                         );
@@ -147,14 +147,14 @@ namespace MV.PresnetationLayer.Controllers
 
 
         //Undelete room
-        [HttpPatch("{unDeleteRoomId}/UnDeleteRoom")]
+        [HttpPatch("UnDeleteRoom/{UnDeleteRoomId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
-        public async Task<ActionResult> UnDeleteRoomById(int unDeleteRoomId)
+        public async Task<ActionResult> UnDeleteRoomById([FromRoute] int UnDeleteRoomId)
         {
             try
             {
-                var unDeleteResult = await _roomService.UnDeleteRoomAsync(unDeleteRoomId);
+                var unDeleteResult = await _roomService.UnDeleteRoomAsync(UnDeleteRoomId);
 
                 if (!unDeleteResult)
                 {
@@ -163,7 +163,7 @@ namespace MV.PresnetationLayer.Controllers
                         {
                             Title = "Room not found",
                             Status = StatusCodes.Status404NotFound,
-                            Detail = $"Room with ID {unDeleteRoomId} does not exist.",
+                            Detail = $"Room with ID {UnDeleteRoomId} does not exist.",
                             Instance = HttpContext.Request.Path
                         }
                         );
@@ -184,7 +184,7 @@ namespace MV.PresnetationLayer.Controllers
 
 
         //Get all room
-        [HttpGet("GetAllRoom")]
+        [HttpGet("GetAllRoomAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(PagedResult<GetAllRoomResponse>))]
         public async Task<ActionResult<PagedResult<GetAllRoomResponse>>> GetAllCinemaroom([FromQuery] GetAllRoomRequest getAllRoomRequest)
         {
@@ -203,7 +203,60 @@ namespace MV.PresnetationLayer.Controllers
                     instance: HttpContext.Request.Path
                 );
             }
-            
+
+        }
+
+        [HttpPut("UpdateRoom/{UpdateRoomId}")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RoomUpdateResponse))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(ProblemDetails))]
+        public async Task<ActionResult<RoomUpdateResponse>> UpdateCinemaRoomInfo(RoomUpdateRequest roomUpdateRequest
+            , [FromRoute] int UpdateRoomId)
+        {
+            try
+            {
+
+                var updateResult = await _roomService.UpdateRoomWithSeatsAsync(roomUpdateRequest, UpdateRoomId);
+
+
+                if (updateResult != null)
+                {
+                    return Ok(updateResult);
+                }
+
+                return NotFound(
+                            new ProblemDetails
+                            {
+                                Title = "Room not found",
+                                Status = StatusCodes.Status404NotFound,
+                                Detail = $"Room with ID {UpdateRoomId} does not exist.",
+                                Instance = HttpContext.Request.Path
+                            });
+            }
+            catch (RoomNameAlreadyExistsException ex)
+            {
+                return Conflict(
+                    new ProblemDetails
+                    {
+                        Title = "Room name already exists",
+                        Status = StatusCodes.Status409Conflict,
+                        Detail = ex.Message,
+                        Instance = HttpContext.Request.Path,
+                        Extensions =
+                        {
+                            {"ConflictingName", ex.ConflictingName}
+                        }
+                    });
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    detail: "An unexpected error occurred while getting all the room. Please try again later.",
+                    title: "Internal Server Error",
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    instance: HttpContext.Request.Path
+                );
+            }
         }
     }
 }

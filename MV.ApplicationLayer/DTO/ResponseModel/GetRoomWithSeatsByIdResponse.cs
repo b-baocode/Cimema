@@ -16,7 +16,13 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
 
         public int Columns { get; set; }
 
-        public string? Status { get; set; }
+        public string? RoomStatus { get; set; }
+
+        public int StandardSeatCount { get; set; } = 0;
+
+        public int VipSeatCount { get; set; } = 0;
+
+        public int CoupleSeatCount { get; set; } = 0;
 
         public List<SeatOfRoomDTO>? ListOfSeats { get; set; }
     }
@@ -36,5 +42,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public int? PairedWithSeatId { get; set; }
 
         public string? PairedWithSeatLocation { get; set; }
+
+        public string? SeatStatus { get; set; }
     }
 }
