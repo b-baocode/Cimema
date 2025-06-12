@@ -42,7 +42,9 @@ namespace MV.InfrastructureLayer.Repositories
                     Rows = s.Rows,
                     Columns = s.Columns,
                     RoomStatus = s.Status,
-                    SeatsCountTotal = s.Seats.Count(),
+                    SeatsCountTotal = s.Seats.Count(seat => seat.Status == "Active"),
+                    //test - NO TOUCH
+                    //SeatsCountTotal = s.Seats.Count(),
                 }).AsQueryable();
 
 

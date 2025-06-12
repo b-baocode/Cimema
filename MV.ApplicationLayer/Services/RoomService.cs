@@ -87,6 +87,7 @@ namespace MV.ApplicationLayer.Services
                         RowLabel = rowLabel,
                         ColumnNumber = j,
                         SeatTypeId = 1,
+                        Status = "Active",
                     };
 
                     room.Seats.Add(seat);
@@ -107,7 +108,6 @@ namespace MV.ApplicationLayer.Services
             }
             catch (Exception ex)
             {
-                // Catch any other unexpected exceptions from SaveChangesAsync or other service logic
                 throw;
             }
 
@@ -136,6 +136,9 @@ namespace MV.ApplicationLayer.Services
                 Rows = roomResult.Rows,
                 Columns = roomResult.Columns,
                 Status = roomResult.Status,
+                StandardSeatCount = seatsOfRoomList.Count(s => s.SeatTypeName == "Standard"),
+                VipSeatCount = seatsOfRoomList.Count(s => s.SeatTypeName == "VIP"),
+                CoupleSeatCount = seatsOfRoomList.Count(s => s.SeatTypeName == "Couple") / 2,
                 ListOfSeats = seatsOfRoomList?.Select(s => new SeatOfRoomDTO
                 {
                     SeatId = s.SeatId,
@@ -145,6 +148,8 @@ namespace MV.ApplicationLayer.Services
                     SeatPrice = s.SeatPrice,
                     PairedWithSeatId = s.PairedWithSeatId,
                     PairedWithSeatLocation = s.PairedWithSeatLocation,
+                    SeatStatus = s.SeatStatus,
+
                 })
                 .OrderBy(sDto => sDto.RowLabel)
                 .ThenBy(sDto => sDto.ColumnNumber)
@@ -214,6 +219,141 @@ namespace MV.ApplicationLayer.Services
                 PageSize = getAllRoomRequest.PageSize,
                 TotalPages = (int)Math.Ceiling(totalItems / (double)getAllRoomRequest.PageSize)
             };
+        }
+
+        public async Task<RoomUpdateResponse?> UpdateRoomWithSeatsAsync(RoomUpdateRequest roomUpdateRequest, int updateRoomId)
+        {
+            var existingRoom = await _unitOfWork.roomRepository.GetRoomByIdAsync(updateRoomId);
+
+            if (existingRoom == null)
+            {
+                return null;
+            }
+
+            int standardSeatTypeId = 1;
+
+            //Delete all couple seats
+            var allCoupleSeatsInRoom = await _unitOfWork.coupleSeatRepository.GetAllCoupleSeatsForRoomAsync(updateRoomId);
+            int coupleSeatsRemovedCount = 0;
+            foreach (var coupleSeat in allCoupleSeatsInRoom)
+            {
+                _unitOfWork.coupleSeatRepository.Remove(coupleSeat);
+                coupleSeatsRemovedCount++;
+            }
+
+            var existingSeatsToCheck = await _unitOfWork.seatRepository
+                .GetExistingSeatsForRoomUpdateCheckAsync(updateRoomId);
+
+            existingRoom.Name = roomUpdateRequest.Name;
+            existingRoom.Rows = roomUpdateRequest.Rows;
+            existingRoom.Columns = roomUpdateRequest.Columns;
+            existingRoom.Status = "Active";
+
+            var seatsToDeactivate = new List<Seat>();
+            var seatsToReactivate = new List<Seat>();
+            var seatsToAdd = new List<Seat>();
+            //var seatsToKeep = new List<Seat>();
+
+            var newTargetSeatLocations = new HashSet<string>();
+            for (int i = 0; i < roomUpdateRequest.Rows; i++)
+            {
+                string rowLabel = ConvertIntToRowLabel(i);
+                for (int j = 1; j <= roomUpdateRequest.Columns; j++)
+                {
+                    newTargetSeatLocations.Add($"{rowLabel}-{j}");
+                }
+            }
+
+            foreach (var existingSeat in existingSeatsToCheck)
+            {
+                string existingSeatLocationKey = $"{existingSeat.RowLabel}-{existingSeat.ColumnNumber}";
+
+                if (newTargetSeatLocations.Contains(existingSeatLocationKey))
+                {
+                    bool wasInactive = existingSeat.Status == "InActive";
+
+                    if (wasInactive)
+                    {
+                        existingSeat.Status = "Active";
+                        seatsToReactivate.Add(existingSeat);
+                    }
+
+
+                    //seatsToKeep.Add(existingSeat);
+                    newTargetSeatLocations.Remove(existingSeatLocationKey);
+                }
+                else
+                {
+                    if (existingSeat.Status == "Active")
+                    {
+                        existingSeat.Status = "InActive";
+                        seatsToDeactivate.Add(existingSeat);
+                    }
+                }
+                existingSeat.SeatTypeId = standardSeatTypeId;
+            }
+
+            if (newTargetSeatLocations.Count > 0)
+            {
+                foreach (string newLocationKey in newTargetSeatLocations)
+                {
+                    var parts = newLocationKey.Split('-');
+                    var newSeat = new Seat
+                    {
+                        RoomId = existingRoom.RoomId,
+                        RowLabel = parts[0],
+                        ColumnNumber = int.Parse(parts[1]),
+                        SeatTypeId = standardSeatTypeId,
+                        Status = "Active"
+                    };
+                    seatsToAdd.Add(newSeat);
+                    await _unitOfWork.seatRepository.AddAsync(newSeat);
+                }
+            }
+
+            //var deactivatedSeatIds = seatsToDeactivate.Select(s => s.SeatId).ToList();
+
+            //if (deactivatedSeatIds.Any())
+            //{
+            //    var coupleSeatsToDelete = await _unitOfWork.coupleSeatRepository.GetCoupleSeatsBySeatIdsAsync(deactivatedSeatIds);
+
+            //    foreach (var coupleSeat in coupleSeatsToDelete)
+            //    {
+            //        _unitOfWork.coupleSeatRepository.Remove(coupleSeat);
+            //    }
+            //}
+
+            int rowsAffected;
+
+            try
+            {
+                rowsAffected = await _unitOfWork.SaveChangesAsync();
+            }
+            catch (UniqueConstraintViolationException ex)
+            {
+                throw new RoomNameAlreadyExistsException(roomUpdateRequest.Name, "The room name already exist.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            var response = new RoomUpdateResponse
+            {
+                RoomId = existingRoom.RoomId,
+                RoomName = existingRoom.Name,
+                Rows = existingRoom.Rows,
+                Columns = existingRoom.Columns,
+                RowsAffected = rowsAffected,
+                RoomStatus = existingRoom.Status,
+                SeatsAddedCount = seatsToAdd.Count,
+                SeatsDeactivatedCount = seatsToDeactivate.Count,
+                SeatsReactivatedCount = seatsToReactivate.Count,
+                CoupleSeatsDeleted = coupleSeatsRemovedCount,
+            };
+
+            return response;
+
         }
     }
 }

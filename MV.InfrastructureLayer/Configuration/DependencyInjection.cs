@@ -50,6 +50,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddSingleton<IPasswordRepository, PasswordRepository>();
             services.AddScoped<IRoomRepository, RoomRepository>();
             services.AddScoped<ISeatRepository, SeatRepository>();
+            services.AddScoped<ICoupleSeatRepository, CoupleSeatRepository>();
 
 
             //Service injection

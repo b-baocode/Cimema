@@ -20,5 +20,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<bool> UnDeleteRoomAsync(int unDeleteRoomId);
 
         Task<PagedResult<GetAllRoomResponse>> GetAllRoomAsync(GetAllRoomRequest getAllRoomRequest);
+
+        Task<RoomUpdateResponse?> UpdateRoomWithSeatsAsync(RoomUpdateRequest roomUpdateRequest, int updateRoomId);
     }
 }

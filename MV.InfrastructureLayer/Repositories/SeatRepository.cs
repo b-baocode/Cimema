@@ -22,7 +22,9 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<SeatsOfRoomCustom>> GetSeatsForRoomAsync(int roomId)
         {
             var getSeats = await _context.Set<Seat>()
-                .Where(s => s.RoomId == roomId)
+                .Where(s => s.RoomId == roomId && s.Status == "Active")
+                //test - NO TOUCH
+                //.Where(s => s.RoomId == roomId)
                 .Select(s => new SeatsOfRoomCustom
                 {
                     SeatId = s.SeatId,
@@ -30,6 +32,8 @@ namespace MV.InfrastructureLayer.Repositories
                     ColumnNumber = s.ColumnNumber,
                     SeatTypeName = s.SeatType != null ? s.SeatType.SeatTypeName : null,
                     SeatPrice = s.SeatType != null ? s.SeatType.SeatTypePrice : 0,
+                    SeatStatus = s.Status,
+
 
                     PairedWithSeatId = (s.SeatType != null && s.SeatType.SeatTypeName == "Couple")
                     ? (s.CoupleSeatSeatId1Navigation != null
@@ -53,7 +57,16 @@ namespace MV.InfrastructureLayer.Repositories
             return getSeats;
         }
 
-
+        public async Task<IEnumerable<Seat>> GetExistingSeatsForRoomUpdateCheckAsync(int roomId)
+        {
+            return await _context.Set<Seat>()
+                .Where(s => s.RoomId == roomId)
+                .ToListAsync();
+        }
         
+        public async Task AddAsync(Seat seat)
+        {
+            await _context.Seats.AddAsync(seat);
+        }
     }
 }

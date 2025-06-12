@@ -22,5 +22,8 @@ namespace MV.DomainLayer.CustomQueryModels
 
         public string? PairedWithSeatLocation { get; set; }
 
+        public string? SeatStatus { get; set; }
+
+       
     }
 }
