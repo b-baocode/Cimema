@@ -18,6 +18,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         ISeatRepository seatRepository { get; }
         ICoupleSeatRepository coupleSeatRepository { get; }
         IFoodCategoryRepository foodCategoryRepository { get; }
+        IFoodRepository foodRepository { get; }
 
         //Single commit point
         Task<int> SaveChangesAsync();
