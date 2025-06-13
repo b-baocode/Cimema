@@ -266,5 +266,23 @@ namespace MV.InfrastructureLayer.Repositories
 
             return await query.CountAsync();
         }
+
+        public async Task<bool> IsEmailExistsAsync(string email)
+        {
+            return await _context.Users
+                .AnyAsync(u => u.Email.ToLower() == email.ToLower());
+        }
+
+        public async Task<bool> IsPhoneExistsAsync(string phone)
+        {
+            return await _context.Users
+                .AnyAsync(u => u.Phone == phone);
+        }
+
+        public async Task<bool> IsIdentityNumberExistsAsync(string identityNumber)
+        {
+            return await _context.Users
+                .AnyAsync(u => u.Identitynumber == identityNumber);
+        }
     }
 }
