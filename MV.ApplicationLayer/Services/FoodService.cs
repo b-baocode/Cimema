@@ -67,7 +67,7 @@ namespace MV.ApplicationLayer.Services
             {
                 FoodName = request.FoodName,
                 FoodPrice = request.FoodPrice,
-                FoodPoster = posterUrl,
+                FoodPoster = "posterUrl",
                 Quantity = request.Quantity,
                 Status = "Active",
                 FoodCates = foodCategories.ToList()
