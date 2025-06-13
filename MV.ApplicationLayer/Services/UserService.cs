@@ -31,9 +31,6 @@ namespace MV.ApplicationLayer.Services
             if (user == null)
                 return null;
 
-            string oldImageUrl = user.Image;
-            string newImageUrl = null;
-
             // Handle image update if provided
             if (request.Image != null && request.Image.Length > 0)
             {
@@ -41,28 +38,25 @@ namespace MV.ApplicationLayer.Services
                 {
                     using var stream = request.Image.OpenReadStream();
                     var fileName = $"customer_{user.Userid}_{DateTime.UtcNow.Ticks}.jpg";
-                    newImageUrl = await _firebaseStorageService.UpdateImageAsync(stream, fileName, oldImageUrl);
-                    user.Image = newImageUrl;
+                    user.Image = await _firebaseStorageService.UpdateImageAsync(stream, fileName, user.Image);
                 }
                 catch (Exception ex)
                 {
-                    // If image update fails, keep the old image URL in database
-                    user.Image = oldImageUrl;
-                    Console.WriteLine($"Warning: Error updating customer image: {ex.Message}");
+                    throw new ValidationException($"Error processing image: {ex.Message}");
                 }
             }
 
+            // Update other user information
+            user.Fullname = request.Fullname;
+            user.Birthdate = request.Birthdate;
+            user.Gender = request.Gender;
+            user.Identitynumber = request.Identitynumber;
+            user.Email = request.Email;
+            user.Phone = request.Phone;
+            user.Address = request.Address;
+
             try
             {
-                // Update user information
-                user.Fullname = request.Fullname;
-                user.Birthdate = request.Birthdate;
-                user.Gender = request.Gender;
-                user.Identitynumber = request.Identitynumber;
-                user.Email = request.Email;
-                user.Phone = request.Phone;
-                user.Address = request.Address;
-
                 _unitOfWork.userRepository.Update(user);
                 await _unitOfWork.SaveChangesAsync();
 
@@ -81,20 +75,6 @@ namespace MV.ApplicationLayer.Services
             }
             catch (Exception ex)
             {
-                // If database update fails, try to rollback the image update
-                if (newImageUrl != null)
-                {
-                    try
-                    {
-                        await _firebaseStorageService.DeleteImageAsync(newImageUrl);
-                        user.Image = oldImageUrl;
-                    }
-                    catch
-                    {
-                        // Log the rollback failure but don't throw
-                        Console.WriteLine("Warning: Failed to rollback image update");
-                    }
-                }
                 throw new Exception($"Error updating profile: {ex.Message}");
             }
         }
@@ -168,28 +148,17 @@ namespace MV.ApplicationLayer.Services
         {
             var user = await _unitOfWork.userRepository.GetByIdAsync(id);
             if (user == null)
-                throw new ValidationException("Customer not found");
+                return false;
 
             try
             {
-                // Delete customer from database
-                var result = await _unitOfWork.userRepository.DeleteCustomerAsync(id);
-
-                // Delete customer image from Firebase Storage if exists
-                if (result && !string.IsNullOrEmpty(user.Image))
+                // Delete user image from Firebase Storage if exists
+                if (!string.IsNullOrEmpty(user.Image))
                 {
-                    try
-                    {
-                        await _firebaseStorageService.DeleteImageAsync(user.Image);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log the error but don't throw - the customer is already deleted
-                        Console.WriteLine($"Warning: Error deleting customer image: {ex.Message}");
-                    }
+                    await _firebaseStorageService.DeleteImageAsync(user.Image);
                 }
 
-                return result;
+                return await _unitOfWork.userRepository.DeleteCustomerAsync(id);
             }
             catch (Exception ex)
             {
