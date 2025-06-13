@@ -39,12 +39,14 @@ namespace MV.InfrastructureLayer
         private IRoomRepository _roomRepository;
         private ISeatRepository _seatRepository;
         private ICoupleSeatRepository _coupleSeatRepository;
+        private IFoodCategoryRepository _foodCategoryRepository;
 
         // Expose repository INTERFACES
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
         public IRoomRepository roomRepository => _roomRepository ??= new RoomRepository(_context);
         public ISeatRepository seatRepository => _seatRepository ??= new SeatRepository(_context);
         public ICoupleSeatRepository coupleSeatRepository => _coupleSeatRepository ??= new CoupleSeatRepository(_context);
+        public IFoodCategoryRepository foodCategoryRepository => _foodCategoryRepository ??= new FoodCategoryRepository(_context);
         
 
         // CONSTRUCTOR INJECTION for DbContext
