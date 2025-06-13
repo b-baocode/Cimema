@@ -33,5 +33,8 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<User> CreateCustomerAsync(User customer);
         Task<IEnumerable<User>> GetUsersAsync(string? keyword, int skip, int take);
         Task<int> GetTotalUsersAsync(string? keyword);
+        Task<bool> IsEmailExistsAsync(string email);
+        Task<bool> IsPhoneExistsAsync(string phone);
+        Task<bool> IsIdentityNumberExistsAsync(string identityNumber);
     }
 }

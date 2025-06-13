@@ -31,6 +31,21 @@ namespace MV.ApplicationLayer.Services
             if (user == null)
                 return null;
 
+            // Check if email is already used by another user
+            if (await _unitOfWork.userRepository.IsEmailExistsAsync(request.Email) && 
+                user.Email != request.Email)
+                throw new ValidationException("Email already exists");
+
+            // Check if phone is already used by another user
+            if (await _unitOfWork.userRepository.IsPhoneExistsAsync(request.Phone) && 
+                user.Phone != request.Phone)
+                throw new ValidationException("Phone number already exists");
+
+            // Check if identity number is already used by another user
+            if (await _unitOfWork.userRepository.IsIdentityNumberExistsAsync(request.Identitynumber) && 
+                user.Identitynumber != request.Identitynumber)
+                throw new ValidationException("Identity number already exists");
+
             string oldImageUrl = user.Image;
             string newImageUrl = null;
 
