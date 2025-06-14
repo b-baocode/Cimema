@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MV.DomainLayer.CustomQueryModels
+namespace MV.ApplicationLayer.DTO.ResponseModel
 {
-    public class GetAllRoomWithSeatCountCustom
+    public class GetAllRoomResponseCustomer
     {
         public int RoomId { get; set; }
 
@@ -20,14 +20,6 @@ namespace MV.DomainLayer.CustomQueryModels
 
         public decimal? RoomTypePrice { get; set; }
 
-        public string? RoomTypeStatus { get; set; }
-
-        public DateTime? CreatedAt { get; set; }
-
-        public DateTime? UpdatedAt { get; set; }
-
-        public string? RoomStatus { get; set; }
-
-        public int SeatsCountTotal { get; set; }
+        public int SeatsCount { get; set; }
     }
 }
