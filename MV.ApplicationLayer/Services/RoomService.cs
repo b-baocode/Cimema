@@ -73,6 +73,8 @@ namespace MV.ApplicationLayer.Services
                 Name = roomCreateRequest.Name,
                 Rows = roomCreateRequest.Rows,
                 Columns = roomCreateRequest.Columns,
+                RoomTypeId = 1,
+                CreatedAt = DateTime.Now,
                 Status = "Active"
             };
 
@@ -118,7 +120,7 @@ namespace MV.ApplicationLayer.Services
         }
 
 
-        public async Task<GetRoomWithSeatsByIdResponse?> GetRoomWithSeatsAsync(int searchedRoomId)
+        public async Task<GetRoomWithSeatsByIdResponse?> GetRoomWithSeatsByIdAsync(int searchedRoomId)
         {
             var roomResult = await _unitOfWork.roomRepository.GetRoomByIdAsync(searchedRoomId);
 
@@ -135,6 +137,8 @@ namespace MV.ApplicationLayer.Services
                 RoomName = roomResult.Name,
                 Rows = roomResult.Rows,
                 Columns = roomResult.Columns,
+                RoomTypeName = roomResult.RoomType.RoomTypeName,
+                RoomTypePrice = roomResult.RoomType.RoomTypePrice,
                 RoomStatus = roomResult.Status,
                 StandardSeatCount = seatsOfRoomList.Count(s => s.SeatTypeName == "Standard"),
                 VipSeatCount = seatsOfRoomList.Count(s => s.SeatTypeName == "VIP"),
@@ -169,7 +173,7 @@ namespace MV.ApplicationLayer.Services
                 return false;
             }
 
-            findRoomToDelete.Status = "UnActive";
+            findRoomToDelete.Status = "InActive";
 
             await _unitOfWork.SaveChangesAsync();
 
@@ -206,6 +210,8 @@ namespace MV.ApplicationLayer.Services
                     RoomName = s.RoomName,
                     Rows = s.Rows,
                     Columns = s.Columns,
+                    RoomTypeName = s.RoomTypeName,
+                    RoomTypePrice = s.RoomTypePrice,
                     RoomStatus = s.RoomStatus,
                     SeatsCount = s.SeatsCountTotal,
                 });
@@ -247,6 +253,8 @@ namespace MV.ApplicationLayer.Services
             existingRoom.Name = roomUpdateRequest.Name;
             existingRoom.Rows = roomUpdateRequest.Rows;
             existingRoom.Columns = roomUpdateRequest.Columns;
+            existingRoom.RoomTypeId = roomUpdateRequest.RoomTypeId;
+            existingRoom.UpdatedAt = DateTime.Now;
             existingRoom.Status = "Active";
 
             var seatsToDeactivate = new List<Seat>();
@@ -344,6 +352,7 @@ namespace MV.ApplicationLayer.Services
                 RoomName = existingRoom.Name,
                 Rows = existingRoom.Rows,
                 Columns = existingRoom.Columns,
+                RoomTypeId = existingRoom.RoomTypeId,
                 RowsAffected = rowsAffected,
                 RoomStatus = existingRoom.Status,
                 SeatsAddedCount = seatsToAdd.Count,

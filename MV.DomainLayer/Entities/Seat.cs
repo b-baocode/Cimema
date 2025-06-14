@@ -11,9 +11,9 @@ public partial class Seat
 
     public int ColumnNumber { get; set; }
 
-    public int? SeatTypeId { get; set; }
+    public int SeatTypeId { get; set; }
 
-    public int? RoomId { get; set; }
+    public int RoomId { get; set; }
 
     public string? Status { get; set; }
 
@@ -21,9 +21,7 @@ public partial class Seat
 
     public virtual CoupleSeat? CoupleSeatSeatId2Navigation { get; set; }
 
-    public virtual CinemaRoom? Room { get; set; }
+    public virtual CinemaRoom Room { get; set; } = null!;
 
-    public virtual SeatType? SeatType { get; set; }
-
-    public virtual ICollection<TicketDetail> TicketDetails { get; set; } = new List<TicketDetail>();
+    public virtual SeatType SeatType { get; set; } = null!;
 }

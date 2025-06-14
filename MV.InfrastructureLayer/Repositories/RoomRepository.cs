@@ -29,6 +29,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<CinemaRoom?> GetRoomByIdAsync(int searchedRoomId)
         {
             return await _context.Set<CinemaRoom>()
+                .Include(r => r.RoomType)
                 .FirstOrDefaultAsync(room => room.RoomId == searchedRoomId);
         }
 
@@ -41,6 +42,8 @@ namespace MV.InfrastructureLayer.Repositories
                     RoomName = s.Name,
                     Rows = s.Rows,
                     Columns = s.Columns,
+                    RoomTypeName = s.RoomType.RoomTypeName,
+                    RoomTypePrice = s.RoomType.RoomTypePrice,
                     RoomStatus = s.Status,
                     SeatsCountTotal = s.Seats.Count(seat => seat.Status == "Active"),
                     //test - NO TOUCH
