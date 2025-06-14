@@ -9,19 +9,15 @@ public partial class Showtime
 
     public int? MovieId { get; set; }
 
-    public int? RoomId { get; set; }
-
-    public decimal? MoviePrice { get; set; }
-
     public DateTime StartTime { get; set; }
 
     public DateTime EndTime { get; set; }
 
-    public bool? IsExpired { get; set; }
+    public int? MovieDuration { get; set; }
+
+    public string? Status { get; set; }
 
     public virtual Movie? Movie { get; set; }
 
-    public virtual CinemaRoom? Room { get; set; }
-
-    public virtual ICollection<TicketDetail> TicketDetails { get; set; } = new List<TicketDetail>();
+    public virtual ICollection<ShowtimeRoomInstance> ShowtimeRoomInstances { get; set; } = new List<ShowtimeRoomInstance>();
 }

@@ -78,7 +78,7 @@ namespace MV.PresnetationLayer.Controllers
 
             try
             {
-                var searchedResult = await _roomService.GetRoomWithSeatsAsync(id);
+                var searchedResult = await _roomService.GetRoomWithSeatsByIdAsync(id);
 
                 if (searchedResult == null)
                 {
