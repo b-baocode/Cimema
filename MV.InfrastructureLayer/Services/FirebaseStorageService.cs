@@ -59,15 +59,25 @@ namespace MV.InfrastructureLayer.Services
             {
                 if (string.IsNullOrEmpty(imageUrl)) return;
 
+                // Try to parse the URL, if it fails, just return silently
+                if (!Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri? uri))
+                {
+                    return;
+                }
+
                 // Extract object name from Firebase Storage URL
-                var uri = new Uri(imageUrl);
                 var pathSegments = uri.AbsolutePath.Split('/');
+                if (pathSegments.Length < 2)
+                {
+                    return;
+                }
                 var objectName = string.Join("/", pathSegments.Skip(pathSegments.Length - 2));
                 await _storageClient.DeleteObjectAsync(_bucketName, objectName);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                throw new Exception($"Error deleting image from Firebase Storage: {ex.Message}");
+                // Silently handle any errors during deletion
+                return;
             }
         }
     }
