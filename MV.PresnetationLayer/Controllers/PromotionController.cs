@@ -41,6 +41,16 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<ActionResult<PromotionResponse>> CreatePromotion(
             [FromForm] PromotionCreateRequest request)
         {
+            if (request.Image == null || request.Image.Length == 0)
+            {
+                return BadRequest("Image is required");
+            }
+
+            if (request.Image.ContentType != "image/jpeg" && request.Image.ContentType != "image/jpg")
+            {
+                return BadRequest("Only JPEG or JPG images are allowed.");
+            }
+
             try
             {
                 var promotion = await _promotionService.CreatePromotionAsync(request);
@@ -56,6 +66,16 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<ActionResult<PromotionResponse>> UpdatePromotion(
             int id, [FromForm] PromotionUpdateRequest request)
         {
+            if (request.Image == null || request.Image.Length == 0)
+            {
+                return BadRequest("Image is required");
+            }
+
+            if (request.Image.ContentType != "image/jpeg" && request.Image.ContentType != "image/jpg")
+            {
+                return BadRequest("Only JPEG or JPG images are allowed.");
+            }
+
             try
             {
                 var promotion = await _promotionService.UpdatePromotionAsync(id, request);

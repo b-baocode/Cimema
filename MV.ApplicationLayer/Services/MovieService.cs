@@ -72,7 +72,7 @@ namespace MV.ApplicationLayer.Services
                 {
                     using var stream = request.Poster.OpenReadStream();
                     var fileName = $"movie_{newMovieId}_{DateTime.UtcNow.Ticks}.jpg";
-                    posterUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName);
+                    posterUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName, "Movies-Poster");
                 }
                 catch (Exception ex)
                 {

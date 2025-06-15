@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
+using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
 using System;
@@ -31,6 +32,38 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.Set<RoomType>()
                 .AnyAsync(rt => rt.RoomTypeId == roomTypeId);
+        }
+
+        public async Task<IEnumerable<GetAllRoomTypeWithListRoom>> GetAllRoomTypeWithRoomAsync()
+        {
+            return await _context.Set<RoomType>()
+                .Select(rt => new GetAllRoomTypeWithListRoom
+                {
+                    RoomTypeId = rt.RoomTypeId,
+                    RoomTypeName = rt.RoomTypeName,
+                    RoomTypePrice = rt.RoomTypePrice,
+                    TypeDescription = rt.TypeDescription,
+                    RoomTypePicture = rt.RoomTypePicture,
+                    RoomTypeStatus = rt.Status,
+                    RoomsUsedRoomType = rt.CinemaRooms.Select(cr => new RoomForRoomType
+                    {
+                        RoomId = cr.RoomId,
+                        RoomName = cr.Name,
+                        RoomStatus = cr.Status,
+                    }).ToList()
+                })
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalRoomTypeCountAsync()
+        {
+            return await _context.Set<RoomType>()
+                .CountAsync();
+        }
+
+        public async Task AddAsync(RoomType roomType)
+        {
+            await _context.Set<RoomType>().AddAsync(roomType);
         }
     }
 }

@@ -74,6 +74,16 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<ActionResult<MovieResponse>> CreateMovie(
             [FromForm] MovieCreateRequest request)
         {
+            if (request.Poster == null || request.Poster.Length == 0)
+            {
+                return BadRequest("Image is required");
+            }
+
+            if (request.Poster.ContentType != "image/jpeg" && request.Poster.ContentType != "image/jpg")
+            {
+                return BadRequest("Only JPEG or JPG images are allowed.");
+            }
+
             try
             {
                 var movie = await _movieService.CreateMovieAsync(request);
@@ -90,6 +100,16 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<ActionResult<MovieResponse>> UpdateMovie(
             int id, [FromForm] MovieUpdateRequest request)
         {
+            if (request.Poster == null || request.Poster.Length == 0)
+            {
+                return BadRequest("Image is required");
+            }
+
+            if (request.Poster.ContentType != "image/jpeg" && request.Poster.ContentType != "image/jpg")
+            {
+                return BadRequest("Only JPEG or JPG images are allowed.");
+            }
+
             try
             {
                 var movie = await _movieService.UpdateMovieAsync(id, request);

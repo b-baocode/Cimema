@@ -7,7 +7,7 @@ using System;
 
 namespace MV.PresnetationLayer.Controllers
 {
-    public class RegisterController : Controller
+    public class RegisterController : ControllerBase
     {
         private readonly IRegisterService _registerService;
 

@@ -55,7 +55,7 @@ namespace MV.ApplicationLayer.Services
             string posterUrl;
             using (var stream = request.FoodPoster.OpenReadStream())
             {
-                posterUrl = await _firebaseStorageService.UploadImageAsync(stream, "foods");
+                posterUrl = await _firebaseStorageService.UploadImageAsync(stream, request.FoodPoster.Name, "FoodImages");
             }
 
             // Get food categories
@@ -110,7 +110,7 @@ namespace MV.ApplicationLayer.Services
                     string posterUrl;
                     using (var stream = request.FoodPoster.OpenReadStream())
                     {
-                        posterUrl = await _firebaseStorageService.UploadImageAsync(stream, "foods");
+                        posterUrl = await _firebaseStorageService.UploadImageAsync(stream, request.FoodPoster.Name, "FoodImages");
                     }
                     // Delete old poster
                     await _firebaseStorageService.DeleteImageAsync(food.FoodPoster);
