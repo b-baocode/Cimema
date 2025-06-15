@@ -74,6 +74,16 @@ namespace MV.PresnetationLayer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<FoodResponse>> CreateFood([FromForm] FoodRequest request)
         {
+            if (request.FoodPoster == null || request.FoodPoster.Length == 0)
+            {
+                return BadRequest("Image is required");
+            }
+
+            if (request.FoodPoster.ContentType != "image/jpeg" && request.FoodPoster.ContentType != "image/jpg")
+            {
+                return BadRequest("Only JPEG or JPG images are allowed.");
+            }
+
             try
             {
                 if (request == null)
@@ -96,6 +106,16 @@ namespace MV.PresnetationLayer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<FoodResponse>> UpdateFood(int id, [FromForm] FoodUpdateRequest request)
         {
+            if (request.FoodPoster == null || request.FoodPoster.Length == 0)
+            {
+                return BadRequest("Image is required");
+            }
+
+            if (request.FoodPoster.ContentType != "image/jpeg" && request.FoodPoster.ContentType != "image/jpg")
+            {
+                return BadRequest("Only JPEG or JPG images are allowed.");
+            }
+
             try
             {
                 if (request == null)

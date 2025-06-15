@@ -20,6 +20,12 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
 
         public decimal? RoomTypePrice { get; set; }
 
+        public string? RoomTypeStatus { get; set; }
+
+        public DateTime? RoomCreateTime { get; set; }
+
+        public DateTime? RoomUpdateTime { get; set; }
+
         public string? RoomStatus { get; set; }
 
         public int SeatsCount { get; set; }

@@ -54,6 +54,8 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<ICoupleSeatRepository, CoupleSeatRepository>();
             services.AddScoped<IFoodCategoryRepository, FoodCategoryRepository>();
             services.AddScoped<IFoodRepository, FoodRepository>();
+            services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
+            services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
 
 
             //Service injection
@@ -65,6 +67,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
             services.AddScoped<IFoodCategoryService, FoodCategoryService>();
             services.AddScoped<IFoodService, FoodService>();
+            services.AddScoped<IRoomTypeService, RoomTypeService>();
 
 
             //Unit of work

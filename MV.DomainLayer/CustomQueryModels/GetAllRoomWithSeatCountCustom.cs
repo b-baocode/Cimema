@@ -20,6 +20,12 @@ namespace MV.DomainLayer.CustomQueryModels
 
         public decimal? RoomTypePrice { get; set; }
 
+        public string? RoomTypeStatus { get; set; }
+
+        public DateTime? CreatedAt { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+
         public string? RoomStatus { get; set; }
 
         public int SeatsCountTotal { get; set; }

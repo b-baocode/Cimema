@@ -5,6 +5,7 @@ using Google.Cloud.Storage.V1;
 using Google.Apis.Auth.OAuth2;
 using MV.ApplicationLayer.ServiceInterfaces;
 using Microsoft.Extensions.Configuration;
+using System.Web;
 
 namespace MV.InfrastructureLayer.Services
 {
@@ -20,11 +21,28 @@ namespace MV.InfrastructureLayer.Services
             _bucketName = configuration["Firebase:StorageBucket"] ?? throw new ArgumentNullException("Firebase:StorageBucket configuration is missing");
         }
 
-        public async Task<string> UploadImageAsync(Stream imageStream, string fileName)
+        public async Task<string> UploadImageAsync(Stream imageStream, string fileName, string folderPath)
         {
+            if (imageStream == null)
+            {
+                throw new ArgumentNullException(nameof(imageStream));
+            }
+            if (string.IsNullOrWhiteSpace(fileName))
+            {
+                throw new ArgumentException("File name cannot be null or empty.", nameof(fileName));
+            }
+            if (string.IsNullOrWhiteSpace(folderPath))
+            {
+                throw new ArgumentException("Folder path cannot be null or empty.", nameof(folderPath));
+            }
+
             try
             {
-                var objectName = $"images/{fileName}";
+                string cleanedFolderPath = folderPath.Trim('/').Replace("\\", "/");
+                
+
+                var objectName = $"{cleanedFolderPath}/{fileName}";
+
                 await _storageClient.UploadObjectAsync(_bucketName, objectName, "image/jpeg", imageStream);
                 return $"https://firebasestorage.googleapis.com/v0/b/{_bucketName}/o/{Uri.EscapeDataString(objectName)}?alt=media";
             }
@@ -38,6 +56,27 @@ namespace MV.InfrastructureLayer.Services
         {
             try
             {
+                var uri = new Uri(oldImageUrl);
+
+                string path = HttpUtility.UrlDecode(uri.AbsolutePath);
+
+                // xoa "/v0/b/[bucket-name]/o/"
+                string[] pathParts = path.Split(new[] { "/o/" }, StringSplitOptions.None);
+
+                string oldFileName = pathParts[1];
+
+                // xoa parameters
+                int indexOfQueryParam = oldFileName.IndexOf('?');
+                if (indexOfQueryParam != -1)
+                {
+                    oldFileName = oldFileName.Substring(0, indexOfQueryParam);
+                }
+
+                //lay path : Images/cat.jpg
+                string objectPath = oldFileName;
+
+                string oldImageFolderName = objectPath.Split('/')[0];
+
                 // Delete old image if exists
                 if (!string.IsNullOrEmpty(oldImageUrl))
                 {
@@ -45,7 +84,7 @@ namespace MV.InfrastructureLayer.Services
                 }
 
                 // Upload new image
-                return await UploadImageAsync(imageStream, fileName);
+                return await UploadImageAsync(imageStream, fileName, oldImageFolderName);
             }
             catch (Exception ex)
             {
@@ -57,27 +96,32 @@ namespace MV.InfrastructureLayer.Services
         {
             try
             {
-                if (string.IsNullOrEmpty(imageUrl)) return;
+                var uri = new Uri(imageUrl);
 
-                // Try to parse the URL, if it fails, just return silently
-                if (!Uri.TryCreate(imageUrl, UriKind.Absolute, out Uri? uri))
+                string path = HttpUtility.UrlDecode(uri.AbsolutePath);
+
+                // xoa "/v0/b/[bucket-name]/o/"
+                string[] pathParts = path.Split(new[] { "/o/" }, StringSplitOptions.None);
+
+                string fileName = pathParts[1];
+
+                // xoa parameters
+                int indexOfQueryParam = fileName.IndexOf('?');
+                if (indexOfQueryParam != -1)
                 {
-                    return;
+                    fileName = fileName.Substring(0, indexOfQueryParam);
                 }
 
-                // Extract object name from Firebase Storage URL
-                var pathSegments = uri.AbsolutePath.Split('/');
-                if (pathSegments.Length < 2)
-                {
-                    return;
-                }
-                var objectName = string.Join("/", pathSegments.Skip(pathSegments.Length - 2));
-                await _storageClient.DeleteObjectAsync(_bucketName, objectName);
+                //lay path : Images/cat.jpg
+                string objectPath = fileName;
+
+                //delete
+                await _storageClient.DeleteObjectAsync(_bucketName, objectPath);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // Silently handle any errors during deletion
-                return;
+
+                throw new Exception($"An error occurred while deleting the image: {ex.Message}", ex);
             }
         }
     }

@@ -72,7 +72,7 @@ namespace MV.ApplicationLayer.Services
                 {
                     using var stream = request.Image.OpenReadStream();
                     var fileName = $"promotion_{newPromotionId}_{DateTime.UtcNow.Ticks}.jpg";
-                    imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName);
+                    imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName, "PromotionImages");
                 }
                 catch (Exception ex)
                 {

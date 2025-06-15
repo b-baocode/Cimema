@@ -44,6 +44,9 @@ namespace MV.InfrastructureLayer.Repositories
                     Columns = s.Columns,
                     RoomTypeName = s.RoomType.RoomTypeName,
                     RoomTypePrice = s.RoomType.RoomTypePrice,
+                    RoomTypeStatus = s.RoomType.Status,
+                    CreatedAt = s.CreatedAt,
+                    UpdatedAt = s.UpdatedAt,
                     RoomStatus = s.Status,
                     SeatsCountTotal = s.Seats.Count(seat => seat.Status == "Active"),
                     //test - NO TOUCH
