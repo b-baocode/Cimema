@@ -1,0 +1,150 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using MV.ApplicationLayer.DTO.RequestModel;
+using MV.ApplicationLayer.DTO.ResponseModel;
+using MV.ApplicationLayer.ServiceInterfaces;
+
+namespace MV.PresnetationLayer.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    // [Authorize(Roles = "Admin,Manager")]
+    public class MovieController : ControllerBase
+    {
+        private readonly IMovieService _movieService;
+
+        public MovieController(IMovieService movieService)
+        {
+            _movieService = movieService;
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<ActionResult<PagedResult<MovieResponse>>> GetMovies(
+            [FromQuery] MovieSearchRequest request)
+        {
+            var result = await _movieService.GetMoviesAsync(request);
+            return Ok(result);
+        }
+
+        [HttpGet("SearchByTime")]
+        [Authorize(Roles = "Customer")]
+        public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByTime(
+            [FromQuery] MovieSearchByTimeRequest request)
+        {
+            try
+            {
+                var result = await _movieService.SearchMoviesByTimeAsync(request);
+                return Ok(result);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("SearchByMovie")]
+        [Authorize(Roles = "Customer")]
+        public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByMovie(
+            [FromQuery] MovieSearchByCustomerRequest request)
+        {
+            try
+            {
+                var result = await _movieService.SearchMoviesByCustomerAsync(request);
+                return Ok(result);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<ActionResult<MovieResponse>> GetMovie(int id)
+        {
+            var movie = await _movieService.GetMovieByIdAsync(id);
+            if (movie == null)
+                return NotFound();
+
+            return Ok(movie);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<ActionResult<MovieResponse>> CreateMovie(
+            [FromForm] MovieCreateRequest request)
+        {
+            if (request.Poster == null || request.Poster.Length == 0)
+            {
+                return BadRequest("Image is required");
+            }
+
+            if (request.Poster.ContentType != "image/jpeg" && request.Poster.ContentType != "image/jpg")
+            {
+                return BadRequest("Only JPEG or JPG images are allowed.");
+            }
+
+            try
+            {
+                var movie = await _movieService.CreateMovieAsync(request);
+                return CreatedAtAction(nameof(GetMovie), new { id = movie.MovieId }, movie);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<ActionResult<MovieResponse>> UpdateMovie(
+            int id, [FromForm] MovieUpdateRequest request)
+        {
+            if (request.Poster == null || request.Poster.Length == 0)
+            {
+                return BadRequest("Image is required");
+            }
+
+            if (request.Poster.ContentType != "image/jpeg" && request.Poster.ContentType != "image/jpg")
+            {
+                return BadRequest("Only JPEG or JPG images are allowed.");
+            }
+
+            try
+            {
+                var movie = await _movieService.UpdateMovieAsync(id, request);
+                return Ok(movie);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<ActionResult> DeleteMovie(int id)
+        {
+            try
+            {
+                await _movieService.DeleteMovieAsync(id);
+                return NoContent();
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("ComingSoon")]
+        [AllowAnonymous]
+        public async Task<ActionResult<PagedResult<MovieResponse>>> GetComingSoonMovies(
+            [FromQuery] MovieSearchRequest request)
+        {
+            var result = await _movieService.GetComingSoonMoviesAsync(request);
+            return Ok(result);
+        }
+    }
+}
