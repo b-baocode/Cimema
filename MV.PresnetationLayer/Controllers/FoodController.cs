@@ -12,6 +12,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,Manager")]
     public class FoodController : ControllerBase
     {
         private readonly IFoodService _foodService;
@@ -142,6 +143,28 @@ namespace MV.PresnetationLayer.Controllers
             {
                 await _foodService.DeleteFoodAsync(id);
                 return Ok("Food deleted successfully");
+            }
+            catch (ValidationException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "An unexpected error occurred");
+            }
+        }
+
+        [HttpPut("{id}/quantity")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<FoodResponse>> UpdateFoodQuantity(int id, [FromBody] FoodQuantityUpdateRequest request)
+        {
+            try
+            {
+                if (request == null)
+                    return BadRequest("Invalid request data");
+
+                var food = await _foodService.UpdateFoodQuantityAsync(id, request);
+                return Ok(food);
             }
             catch (ValidationException ex)
             {
