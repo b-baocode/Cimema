@@ -21,20 +21,8 @@ namespace MV.ApplicationLayer.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<IEnumerable<CommentRatingResponse>> GetAllAsync()
-        {
-            var commentRatings = await _unitOfWork.commentRatingRepository.GetAllAsync();
-            return commentRatings.Select(MapToResponse);
-        }
-
-        public async Task<CommentRatingResponse> GetByIdAsync(int id)
-        {
-            var commentRating = await _unitOfWork.commentRatingRepository.GetByIdAsync(id);
-            if (commentRating == null)
-                throw new NotFoundException($"Comment rating with ID {id} not found.");
-
-            return MapToResponse(commentRating);
-        }
+    
+      
 
         public async Task<PagedResult<CommentRatingResponse>> GetByMovieIdAsync(int movieId, CommentRatingPagingRequest request)
         {
@@ -55,11 +43,7 @@ namespace MV.ApplicationLayer.Services
             };
         }
 
-        public async Task<IEnumerable<CommentRatingResponse>> GetByUserIdAsync(string userId)
-        {
-            var commentRatings = await _unitOfWork.commentRatingRepository.GetByUserIdAsync(userId);
-            return commentRatings.Select(MapToResponse);
-        }
+      
 
         public async Task<CommentRatingResponse> CreateAsync(CommentRatingRequest request)
         {
@@ -78,20 +62,6 @@ namespace MV.ApplicationLayer.Services
             return MapToResponse(createdComment);
         }
 
-        public async Task<CommentRatingResponse> UpdateAsync(int id, CommentRatingRequest request)
-        {
-            var existingComment = await _unitOfWork.commentRatingRepository.GetByIdAsync(id);
-            if (existingComment == null)
-                throw new NotFoundException($"Comment rating with ID {id} not found.");
-
-            existingComment.Rating = request.Rating;
-            existingComment.Comment = request.Comment;
-
-            var updatedComment = await _unitOfWork.commentRatingRepository.UpdateAsync(existingComment);
-            await _unitOfWork.SaveChangesAsync();
-
-            return MapToResponse(updatedComment);
-        }
 
         public async Task<bool> DeleteAsync(int id)
         {

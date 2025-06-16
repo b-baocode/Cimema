@@ -64,7 +64,6 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<CommentRating> CreateAsync(CommentRating commentRating)
         {
-            commentRating.CreatedAt = DateTime.UtcNow;
             await _context.CommentRatings.AddAsync(commentRating);
             return commentRating;
         }
