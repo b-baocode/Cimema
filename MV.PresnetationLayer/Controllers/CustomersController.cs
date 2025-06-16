@@ -63,14 +63,17 @@ namespace MV.PresnetationLayer.Controllers
         [HttpPut("profile")]
         public async Task<IActionResult> EditProfile([FromForm] CustomersRequest request)
         {
-            if (request.Image == null || request.Image.Length == 0)
-            {
-                return BadRequest("Image is required");
-            }
+            //if (request.Image == null || request.Image.Length == 0)
+            //{
+            //    return BadRequest("Image is required");
+            //}
 
-            if (request.Image.ContentType != "image/jpeg" && request.Image.ContentType != "image/jpg")
+            if(request.Image != null)
             {
-                return BadRequest("Only JPEG or JPG images are allowed.");
+                if (request.Image.ContentType != "image/jpeg" && request.Image.ContentType != "image/jpg")
+                {
+                    return BadRequest("Only JPEG or JPG images are allowed.");
+                }
             }
 
             try
