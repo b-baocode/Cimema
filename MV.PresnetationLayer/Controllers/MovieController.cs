@@ -9,7 +9,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,Manager")]
+    // [Authorize(Roles = "Admin,Manager")]
     public class MovieController : ControllerBase
     {
         private readonly IMovieService _movieService;
@@ -20,6 +20,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<PagedResult<MovieResponse>>> GetMovies(
             [FromQuery] MovieSearchRequest request)
         {
@@ -28,7 +29,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("SearchByTime")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Customer")]
         public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByTime(
             [FromQuery] MovieSearchByTimeRequest request)
         {
@@ -44,7 +45,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("SearchByMovie")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Customer")]
         public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByMovie(
             [FromQuery] MovieSearchByCustomerRequest request)
         {
@@ -60,6 +61,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<MovieResponse>> GetMovie(int id)
         {
             var movie = await _movieService.GetMovieByIdAsync(id);
@@ -135,5 +137,14 @@ namespace MV.PresnetationLayer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpGet("ComingSoon")]
+        [AllowAnonymous]
+        public async Task<ActionResult<PagedResult<MovieResponse>>> GetComingSoonMovies(
+            [FromQuery] MovieSearchRequest request)
+        {
+            var result = await _movieService.GetComingSoonMoviesAsync(request);
+            return Ok(result);
+        }
     }
-} 
+}

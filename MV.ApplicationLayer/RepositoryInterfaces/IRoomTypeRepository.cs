@@ -20,5 +20,9 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 
         Task AddAsync(RoomType roomType);
 
+        Task<GetAllRoomTypeWithListRoom?> GetRoomTypeByIdWithRoom(int roomTypeId);
+
+        Task<RoomType?> GetRoomTypeByIdTrackedAsync(int roomTypeId);
+
     }
 }

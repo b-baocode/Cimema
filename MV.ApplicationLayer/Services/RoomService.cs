@@ -70,14 +70,14 @@ namespace MV.ApplicationLayer.Services
         {
             var standardSeatTypeId = await _unitOfWork.seatTypeRepository.GetStandardSeatTypeIdAsync();
 
-            var standardRoomTypeId = await _unitOfWork.roomTypeRepository.GetStandardRoomTypeIdAsync();
+            //var standardRoomTypeId = await _unitOfWork.roomTypeRepository.GetStandardRoomTypeIdAsync();
 
             var room = new CinemaRoom
             {
                 Name = roomCreateRequest.Name,
                 Rows = roomCreateRequest.Rows,
                 Columns = roomCreateRequest.Columns,
-                RoomTypeId = standardRoomTypeId,
+                RoomTypeId = roomCreateRequest.RoomTypeId,
                 CreatedAt = DateTime.Now,
                 Status = "Active"
             };
