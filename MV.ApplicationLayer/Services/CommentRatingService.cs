@@ -47,6 +47,12 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<CommentRatingResponse> CreateAsync(CommentRatingRequest request)
         {
+            var existingComment = await _unitOfWork.commentRatingRepository.GetByUserIdAndMovieIdAsync(request.UserId, request.MovieId);
+            if (existingComment != null)
+            {
+                throw new CommentAlreadyExistsException("You have already commented on this movie.");
+            }
+
             var commentRating = new CommentRating
             {
                 Userid = request.UserId,

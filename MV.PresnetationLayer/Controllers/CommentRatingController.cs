@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
+using MV.ApplicationLayer.GenericExceptionReport;
 using MV.ApplicationLayer.ServiceInterfaces;
+using MV.ApplicationLayer.SpecificExceptionReport;
 using System.Threading.Tasks;
 
 namespace MV.PresnetationLayer.Controllers
@@ -39,8 +41,19 @@ namespace MV.PresnetationLayer.Controllers
                 return BadRequest(ModelState);
             }
 
-            var commentRating = await _commentRatingService.CreateAsync(request);
-            return CreatedAtAction(nameof(GetByMovieId), new { movieId = commentRating.MovieId }, commentRating);
+            try
+            {
+                var commentRating = await _commentRatingService.CreateAsync(request);
+                return CreatedAtAction(nameof(GetByMovieId), new { movieId = commentRating.MovieId }, commentRating);
+            }
+            catch (CommentAlreadyExistsException ex)
+            {
+                return Conflict(new { message = ex.Message }); // 409 Conflict
+            }
+            catch (UniqueConstraintViolationException ex)
+            {
+                return Conflict(new { message = ex.Message }); // 409 Conflict
+            }
         }
 
         [HttpDelete("{id}")]

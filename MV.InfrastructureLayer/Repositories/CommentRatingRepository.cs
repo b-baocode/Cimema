@@ -94,5 +94,10 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.CommentRatings.AnyAsync(cr => cr.CommentRatingId == id);
         }
+
+        public async Task<CommentRating> GetByUserIdAndMovieIdAsync(string userId, int movieId)
+        {
+            return await _context.CommentRatings.FirstOrDefaultAsync(cr => cr.Userid == userId && cr.MovieId == movieId);
+        }
     }
 } 

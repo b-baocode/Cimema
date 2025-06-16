@@ -12,6 +12,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<IEnumerable<CommentRating>> GetByMovieIdAsync(int movieId, int skip, int take);
         Task<int> GetTotalByMovieIdAsync(int movieId);
         Task<IEnumerable<CommentRating>> GetByUserIdAsync(string userId);
+        Task<CommentRating> GetByUserIdAndMovieIdAsync(string userId, int movieId);
         Task<CommentRating> CreateAsync(CommentRating commentRating);
         Task<CommentRating> UpdateAsync(CommentRating commentRating);
         Task<bool> DeleteAsync(int id);
