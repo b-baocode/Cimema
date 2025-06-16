@@ -106,7 +106,7 @@ namespace MV.ApplicationLayer.Services
             var genres = await _unitOfWork.genreRepository.GetGenresByIdsAsync(request.GenreIds);
             if (!genres.Any())
                 throw new ValidationException("No valid genres found for the provided genre IDs");
-            
+
             movie.Genres = genres.ToList();
 
             try
@@ -168,7 +168,7 @@ namespace MV.ApplicationLayer.Services
             var genres = await _unitOfWork.genreRepository.GetGenresByIdsAsync(request.GenreIds);
             if (!genres.Any())
                 throw new ValidationException("No valid genres found for the provided genre IDs");
-            
+
             movie.Genres.Clear();
             movie.Genres = genres.ToList();
 
@@ -190,7 +190,7 @@ namespace MV.ApplicationLayer.Services
             {
                 // Delete movie poster from Firebase Storage
                 // await _firebaseStorageService.DeleteImageAsync(movie.Poster);
-                
+
                 // Delete movie from database
                 // await _unitOfWork.movieRepository.DeleteMovieAsync(id);
 
@@ -255,6 +255,26 @@ namespace MV.ApplicationLayer.Services
             };
         }
 
+        public async Task<PagedResult<MovieResponse>> GetComingSoonMoviesAsync(MovieSearchRequest request)
+        {
+            var movies = await _unitOfWork.movieRepository.GetComingSoonMoviesAsync(
+                request.Keyword,
+                (request.Page - 1) * request.PageSize,
+                request.PageSize);
+
+            var totalItems = await _unitOfWork.movieRepository.GetTotalComingSoonMoviesAsync(
+                request.Keyword);
+
+            return new PagedResult<MovieResponse>
+            {
+                Items = movies.Select(MapToResponse).ToList(),
+                TotalItems = totalItems,
+                Page = request.Page,
+                PageSize = request.PageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)request.PageSize)
+            };
+        }
+
         private MovieResponse MapToResponse(Movie movie)
         {
             return new MovieResponse
@@ -303,9 +323,9 @@ namespace MV.ApplicationLayer.Services
             if (publishDate.HasValue)
             {
                 var publishDateVietnam = DateOnly.FromDateTime(TimeZoneInfo.ConvertTime(
-                    publishDate.Value.ToDateTime(TimeOnly.MinValue), 
+                    publishDate.Value.ToDateTime(TimeOnly.MinValue),
                     vietnamTimeZone));
-                
+
                 if (publishDateVietnam > DateOnly.FromDateTime(toDateVietnam))
                 {
                     throw new ValidationException("Publish date cannot be after to date");
@@ -385,4 +405,4 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("At least one genre is required");
         }
     }
-} 
+}

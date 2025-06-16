@@ -13,5 +13,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<MovieResponse> CreateMovieAsync(MovieCreateRequest request);
         Task<MovieResponse> UpdateMovieAsync(int id, MovieUpdateRequest request);
         Task DeleteMovieAsync(int id);
+        Task<PagedResult<MovieResponse>> GetComingSoonMoviesAsync(MovieSearchRequest request);
     }
-} 
+}

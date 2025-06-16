@@ -113,7 +113,7 @@ namespace MV.InfrastructureLayer.Repositories
                 Address = registerRequest.Address,
                 //Accumulatedpoints = 0,
                 Status = 1,
-                Roleid = 1,
+                Roleid = 4,
             };
 
             _context.Users.Add(newUser);
@@ -122,7 +122,10 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<User> GetUserByUsername(string userName)
         {
+            // === THAY ĐỔI Ở ĐÂY ===
+            // Thêm .Include(u => u.Role) để Entity Framework tải thông tin Role liên quan
             var getUser = await _context.Set<User>()
+                .Include(u => u.Role) // <--- Thêm dòng này
                 .Where(u => u.Username == userName)
                 .FirstOrDefaultAsync();
 
