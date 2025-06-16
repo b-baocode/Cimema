@@ -50,15 +50,15 @@ namespace MV.ApplicationLayer.DTO.RequestModel
 
         public IFormFile? Image { get; set; }
 
-        //public static ValidationResult ValidateBirthDate(DateOnly? birthDate, ValidationContext context)
-        //{
-        //    if (birthDate == null)
-        //        return new ValidationResult("Birth date is required");
+        public static ValidationResult ValidateBirthDate(DateOnly? birthDate, ValidationContext context)
+        {
+            if (birthDate == null)
+                return new ValidationResult("Birth date is required");
 
-        //    if (birthDate > DateOnly.FromDateTime(DateTime.Now))
-        //        return new ValidationResult("Birth date cannot be in the future");
+            if (birthDate > DateOnly.FromDateTime(DateTime.Now))
+                return new ValidationResult("Birth date cannot be in the future");
 
-        //    return ValidationResult.Success;
-        //}
+            return ValidationResult.Success;
+        }
     }
 }
