@@ -126,5 +126,76 @@ namespace MV.ApplicationLayer.Services
             return response;
         }
 
+        public async Task<GetAllRoomTypeWithRoomAdminResponse?> GetRoomTypeByIdWithRoomAsync(int roomTypeId)
+        {
+            var searchResult = await _unitOfWork.roomTypeRepository.GetRoomTypeByIdWithRoom(roomTypeId);
+
+            if(searchResult == null)
+            {
+                return null;
+            }
+
+            var response = new GetAllRoomTypeWithRoomAdminResponse
+            {
+                RoomTypeId = searchResult.RoomTypeId,
+                RoomTypeName = searchResult.RoomTypeName,
+                RoomTypePrice = searchResult.RoomTypePrice,
+                TypeDescription = searchResult.TypeDescription,
+                RoomTypePicture = searchResult.RoomTypePicture,
+                RoomTypeStatus = searchResult.RoomTypeStatus,
+                RoomsUsedRoomType = searchResult.RoomsUsedRoomType?.Select(
+                        r => new RoomForRoomType
+                        {
+                            RoomId = r.RoomId,
+                            RoomName = r.RoomName,
+                            RoomStatus = r.RoomStatus,
+                        }).ToList()
+            };
+
+            return response;
+        }
+
+        public async Task<(bool, string)> DeleteRoomTypeAsync(int deleteRoomTypeId)
+        {
+            var findRoomTypeToDelete = await _unitOfWork.roomTypeRepository.GetRoomTypeByIdTrackedAsync(deleteRoomTypeId);
+
+            if (findRoomTypeToDelete == null)
+            {
+                return (false, "Not exist");
+            }
+
+            if(findRoomTypeToDelete.CinemaRooms?.Count > 0)
+            {
+                return (false, $"Room with id {deleteRoomTypeId} is being used");
+            }
+
+            if(findRoomTypeToDelete.RoomTypeName == "Standard")
+            {
+                return (false, $"Can't delete Standard type");
+            }
+
+            findRoomTypeToDelete.Status = "InActive";
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return (true, "Success");
+        }
+
+        public async Task<bool> UnDeleteRoomTypeAsync(int unDeleteRoomTypeId)
+        {
+            var findRoomTypeToUnDelete = await _unitOfWork.roomTypeRepository.GetRoomTypeByIdTrackedAsync(unDeleteRoomTypeId);
+
+            if (findRoomTypeToUnDelete == null)
+            {
+                return false;
+            }
+
+            findRoomTypeToUnDelete.Status = "Active";
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
+        }
+
     }
 }
