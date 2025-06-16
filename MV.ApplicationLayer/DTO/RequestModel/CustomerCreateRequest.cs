@@ -1,18 +1,18 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace MV.ApplicationLayer.DTO.RequestModel
 {
-    public class CustomersRequest
+    public class CustomerCreateRequest
     {
-        [Required(ErrorMessage = "User ID is required")]
-        [StringLength(50, ErrorMessage = "User ID cannot exceed 50 characters")]
-        public string Userid { get; set; } = null!;
+        //[Required(ErrorMessage = "User ID is required")]
+        //[StringLength(50, ErrorMessage = "User ID cannot exceed 50 characters")]
+        //public string Userid { get; set; } = null!;
 
         [Required(ErrorMessage = "Full name is required")]
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Full name must be between 2-100 characters")]
@@ -48,7 +48,7 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [StringLength(255, ErrorMessage = "Address must not exceed 255 characters")]
         public string? Address { get; set; }
 
-        public IFormFile? Image { get; set; }
+        //public IFormFile? Image { get; set; }
 
         //public static ValidationResult ValidateBirthDate(DateOnly? birthDate, ValidationContext context)
         //{
