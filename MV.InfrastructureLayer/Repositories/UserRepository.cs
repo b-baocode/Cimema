@@ -124,6 +124,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var getUser = await _context.Set<User>()
                 .Where(u => u.Username == userName)
+                .Include(u => u.Role)
                 .FirstOrDefaultAsync();
 
             if (getUser == null)
