@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MV.DomainLayer.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         IFoodRepository foodRepository { get; }
         ISeatTypeRepository seatTypeRepository { get; }
         IRoomTypeRepository roomTypeRepository { get; }
+        ICommentRatingRepository commentRatingRepository { get; }
 
         //Single commit point
         Task<int> SaveChangesAsync();

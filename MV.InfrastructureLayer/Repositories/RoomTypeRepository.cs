@@ -65,5 +65,34 @@ namespace MV.InfrastructureLayer.Repositories
         {
             await _context.Set<RoomType>().AddAsync(roomType);
         }
+
+        public async Task<GetAllRoomTypeWithListRoom?> GetRoomTypeByIdWithRoom(int roomTypeId)
+        {
+            return await _context.Set<RoomType>()
+                .Select(rt => new GetAllRoomTypeWithListRoom
+                {
+                    RoomTypeId = rt.RoomTypeId,
+                    RoomTypeName = rt.RoomTypeName,
+                    RoomTypePrice = rt.RoomTypePrice,
+                    TypeDescription = rt.TypeDescription,
+                    RoomTypePicture = rt.RoomTypePicture,
+                    RoomTypeStatus = rt.Status,
+                    RoomsUsedRoomType = rt.CinemaRooms.Select(cr => new RoomForRoomType
+                    {
+                        RoomId = cr.RoomId,
+                        RoomName = cr.Name,
+                        RoomStatus = cr.Status,
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync(r  => r.RoomTypeId == roomTypeId);
+        }
+
+        public async Task<RoomType?> GetRoomTypeByIdTrackedAsync(int roomTypeId)
+        {
+            return await _context.Set<RoomType>()
+                .Include(rooms => rooms.CinemaRooms)
+                .FirstOrDefaultAsync(r => r.RoomTypeId == roomTypeId);
+        }
+
     }
 }
