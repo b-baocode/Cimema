@@ -79,6 +79,7 @@ namespace MV.ApplicationLayer.Services
                 Password = _passwordRepository.HashPassword(request.Password),
                 Joindate = DateTime.Now,
                 Roleid = request.RoleId,
+                Image = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media",
                 Status = 1, // Active
                 Birthdate = DateOnly.FromDateTime(request.DateOfBirth),
                 Gender = request.Sex ? 1 : 0 // 1 for male, 0 for female

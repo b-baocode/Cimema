@@ -135,18 +135,10 @@ namespace MV.PresnetationLayer.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateCustomer([FromForm] CustomersRequest request)
+        public async Task<IActionResult> CreateCustomer([FromForm] CustomerCreateRequest request)
         {
 
-            if (request.Image == null || request.Image.Length == 0)
-            {
-                return BadRequest("Image is required");
-            }
-
-            if (request.Image.ContentType != "image/jpeg" && request.Image.ContentType != "image/jpg")
-            {
-                return BadRequest("Only JPEG or JPG images are allowed.");
-            }
+           
 
             try
             {

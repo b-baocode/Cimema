@@ -35,6 +35,22 @@ namespace MV.PresnetationLayer.Controllers
         {
             try
             {
+                var checkTypeExist = await _roomTypeService.CheckTypeExistByIdAsync(roomCreateRequest.RoomTypeId);
+
+                if (checkTypeExist == false)
+                {
+                    return BadRequest(
+                            new ProblemDetails
+                            {
+                                Title = "Room Type not found",
+                                Status = StatusCodes.Status400BadRequest,
+                                Detail = $"Room type with ID {roomCreateRequest.RoomTypeId} does not exist.",
+                                Instance = HttpContext.Request.Path
+                            });
+                }
+
+
+
                 var createdRoom = await _roomService.AddRoomWithSeatsAsync(roomCreateRequest);
 
                 return CreatedAtAction(

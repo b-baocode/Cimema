@@ -96,6 +96,12 @@ namespace MV.InfrastructureLayer.Services
         {
             try
             {
+                if (imageUrl == null || imageUrl == "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media&token=11cc28fe-2437-4527-a755-909c0a332ffa" ||
+                    imageUrl == "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media")
+                {
+                    return;
+                }
+
                 var uri = new Uri(imageUrl);
 
                 string path = HttpUtility.UrlDecode(uri.AbsolutePath);

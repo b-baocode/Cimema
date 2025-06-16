@@ -17,7 +17,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<PagedResult<CustomersReponse>> GetUsersAsync(UserSearchRequest request);
 
         Task<bool> DeleteCustomerAsync(string id);
-        Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request);
+        Task<CustomersReponse> CreateCustomerAsync(CustomerCreateRequest request);
         Task<UserResponse> UpdateUserAsync(string id, UserRequest request);
         Task DeleteUserAsync(string id);
     }

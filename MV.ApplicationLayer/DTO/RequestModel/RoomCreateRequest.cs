@@ -18,6 +18,9 @@ namespace MV.ApplicationLayer.DTO.RequestModel
 
         [Range(1, 10, ErrorMessage = "Columns must be between 1 and 10.")]
         public int Columns { get; set; }
-        
+
+        [Required]
+        public int RoomTypeId { get; set; }
+
     }
 }
