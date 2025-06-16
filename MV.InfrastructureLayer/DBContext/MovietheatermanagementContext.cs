@@ -40,15 +40,21 @@ public partial class MovietheatermanagementContext : DbContext
 
     public virtual DbSet<Role> Roles { get; set; }
 
+    public virtual DbSet<RoomType> RoomTypes { get; set; }
+
     public virtual DbSet<Score> Scores { get; set; }
 
     public virtual DbSet<ScoreHistory> ScoreHistories { get; set; }
 
     public virtual DbSet<Seat> Seats { get; set; }
 
+    public virtual DbSet<SeatDataForShowtime> SeatDataForShowtimes { get; set; }
+
     public virtual DbSet<SeatType> SeatTypes { get; set; }
 
     public virtual DbSet<Showtime> Showtimes { get; set; }
+
+    public virtual DbSet<ShowtimeRoomInstance> ShowtimeRoomInstances { get; set; }
 
     public virtual DbSet<TicketDetail> TicketDetails { get; set; }
 
@@ -72,8 +78,15 @@ public partial class MovietheatermanagementContext : DbContext
 
             entity.HasIndex(e => e.Name, "CinemaRooms_Name_key").IsUnique();
 
+            entity.Property(e => e.CreatedAt).HasColumnType("timestamp(0) without time zone");
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Status).HasMaxLength(25);
+            entity.Property(e => e.UpdatedAt).HasColumnType("timestamp(0) without time zone");
+
+            entity.HasOne(d => d.RoomType).WithMany(p => p.CinemaRooms)
+                .HasForeignKey(d => d.RoomTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_cinemarooms_roomtypeid");
         });
 
         modelBuilder.Entity<CommentRating>(entity =>
@@ -274,6 +287,17 @@ public partial class MovietheatermanagementContext : DbContext
                 .HasColumnName("name");
         });
 
+        modelBuilder.Entity<RoomType>(entity =>
+        {
+            entity.HasKey(e => e.RoomTypeId).HasName("RoomTypes_pkey");
+
+            entity.HasIndex(e => e.RoomTypeName, "RoomTypes_RoomTypeName_key").IsUnique();
+
+            entity.Property(e => e.RoomTypeName).HasMaxLength(100);
+            entity.Property(e => e.RoomTypePrice).HasPrecision(18, 2);
+            entity.Property(e => e.Status).HasMaxLength(25);
+        });
+
         modelBuilder.Entity<Score>(entity =>
         {
             entity.HasKey(e => e.ScoreId).HasName("Score_pkey");
@@ -323,11 +347,31 @@ public partial class MovietheatermanagementContext : DbContext
 
             entity.HasOne(d => d.Room).WithMany(p => p.Seats)
                 .HasForeignKey(d => d.RoomId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_seats_roomid");
 
             entity.HasOne(d => d.SeatType).WithMany(p => p.Seats)
                 .HasForeignKey(d => d.SeatTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_seats_seattypeid");
+        });
+
+        modelBuilder.Entity<SeatDataForShowtime>(entity =>
+        {
+            entity.HasKey(e => e.SeatDataId).HasName("SeatDataForShowtime_pkey");
+
+            entity.ToTable("SeatDataForShowtime");
+
+            entity.Property(e => e.PairedWithSeatLocation).HasMaxLength(10);
+            entity.Property(e => e.RowLabel).HasMaxLength(10);
+            entity.Property(e => e.SeatTypeName).HasMaxLength(50);
+            entity.Property(e => e.SeatTypePrice).HasPrecision(18, 2);
+            entity.Property(e => e.Status).HasMaxLength(25);
+
+            entity.HasOne(d => d.ShowtimeInstance).WithMany(p => p.SeatDataForShowtimes)
+                .HasForeignKey(d => d.ShowtimeInstanceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_seatdataforshowtime_showtimeinstanceid");
         });
 
         modelBuilder.Entity<SeatType>(entity =>
@@ -345,22 +389,43 @@ public partial class MovietheatermanagementContext : DbContext
         {
             entity.HasKey(e => e.ShowtimeId).HasName("Showtimes_pkey");
 
-            entity.Property(e => e.EndTime).HasColumnType("timestamp without time zone");
-            entity.Property(e => e.MoviePrice).HasPrecision(18, 2);
-            entity.Property(e => e.StartTime).HasColumnType("timestamp without time zone");
+            entity.Property(e => e.EndTime).HasColumnType("timestamp(0) without time zone");
+            entity.Property(e => e.StartTime).HasColumnType("timestamp(0) without time zone");
+            entity.Property(e => e.Status).HasMaxLength(25);
 
             entity.HasOne(d => d.Movie).WithMany(p => p.Showtimes)
                 .HasForeignKey(d => d.MovieId)
                 .HasConstraintName("fk_showtimes_movieid");
+        });
 
-            entity.HasOne(d => d.Room).WithMany(p => p.Showtimes)
-                .HasForeignKey(d => d.RoomId)
-                .HasConstraintName("fk_showtimes_roomid");
+        modelBuilder.Entity<ShowtimeRoomInstance>(entity =>
+        {
+            entity.HasKey(e => e.ShowtimeInstanceId).HasName("ShowtimeRoomInstance_pkey");
+
+            entity.ToTable("ShowtimeRoomInstance");
+
+            entity.Property(e => e.ActualEndTime).HasColumnType("timestamp(0) without time zone");
+            entity.Property(e => e.ActualStartTime).HasColumnType("timestamp(0) without time zone");
+            entity.Property(e => e.AddedAt).HasColumnType("timestamp(0) without time zone");
+            entity.Property(e => e.MoviePrice).HasPrecision(18, 2);
+            entity.Property(e => e.RoomName).HasMaxLength(100);
+            entity.Property(e => e.RoomTypeName).HasMaxLength(100);
+            entity.Property(e => e.RoomTypePrice).HasPrecision(18, 2);
+
+            entity.HasOne(d => d.OriginalRoom).WithMany(p => p.ShowtimeRoomInstances)
+                .HasForeignKey(d => d.OriginalRoomId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_showtimeroominstance_originalroomid");
+
+            entity.HasOne(d => d.Showtime).WithMany(p => p.ShowtimeRoomInstances)
+                .HasForeignKey(d => d.ShowtimeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_showtimeroominstance_showtimeid");
         });
 
         modelBuilder.Entity<TicketDetail>(entity =>
         {
-            entity.HasKey(e => new { e.ShowtimeId, e.SeatId }).HasName("TicketDetails_pkey");
+            entity.HasKey(e => new { e.ShowtimeInstanceId, e.SeatDataId }).HasName("TicketDetails_pkey");
 
             entity.Property(e => e.Status).HasMaxLength(25);
             entity.Property(e => e.TicketPrice).HasPrecision(18, 2);
@@ -369,15 +434,15 @@ public partial class MovietheatermanagementContext : DbContext
                 .HasForeignKey(d => d.InvoiceId)
                 .HasConstraintName("fk_ticketdetails_invoiceid");
 
-            entity.HasOne(d => d.Seat).WithMany(p => p.TicketDetails)
-                .HasForeignKey(d => d.SeatId)
+            entity.HasOne(d => d.SeatData).WithMany(p => p.TicketDetails)
+                .HasForeignKey(d => d.SeatDataId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_ticketdetails_seatid");
+                .HasConstraintName("fk_ticketdetails_seatdataid");
 
-            entity.HasOne(d => d.Showtime).WithMany(p => p.TicketDetails)
-                .HasForeignKey(d => d.ShowtimeId)
+            entity.HasOne(d => d.ShowtimeInstance).WithMany(p => p.TicketDetails)
+                .HasForeignKey(d => d.ShowtimeInstanceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_ticketdetails_showtimeid");
+                .HasConstraintName("fk_ticketdetails_showtimeinstanceid");
         });
 
         modelBuilder.Entity<TicketInvoice>(entity =>

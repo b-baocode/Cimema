@@ -31,6 +31,21 @@ namespace MV.ApplicationLayer.Services
             if (user == null)
                 return null;
 
+            // Check if email is already used by another user
+            if (await _unitOfWork.userRepository.IsEmailExistsAsync(request.Email) &&
+                user.Email != request.Email)
+                throw new ValidationException("Email already exists");
+
+            // Check if phone is already used by another user
+            if (await _unitOfWork.userRepository.IsPhoneExistsAsync(request.Phone) &&
+                user.Phone != request.Phone)
+                throw new ValidationException("Phone number already exists");
+
+            // Check if identity number is already used by another user
+            if (await _unitOfWork.userRepository.IsIdentityNumberExistsAsync(request.Identitynumber) &&
+                user.Identitynumber != request.Identitynumber)
+                throw new ValidationException("Identity number already exists");
+
             string oldImageUrl = user.Image;
             string newImageUrl = null;
 
@@ -197,22 +212,23 @@ namespace MV.ApplicationLayer.Services
             }
         }
 
-        public async Task<CustomersReponse> CreateCustomerAsync(CustomersRequest request)
+        public async Task<CustomersReponse> CreateCustomerAsync(CustomerCreateRequest request)
         {
-            string imageUrl = null;
-            if (request.Image != null && request.Image.Length > 0)
-            {
-                try
-                {
-                    using var stream = request.Image.OpenReadStream();
-                    var fileName = $"customer_{Guid.NewGuid()}_{DateTime.UtcNow.Ticks}.jpg";
-                    imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName);
-                }
-                catch (Exception ex)
-                {
-                    throw new ValidationException($"Error processing image: {ex.Message}");
-                }
-            }
+            string imageUrl = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media&token=11cc28fe-2437-4527-a755-909c0a332ffa";
+
+            //if (request.Image != null && request.Image.Length > 0)
+            //{
+            //    try
+            //    {
+            //        using var stream = request.Image.OpenReadStream();
+            //        var fileName = $"customer_{Guid.NewGuid()}_{DateTime.UtcNow.Ticks}.jpg";
+            //        imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName, "UserImages");
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        throw new ValidationException($"Error processing image: {ex.Message}");
+            //    }
+            //}
 
             var user = new User
             {

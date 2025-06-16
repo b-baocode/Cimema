@@ -39,21 +39,26 @@ namespace MV.InfrastructureLayer
         private IRoomRepository _roomRepository;
         private ISeatRepository _seatRepository;
         private ICoupleSeatRepository _coupleSeatRepository;
+        private IFoodCategoryRepository _foodCategoryRepository;
+        private IFoodRepository _foodRepository;
+        private ISeatTypeRepository _seatTypeRepository;
+        private IRoomTypeRepository _roomTypeRepository;
 
         // Expose repository INTERFACES
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
         public IRoomRepository roomRepository => _roomRepository ??= new RoomRepository(_context);
         public ISeatRepository seatRepository => _seatRepository ??= new SeatRepository(_context);
         public ICoupleSeatRepository coupleSeatRepository => _coupleSeatRepository ??= new CoupleSeatRepository(_context);
-        
+        public IFoodCategoryRepository foodCategoryRepository => _foodCategoryRepository ??= new FoodCategoryRepository(_context);
+        public IFoodRepository foodRepository => _foodRepository ??= new FoodRepository(_context);
+        public ISeatTypeRepository seatTypeRepository => _seatTypeRepository ??= new SeatTypeRepository(_context);
+        public IRoomTypeRepository roomTypeRepository => _roomTypeRepository ??= new RoomTypeRepository(_context);
 
         // CONSTRUCTOR INJECTION for DbContext
         public UnitOfWork(MovietheatermanagementContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-
-
 
         // THE ONLY PLACE TO SAVE CHANGES
         public async Task<int> SaveChangesAsync()
@@ -80,8 +85,6 @@ namespace MV.InfrastructureLayer
                 // Catch any other unexpected exceptions during the save process.
                 throw;
             }
-
-            //return await _context.SaveChangesAsync();
         }
 
         private bool IsUniqueConstraintViolation(DbUpdateException ex)
@@ -89,7 +92,6 @@ namespace MV.InfrastructureLayer
             var innerEx = ex.InnerException;
             if (innerEx == null) return false;
 
-            
             if (innerEx is PostgresException pgException)
             {
                 return pgException.SqlState == "23505";
@@ -97,7 +99,6 @@ namespace MV.InfrastructureLayer
 
             return false;
         }
-
 
         // IDisposable Implementation
         private bool disposed = false;

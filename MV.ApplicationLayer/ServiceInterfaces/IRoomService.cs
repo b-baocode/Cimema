@@ -13,7 +13,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
     {
         Task<RoomCreateResponse> AddRoomWithSeatsAsync(RoomCreateRequest roomCreateRequest);
 
-        Task<GetRoomWithSeatsByIdResponse?> GetRoomWithSeatsAsync(int searchedRoomId);
+        Task<GetRoomWithSeatsByIdResponse?> GetRoomWithSeatsByIdAsync(int searchedRoomId);
 
         Task<bool> DeleteRoomAsync(int roomId);
 

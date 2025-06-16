@@ -1,0 +1,19 @@
+﻿using MV.ApplicationLayer.DTO.RequestModel;
+using MV.ApplicationLayer.DTO.ResponseModel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MV.ApplicationLayer.ServiceInterfaces
+{
+    public interface IRoomTypeService
+    {
+        Task<bool> CheckTypeExistByIdAsync(int roomTypeId);
+
+        Task<PagedResult<GetAllRoomTypeWithRoomAdminResponse>> GetAllRoomTypeAdminAsync(GetAllRoomTypeAdminRequest getAllRoomTypeAdminRequest);
+
+        Task<RoomTypeCreateResponse> CreateRoomTypeAsync(RoomTypeCreateRequest roomTypeCreateRequest, Stream imageStream, string imageName);
+    }
+}

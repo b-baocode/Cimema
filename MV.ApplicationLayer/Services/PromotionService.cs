@@ -72,7 +72,7 @@ namespace MV.ApplicationLayer.Services
                 {
                     using var stream = request.Image.OpenReadStream();
                     var fileName = $"promotion_{newPromotionId}_{DateTime.UtcNow.Ticks}.jpg";
-                    imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName);
+                    imageUrl = await _firebaseStorageService.UploadImageAsync(stream, fileName, "PromotionImages");
                 }
                 catch (Exception ex)
                 {
@@ -123,9 +123,6 @@ namespace MV.ApplicationLayer.Services
                 promotion.PromotionName != request.PromotionName)
                 throw new ValidationException("A promotion with this name already exists.");
 
-            string oldImageUrl = promotion.Image;
-            string newImageUrl = null;
-
             // Update image if provided
             if (request.Image != null && request.Image.Length > 0)
             {
@@ -133,48 +130,24 @@ namespace MV.ApplicationLayer.Services
                 {
                     using var stream = request.Image.OpenReadStream();
                     var fileName = $"promotion_{id}_{DateTime.UtcNow.Ticks}.jpg";
-                    newImageUrl = await _firebaseStorageService.UpdateImageAsync(stream, fileName, oldImageUrl);
-                    promotion.Image = newImageUrl;
+                    promotion.Image = await _firebaseStorageService.UpdateImageAsync(stream, fileName, promotion.Image);
                 }
                 catch (Exception ex)
                 {
-                    // If image update fails, keep the old image URL in database
-                    promotion.Image = oldImageUrl;
-                    Console.WriteLine($"Warning: Error updating promotion image: {ex.Message}");
+                    throw new ValidationException($"Error processing image: {ex.Message}");
                 }
             }
 
-            try
-            {
-                // Update basic information
-                promotion.PromotionName = request.PromotionName;
-                promotion.StartDate = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Unspecified);
-                promotion.EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Unspecified);
-                promotion.DiscountRate = (decimal)request.DiscountRate;
-                promotion.Description = request.Description;
-                promotion.Status = request.Status;
+            // Update basic information
+            promotion.PromotionName = request.PromotionName;
+            promotion.StartDate = DateTime.SpecifyKind(request.StartDate, DateTimeKind.Unspecified);
+            promotion.EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Unspecified);
+            promotion.DiscountRate = (decimal)request.DiscountRate;
+            promotion.Description = request.Description;
+            promotion.Status = request.Status;
 
-                var updatedPromotion = await _unitOfWork.promotionRepository.UpdatePromotionAsync(promotion);
-                return MapToResponse(updatedPromotion);
-            }
-            catch (Exception ex)
-            {
-                // If database update fails, try to rollback the image update
-                if (newImageUrl != null)
-                {
-                    try
-                    {
-                        await _firebaseStorageService.DeleteImageAsync(newImageUrl);
-                        promotion.Image = oldImageUrl;
-                    }
-                    catch
-                    {
-                        // Log the rollback failure but don't throw
-                        Console.WriteLine("Warning: Failed to rollback image update");
-                    }
-                }
-                throw new Exception($"Error updating promotion: {ex.Message}");
-            }
+            var updatedPromotion = await _unitOfWork.promotionRepository.UpdatePromotionAsync(promotion);
+            return MapToResponse(updatedPromotion);
         }
 
         public async Task DeletePromotionAsync(int id)
@@ -183,24 +156,15 @@ namespace MV.ApplicationLayer.Services
             if (promotion == null)
                 throw new ValidationException("Promotion not found.");
 
+            // Check if promotion is currently active
+            // if (promotion.StartDate <= DateTime.Now && promotion.EndDate >= DateTime.Now)
+            //     throw new ValidationException("Cannot delete an active promotion.");
+            
             try
             {
-                // Delete promotion from database
-                await _unitOfWork.promotionRepository.DeletePromotionAsync(id);
-
-                // Delete promotion image from Firebase Storage if exists
-                if (!string.IsNullOrEmpty(promotion.Image))
-                {
-                    try
-                    {
-                        await _firebaseStorageService.DeleteImageAsync(promotion.Image);
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log the error but don't throw - the promotion is already deleted
-                        Console.WriteLine($"Warning: Error deleting promotion image: {ex.Message}");
-                    }
-                }
+                // Update promotion status to InActive
+                promotion.Status = "InActive";
+                await _unitOfWork.promotionRepository.UpdatePromotionAsync(promotion);
             }
             catch (Exception ex)
             {
