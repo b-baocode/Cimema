@@ -34,6 +34,10 @@ namespace MV.InfrastructureLayer
         public IPromotionRepository promotionRepository =>
             _promotionRepository ??= new PromotionRepository(_context);
 
+        private ICommentRatingRepository _commentRatingRepository;
+        public ICommentRatingRepository commentRatingRepository =>
+            _commentRatingRepository ??= new CommentRatingRepository(_context);
+
         // Repository fields should be of the INTERFACE type
         private IUserRepository _userRepository;
         private IRoomRepository _roomRepository;
