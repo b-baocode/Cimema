@@ -19,5 +19,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<Movie> UpdateMovieAsync(Movie movie);
         Task DeleteMovieAsync(int id);
         Task<Movie?> GetLastMovieAsync();
+        Task<IEnumerable<Movie>> GetComingSoonMoviesAsync(string? keyword, int skip, int take);
+        Task<int> GetTotalComingSoonMoviesAsync(string? keyword);
     }
-} 
+}

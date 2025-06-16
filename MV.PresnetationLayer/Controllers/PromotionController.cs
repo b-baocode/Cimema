@@ -9,7 +9,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin")] // Only Admin can access Promotion functions
+    // [Authorize(Roles = "Admin")] // Only Admin can access Promotion functions
     public class PromotionController : ControllerBase
     {
         private readonly IPromotionService _promotionService;
@@ -20,6 +20,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Customer")]
         public async Task<ActionResult<PagedResult<PromotionResponse>>> GetPromotions(
             [FromQuery] PromotionSearchRequest request)
         {
@@ -38,6 +39,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<PromotionResponse>> CreatePromotion(
             [FromForm] PromotionCreateRequest request)
         {
@@ -63,6 +65,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<PromotionResponse>> UpdatePromotion(
             int id, [FromForm] PromotionUpdateRequest request)
         {
@@ -88,6 +91,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeletePromotion(int id)
         {
             try

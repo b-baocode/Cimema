@@ -32,11 +32,11 @@ namespace MV.InfrastructureLayer.Repositories
                     EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
                     EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
                     EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
-                    // m.Title.ToLower().Contains(keyword) ||
-                    // m.Director.ToLower().Contains(keyword) ||
-                    // m.Actors.ToLower().Contains(keyword) ||
-                    // m.Studio.ToLower().Contains(keyword) ||
-                    // m.PublishDate.ToString().ToLower().Contains(keyword));
+                // m.Title.ToLower().Contains(keyword) ||
+                // m.Director.ToLower().Contains(keyword) ||
+                // m.Actors.ToLower().Contains(keyword) ||
+                // m.Studio.ToLower().Contains(keyword) ||
+                // m.PublishDate.ToString().ToLower().Contains(keyword));
             }
 
             return await query
@@ -44,7 +44,7 @@ namespace MV.InfrastructureLayer.Repositories
                 .Take(take)
                 .ToListAsync();
         }
-        
+
 
         public async Task<int> GetTotalMoviesAsync(string? keyword)
         {
@@ -59,11 +59,11 @@ namespace MV.InfrastructureLayer.Repositories
                     EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
                     EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
                     EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
-                    // m.Title.ToLower().Contains(keyword) ||
-                    // m.Director.ToLower().Contains(keyword) ||
-                    // m.Actors.ToLower().Contains(keyword) ||
-                    // m.Studio.ToLower().Contains(keyword) ||
-                    // m.PublishDate.ToString().ToLower().Contains(keyword));
+                // m.Title.ToLower().Contains(keyword) ||
+                // m.Director.ToLower().Contains(keyword) ||
+                // m.Actors.ToLower().Contains(keyword) ||
+                // m.Studio.ToLower().Contains(keyword) ||
+                // m.PublishDate.ToString().ToLower().Contains(keyword));
             }
 
             return await query.CountAsync();
@@ -185,7 +185,7 @@ namespace MV.InfrastructureLayer.Repositories
         //         await _context.SaveChangesAsync();
         //     }
         // }
-        
+
         // Xóa đi nếu có trường IsDelete
         public async Task DeleteMovieAsync(int id)
         {
@@ -272,5 +272,47 @@ namespace MV.InfrastructureLayer.Repositories
 
             return await query.CountAsync();
         }
+
+        public async Task<IEnumerable<Movie>> GetComingSoonMoviesAsync(string? keyword, int skip, int take)
+        {
+            var query = _context.Movies
+                .Include(m => m.Genres)
+                .Where(m => m.Status == "ComingSoon")
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower().Trim();
+                query = query.Where(m =>
+                    EF.Functions.Like(m.Title.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
+            }
+
+            return await query
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalComingSoonMoviesAsync(string? keyword)
+        {
+            var query = _context.Movies
+                .Where(m => m.Status == "ComingSoon")
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower().Trim();
+                query = query.Where(m =>
+                    EF.Functions.Like(m.Title.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
+            }
+
+            return await query.CountAsync();
+        }
     }
-} 
+}
