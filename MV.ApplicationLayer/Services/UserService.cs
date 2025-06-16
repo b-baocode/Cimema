@@ -214,7 +214,7 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<CustomersReponse> CreateCustomerAsync(CustomerCreateRequest request)
         {
-            string imageUrl = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media";
+            string imageUrl = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media&token=11cc28fe-2437-4527-a755-909c0a332ffa";
 
             //if (request.Image != null && request.Image.Length > 0)
             //{

@@ -104,7 +104,7 @@ namespace MV.InfrastructureLayer.Repositories
                 Password = hashedPassword,
                 Email = registerRequest.Email,
                 Phone = registerRequest.Phone,
-                Image = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media",
+                Image = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media&token=11cc28fe-2437-4527-a755-909c0a332ffa",
                 Joindate = DateTime.Now,
                 Fullname = registerRequest.Fullname,
                 Birthdate = registerRequest.Birthdate,
