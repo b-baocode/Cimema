@@ -1,5 +1,3 @@
-using System;
-
 namespace MV.ApplicationLayer.Models
 {
     public class FirebaseConfig
@@ -15,4 +13,4 @@ namespace MV.ApplicationLayer.Models
         public string AuthProviderX509CertUrl { get; set; }
         public string ClientX509CertUrl { get; set; }
     }
-} 
+}

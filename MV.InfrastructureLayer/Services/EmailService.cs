@@ -1,8 +1,8 @@
-﻿using MV.InfrastructureLayer.Configuration;
-using Microsoft.Extensions.Options;
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
+using Microsoft.Extensions.Options;
 using MV.ApplicationLayer.ServiceInterfaces;
+using MV.InfrastructureLayer.Configuration;
 
 namespace MV.InfrastructureLayer.Services
 {

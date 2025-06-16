@@ -21,7 +21,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<Promotion>> GetPromotionsAsync(string? keyword, int skip, int take)
         {
             var query = _context.Promotions
-                .Where(p => p.Status != "UnActive")
+                .Where(p => p.Status != "InActive")
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
@@ -32,16 +32,69 @@ namespace MV.InfrastructureLayer.Repositories
                     p.Description.ToLower().Contains(keyword));
             }
 
-            return await query
+            var promotions = await query
+                .OrderByDescending(p => p.StartDate)
                 .Skip(skip)
                 .Take(take)
                 .ToListAsync();
+
+            // Update status based on current date
+            var now = DateTime.Now;
+            foreach (var promotion in promotions)
+            {
+                var newStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
+                if (promotion.Status != newStatus)
+                {
+                    promotion.Status = newStatus;
+                    _context.Promotions.Update(promotion);
+                }
+            }
+            await _context.SaveChangesAsync(); // SaveChanges: Set Status in Database
+
+            return promotions;
+
+            /*
+             * // Update status in memory only
+                var now = DateTime.Now;
+                foreach (var promotion in promotions)
+                {
+                    promotion.Status = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
+                }
+                return promotions;
+             */
+        }
+
+        public async Task<IEnumerable<Promotion>> GetComingSoonPromotionsAsync(int skip, int take)
+        {
+            var now = DateTime.Now;
+            var promotions = await _context.Promotions
+                .Where(p => p.Status != "InActive" && p.StartDate > now)
+                .OrderBy(p => p.StartDate) // Sắp xếp theo ngày bắt đầu tăng dần
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+
+            // Cập nhật status cho tất cả promotion thành ComingSoon
+            foreach (var promotion in promotions)
+            {
+                promotion.Status = "ComingSoon";
+            }
+
+            return promotions;
+        }
+
+        public async Task<int> GetTotalComingSoonPromotionsAsync()
+        {
+            var now = DateTime.Now;
+            return await _context.Promotions
+                .Where(p => p.Status != "InActive" && p.StartDate > now)
+                .CountAsync();
         }
 
         public async Task<int> GetTotalPromotionsAsync(string? keyword)
         {
             var query = _context.Promotions
-                .Where(p => p.Status != "UnActive")
+                .Where(p => p.Status != "InActive")
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
@@ -57,7 +110,19 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<Promotion?> GetPromotionByIdAsync(int id)
         {
-            return await _context.Promotions.FirstOrDefaultAsync(p => p.PromotionId == id);
+            var promotion = await _context.Promotions.FirstOrDefaultAsync(p => p.PromotionId == id);
+            if (promotion != null && promotion.Status != "InActive")
+            {
+                // Update status based on current date
+                var newStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
+                if (promotion.Status != newStatus)
+                {
+                    promotion.Status = newStatus;
+                    _context.Promotions.Update(promotion);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            return promotion;
         }
 
         public async Task<bool> IsPromotionNameExistsAsync(string promotionName)
@@ -91,7 +156,7 @@ namespace MV.InfrastructureLayer.Repositories
                 {
                     throw new InvalidOperationException("Cannot delete promotion because it is associated with ticket invoices.");
                 }
-                promotion.Status = "UnActive";
+                promotion.Status = "InActive";
                 _context.Promotions.Update(promotion);
                 await _context.SaveChangesAsync();
             }
@@ -103,5 +168,27 @@ namespace MV.InfrastructureLayer.Repositories
                 .OrderByDescending(p => p.PromotionId)
                 .FirstOrDefaultAsync();
         }
+
+        private string DeterminePromotionStatus(DateTime startDate, DateTime endDate)
+        {
+            var now = DateTime.Now;
+            
+            if (startDate > now)
+            {
+                return "ComingSoon";
+            }
+            else if (startDate <= now && endDate >= now)
+            {
+                return "Active";
+            }
+            else if (endDate < now)
+            {
+                return "Expired";
+            }
+            else
+            {
+                return "InActive";
+            }
+        }
     }
-} 
+}

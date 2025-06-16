@@ -1,11 +1,8 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Google.Cloud.Storage.V1;
-using Google.Apis.Auth.OAuth2;
-using MV.ApplicationLayer.ServiceInterfaces;
-using Microsoft.Extensions.Configuration;
 using System.Web;
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
+using Microsoft.Extensions.Configuration;
+using MV.ApplicationLayer.ServiceInterfaces;
 
 namespace MV.InfrastructureLayer.Services
 {
@@ -39,7 +36,7 @@ namespace MV.InfrastructureLayer.Services
             try
             {
                 string cleanedFolderPath = folderPath.Trim('/').Replace("\\", "/");
-                
+
 
                 var objectName = $"{cleanedFolderPath}/{fileName}";
 
@@ -131,4 +128,4 @@ namespace MV.InfrastructureLayer.Services
             }
         }
     }
-} 
+}

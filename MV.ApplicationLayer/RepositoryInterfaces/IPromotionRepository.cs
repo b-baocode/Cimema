@@ -15,5 +15,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<Promotion> UpdatePromotionAsync(Promotion promotion);
         Task DeletePromotionAsync(int id);
         Task<Promotion?> GetLastPromotionAsync();
+        Task<IEnumerable<Promotion>> GetComingSoonPromotionsAsync(int skip, int take);
+        Task<int> GetTotalComingSoonPromotionsAsync();
     }
-} 
+}

@@ -3,11 +3,6 @@ using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -84,7 +79,7 @@ namespace MV.InfrastructureLayer.Repositories
                         RoomStatus = cr.Status,
                     }).ToList()
                 })
-                .FirstOrDefaultAsync(r  => r.RoomTypeId == roomTypeId);
+                .FirstOrDefaultAsync(r => r.RoomTypeId == roomTypeId);
         }
 
         public async Task<RoomType?> GetRoomTypeByIdTrackedAsync(int roomTypeId)

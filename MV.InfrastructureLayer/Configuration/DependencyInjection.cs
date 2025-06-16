@@ -4,10 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services;
-using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.DBContext;
 using MV.InfrastructureLayer.Repositories;
-using MV.InfrastructureLayer.Configuration;
 using MV.InfrastructureLayer.Services;
 // using MV.InfrastructureLayer.Interfaces;
 
@@ -59,7 +57,7 @@ namespace MV.InfrastructureLayer.Configuration
 
 
             //Service injection
-            services.AddScoped<ILoginService,LoginService>();
+            services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUserService, UserService>();

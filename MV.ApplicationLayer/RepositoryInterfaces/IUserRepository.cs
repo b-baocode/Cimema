@@ -1,11 +1,6 @@
 ﻿using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.RepositoryInterfaces
 {
@@ -18,17 +13,17 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<(bool, string)> ValidateRegister(RegisterRequest registerRequest, string? existingId);
 
         //Task<bool> ChangePassword(string newPassword, User user);
-        
+
 
         Task<List<User>> GetAllCustomer();
         Task<User> GetUserByUsername(string username);
-     
+
         Task<User?> GetByIdAsync(string userId);
         void Update(User user);
 
         Task<IEnumerable<User>> GetAllUsersAsync();
-     
-      
+
+
         Task<bool> DeleteCustomerAsync(string id);
         Task<User> CreateCustomerAsync(User customer);
         Task<IEnumerable<User>> GetUsersAsync(string? keyword, int skip, int take);

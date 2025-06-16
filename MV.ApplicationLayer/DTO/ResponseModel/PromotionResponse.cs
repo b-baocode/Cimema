@@ -1,5 +1,3 @@
-using System;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class PromotionResponse
@@ -13,4 +11,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public string Description { get; set; }
         public string? Status { get; set; }
     }
-} 
+}

@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
@@ -52,4 +51,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [Required(ErrorMessage = "At least one genre is required")]
         public List<int> GenreIds { get; set; }
     }
-} 
+}

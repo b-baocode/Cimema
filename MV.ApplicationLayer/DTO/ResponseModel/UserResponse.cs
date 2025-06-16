@@ -1,5 +1,3 @@
-using System;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class UserResponse
@@ -16,4 +14,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public int? Roleid { get; set; }
         public int? Status { get; set; }
     }
-} 
+}

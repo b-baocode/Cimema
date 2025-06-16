@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.ServiceInterfaces;
-using MV.ApplicationLayer.Services;
 //using MV.InfrastructureLayer.Interfaces;
 
 namespace MV.PresnetationLayer.Controllers

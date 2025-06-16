@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
 
 namespace MV.ApplicationLayer.DTO.RequestModel
 {
@@ -25,4 +24,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [Required(ErrorMessage = "At least one food category is required")]
         public List<int> FoodCateIds { get; set; }
     }
-} 
+}
