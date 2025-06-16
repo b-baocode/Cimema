@@ -2,6 +2,7 @@
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
+using MV.ApplicationLayer.Services;
 using MV.ApplicationLayer.SpecificExceptionReport;
 
 namespace MV.PresnetationLayer.Controllers
@@ -105,10 +106,126 @@ namespace MV.PresnetationLayer.Controllers
 
         }
 
+
+
         [HttpGet("{id}")]
-        public async Task<string> GetRoomTypeById([FromRoute] string id)
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(GetRoomWithSeatsByIdResponse))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<ActionResult<GetAllRoomTypeWithRoomAdminResponse>> GetRoomTypeById([FromRoute] int id)
         {
-            return "kkk";
+            try
+            {
+                var searchedResult = await _roomTypeService.GetRoomTypeByIdWithRoomAsync(id);
+
+                if (searchedResult == null)
+                {
+                    return NotFound(
+                        new ProblemDetails
+                        {
+                            Title = "Room Type not found",
+                            Status = StatusCodes.Status404NotFound,
+                            Detail = $"Room with ID {id} does not exist.",
+                            Instance = HttpContext.Request.Path
+                        }
+                        );
+                }
+
+                return Ok(searchedResult);
+
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    detail: "An unexpected error occurred while searching the room. Please try again later.",
+                    title: "Internal Server Error",
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    instance: HttpContext.Request.Path
+                );
+            }
+        }
+
+
+        [HttpDelete("DeleteRoomType/{DeleteRoomTypeId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ProblemDetails))]
+        public async Task<ActionResult> DeleteRoomTypeById([FromRoute] int DeleteRoomTypeId)
+        {
+            try
+            {
+                var (deleteResult, errorMessage) = await _roomTypeService.DeleteRoomTypeAsync(DeleteRoomTypeId);
+
+                if (!deleteResult)
+                {
+                    if(errorMessage == "Not exist")
+                    {
+                        return NotFound(
+                        new ProblemDetails
+                        {
+                            Title = "Room not found",
+                            Status = StatusCodes.Status404NotFound,
+                            Detail = $"Room type with ID {DeleteRoomTypeId} does not exist.",
+                            Instance = HttpContext.Request.Path
+                        });
+                    }
+                    else
+                    {
+                        return BadRequest(
+                        new ProblemDetails
+                        {
+                            Title = $"{errorMessage}",
+                            Status = StatusCodes.Status400BadRequest,
+                            Instance = HttpContext.Request.Path
+                        });
+                    }
+                }
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                   detail: "An unexpected error occurred while deleting the room. Please try again later.",
+                   title: "Internal Server Error",
+                   statusCode: StatusCodes.Status500InternalServerError,
+                   instance: HttpContext.Request.Path
+               );
+            }
+        }
+
+
+        [HttpPatch("UnDeleteRoom/{UnDeleteRoomId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<ActionResult> UnDeleteRoomById([FromRoute] int UnDeleteRoomId)
+        {
+            try
+            {
+                var unDeleteResult = await _roomTypeService.UnDeleteRoomTypeAsync(UnDeleteRoomId);
+
+                if (!unDeleteResult)
+                {
+                    return NotFound(
+                        new ProblemDetails
+                        {
+                            Title = "Room not found",
+                            Status = StatusCodes.Status404NotFound,
+                            Detail = $"Room with ID {UnDeleteRoomId} does not exist.",
+                            Instance = HttpContext.Request.Path
+                        }
+                        );
+                }
+
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                   detail: "An unexpected error occurred while undeleting the room. Please try again later.",
+                   title: "Internal Server Error",
+                   statusCode: StatusCodes.Status500InternalServerError,
+                   instance: HttpContext.Request.Path
+               );
+            }
         }
     }
 }
