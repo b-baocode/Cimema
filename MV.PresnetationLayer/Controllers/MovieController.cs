@@ -29,7 +29,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("SearchByTime")]
-        [Authorize(Roles = "Customer")]
+        //[Authorize(Roles = "Customer")]
         public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByTime(
             [FromQuery] MovieSearchByTimeRequest request)
         {
