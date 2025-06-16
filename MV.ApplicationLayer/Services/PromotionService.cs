@@ -1,3 +1,4 @@
+﻿using System.ComponentModel.DataAnnotations;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
@@ -5,7 +6,6 @@ using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -32,6 +32,24 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.promotionRepository.GetTotalPromotionsAsync(
                 request.Keyword);
+
+            return new PagedResult<PromotionResponse>
+            {
+                Items = promotions.Select(MapToResponse).ToList(),
+                TotalItems = totalItems,
+                Page = request.Page,
+                PageSize = request.PageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)request.PageSize)
+            };
+        }
+
+        public async Task<PagedResult<PromotionResponse>> GetComingSoonPromotionsAsync(PromotionSearchRequest request)
+        {
+            var promotions = await _unitOfWork.promotionRepository.GetComingSoonPromotionsAsync(
+                (request.Page - 1) * request.PageSize,
+                request.PageSize);
+
+            var totalItems = await _unitOfWork.promotionRepository.GetTotalComingSoonPromotionsAsync();
 
             return new PagedResult<PromotionResponse>
             {
@@ -84,6 +102,9 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("Image is required");
             }
 
+            // Determine initial status based on dates
+            string initialStatus = DeterminePromotionStatus(request.StartDate, request.EndDate);
+
             var promotion = new Promotion
             {
                 PromotionId = newPromotionId,
@@ -93,7 +114,8 @@ namespace MV.ApplicationLayer.Services
                 EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Unspecified),
                 DiscountRate = (decimal)request.DiscountRate,
                 Description = request.Description,
-                Status = request.Status
+                // Status = request.Status
+                Status = initialStatus
             };
 
             try
@@ -144,7 +166,10 @@ namespace MV.ApplicationLayer.Services
             promotion.EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Unspecified);
             promotion.DiscountRate = (decimal)request.DiscountRate;
             promotion.Description = request.Description;
-            promotion.Status = request.Status;
+            // promotion.Status = request.Status;
+
+            // Update status based on new dates
+            promotion.Status = DeterminePromotionStatus(request.StartDate, request.EndDate);
 
             var updatedPromotion = await _unitOfWork.promotionRepository.UpdatePromotionAsync(promotion);
             return MapToResponse(updatedPromotion);
@@ -159,7 +184,7 @@ namespace MV.ApplicationLayer.Services
             // Check if promotion is currently active
             // if (promotion.StartDate <= DateTime.Now && promotion.EndDate >= DateTime.Now)
             //     throw new ValidationException("Cannot delete an active promotion.");
-            
+
             try
             {
                 // Update promotion status to InActive
@@ -234,6 +259,35 @@ namespace MV.ApplicationLayer.Services
 
             if (string.IsNullOrWhiteSpace(request.Description))
                 throw new ValidationException("Description is required");
+        }
+
+        /// <summary>
+        /// To determine the status of a promotion based on start and end dates.
+        /// Để xác định trạng thái của promotion dựa trên ngày bắt đầu và kết thúc
+        /// </summary>
+        /// <param name="startDate">Ngày bắt đầu của promotion</param>
+        /// <param name="endDate">Ngày kết thúc của promotion</param>
+        /// <returns>Trạng thái của promotion: Active, InActive, Expired, ComingSoon</returns>
+        private string DeterminePromotionStatus(DateTime startDate, DateTime endDate)
+        {
+            var now = DateTime.Now;
+            
+            if (startDate > now)
+            {
+                return "ComingSoon";
+            }
+            else if (startDate <= now && endDate >= now)
+            {
+                return "Active";
+            }
+            else if (endDate < now)
+            {
+                return "Expired";
+            }
+            else
+            {
+                return "InActive";
+            }
         }
     }
 } 

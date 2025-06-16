@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MV.ApplicationLayer.DTO.RequestModel
@@ -19,4 +18,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [StringLength(500, MinimumLength = 1, ErrorMessage = "Comment must be between 1 and 500 characters")]
         public string Comment { get; set; }
     }
-}   
+}

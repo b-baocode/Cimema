@@ -1,6 +1,5 @@
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.ServiceInterfaces
 {
@@ -10,4 +9,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<CommentRatingResponse> CreateAsync(CommentRatingRequest request);
         Task<bool> DeleteAsync(int id);
     }
-} 
+}

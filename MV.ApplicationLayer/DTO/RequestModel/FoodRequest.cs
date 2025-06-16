@@ -23,4 +23,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [Required(ErrorMessage = "At least one category is required")]
         public List<int> FoodCateIds { get; set; }
     }
-} 
+}

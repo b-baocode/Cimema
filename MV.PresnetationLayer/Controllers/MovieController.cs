@@ -1,6 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
@@ -19,8 +19,14 @@ namespace MV.PresnetationLayer.Controllers
             _movieService = movieService;
         }
 
+        /// <summary>
+        /// [AllowAnonymous]: is an Attribute in ASP.NET Core used to bypass the Authorization steps.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedResult<MovieResponse>>> GetMovies(
             [FromQuery] MovieSearchRequest request)
         {
@@ -30,6 +36,7 @@ namespace MV.PresnetationLayer.Controllers
 
         [HttpGet("SearchByTime")]
         //[Authorize(Roles = "Customer")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByTime(
             [FromQuery] MovieSearchByTimeRequest request)
         {
@@ -45,7 +52,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("SearchByMovie")]
-        [Authorize(Roles = "Customer")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByMovie(
             [FromQuery] MovieSearchByCustomerRequest request)
         {

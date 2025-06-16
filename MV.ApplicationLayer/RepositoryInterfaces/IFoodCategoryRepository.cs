@@ -1,6 +1,4 @@
 using MV.DomainLayer.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.RepositoryInterfaces
 {
@@ -15,4 +13,4 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<FoodCategory> UpdateFoodCategoryAsync(FoodCategory foodCategory);
         Task DeleteFoodCategoryAsync(int id);
     }
-} 
+}

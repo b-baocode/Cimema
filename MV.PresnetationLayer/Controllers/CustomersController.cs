@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
-using MV.ApplicationLayer.Services;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -68,7 +67,7 @@ namespace MV.PresnetationLayer.Controllers
             //    return BadRequest("Image is required");
             //}
 
-            if(request.Image != null)
+            if (request.Image != null)
             {
                 if (request.Image.ContentType != "image/jpeg" && request.Image.ContentType != "image/jpg")
                 {
@@ -141,7 +140,7 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<IActionResult> CreateCustomer([FromForm] CustomerCreateRequest request)
         {
 
-           
+
 
             try
             {

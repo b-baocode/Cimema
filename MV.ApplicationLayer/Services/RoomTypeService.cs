@@ -1,16 +1,11 @@
-﻿using MV.ApplicationLayer.DTO.RequestModel;
+﻿using System.Globalization;
+using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.GenericExceptionReport;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.SpecificExceptionReport;
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -130,7 +125,7 @@ namespace MV.ApplicationLayer.Services
         {
             var searchResult = await _unitOfWork.roomTypeRepository.GetRoomTypeByIdWithRoom(roomTypeId);
 
-            if(searchResult == null)
+            if (searchResult == null)
             {
                 return null;
             }
@@ -164,12 +159,12 @@ namespace MV.ApplicationLayer.Services
                 return (false, "Not exist");
             }
 
-            if(findRoomTypeToDelete.CinemaRooms?.Count > 0)
+            if (findRoomTypeToDelete.CinemaRooms?.Count > 0)
             {
                 return (false, $"Room with id {deleteRoomTypeId} is being used");
             }
 
-            if(findRoomTypeToDelete.RoomTypeName == "Standard")
+            if (findRoomTypeToDelete.RoomTypeName == "Standard")
             {
                 return (false, $"Can't delete Standard type");
             }

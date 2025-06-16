@@ -1,18 +1,13 @@
-﻿using MV.ApplicationLayer.RepositoryInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Security.Cryptography;
+using MV.ApplicationLayer.RepositoryInterfaces;
 
 namespace MV.InfrastructureLayer.Repositories
 {
     public class PasswordRepository : IPasswordRepository
     {
-        private const int SaltSize = 16; 
-        private const int KeySize = 32;  
-        private const int Iterations = 100_000; 
+        private const int SaltSize = 16;
+        private const int KeySize = 32;
+        private const int Iterations = 100_000;
 
         public string HashPassword(string password)
         {

@@ -1,8 +1,5 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.ServiceInterfaces;
-using MV.ApplicationLayer.Services;
 
 namespace MV.PresnetationLayer.Controllers
 {
