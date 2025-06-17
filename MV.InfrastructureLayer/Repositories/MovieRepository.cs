@@ -69,7 +69,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                //.Where(m => m.FromDate >= fromDate && m.ToDate <= toDate) // Giữ khi có trường IsDelete
+                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && !EF.Functions.Like(m.Status, "InActive"))
                 .AsQueryable();
 
             return await query

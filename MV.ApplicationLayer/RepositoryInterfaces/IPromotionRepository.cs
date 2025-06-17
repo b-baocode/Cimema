@@ -1,7 +1,4 @@
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.RepositoryInterfaces
 {

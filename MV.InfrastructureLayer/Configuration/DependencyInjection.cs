@@ -54,6 +54,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IFoodRepository, FoodRepository>();
             services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
+            services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
 
 
             //Service injection
@@ -67,7 +68,10 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IFoodService, FoodService>();
             services.AddScoped<IRoomTypeService, RoomTypeService>();
             services.AddScoped<ICommentRatingService, CommentRatingService>();
+            services.AddScoped<IShowtimeService, ShowtimeService>();
 
+            // Background services
+            services.AddHostedService<ShowtimeBackgroundService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
