@@ -25,8 +25,10 @@ namespace MV.ApplicationLayer.Services
                 (request.Page - 1) * request.PageSize,
                 request.PageSize);
 
-            var totalItems = await _unitOfWork.movieRepository.GetTotalMoviesAsync(
-                request.Keyword);
+            // Lọc ra những phim chưa bị xóa (status khác "InActive")
+            var filteredMovies = movies.Where(m => m.Status != "InActive").ToList();
+
+            var totalItems = filteredMovies.Count;
 
             return new PagedResult<MovieResponse>
             {
@@ -182,6 +184,8 @@ namespace MV.ApplicationLayer.Services
             // Check if movie is currently showing
             // if (movie.FromDate <= DateTime.Now && movie.ToDate >= DateTime.Now)
             //     throw new ValidationException("Cannot delete a movie that is currently showing");
+            // if (movie.Status == "Active")
+            //     throw new ValidationException("Cannot delete a movie that is currently showing");
 
             try
             {
@@ -192,7 +196,9 @@ namespace MV.ApplicationLayer.Services
                 // await _unitOfWork.movieRepository.DeleteMovieAsync(id);
 
                 // Update movie IsDelete to true
-                movie.IsDelete = true;
+                // movie.IsDelete = true;
+                // Update movie status to InActive instead of using IsDelete
+                movie.Status = "InActive";
                 await _unitOfWork.movieRepository.UpdateMovieAsync(movie);
             }
             catch (Exception ex)
@@ -275,7 +281,12 @@ namespace MV.ApplicationLayer.Services
         private MovieResponse MapToResponse(Movie movie)
         {
             // Update status based on current time
-            movie.Status = GetMovieStatus(movie.FromDate, movie.ToDate);
+            // movie.Status = GetMovieStatus(movie.FromDate, movie.ToDate);
+            // Only update status if it's not InActive (deleted)
+            if (movie.Status != "InActive")
+            {
+                movie.Status = GetMovieStatus(movie.FromDate, movie.ToDate);
+            }
 
             return new MovieResponse
             {
@@ -422,7 +433,7 @@ namespace MV.ApplicationLayer.Services
             }
             else
             {
-                return "InActive";
+                return "Expired";
             }
         }
     }
