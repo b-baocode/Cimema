@@ -45,8 +45,10 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
+        /* Status đã được tự động set theo thời gian FromDate-ToDate
         [MaxLength(25)]
         public string? Status { get; set; }
+        */
 
         [Required(ErrorMessage = "At least one genre is required")]
         public List<int> GenreIds { get; set; }

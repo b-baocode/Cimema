@@ -94,7 +94,8 @@ namespace MV.ApplicationLayer.Services
                 Version = request.Version,
                 TrailerUrl = request.TrailerUrl,
                 Description = request.Description,
-                Status = request.Status
+                // movie.Status = request.Status;
+                Status = GetMovieStatus(request.FromDate, request.ToDate)
             };
 
             // Add genres
@@ -157,7 +158,8 @@ namespace MV.ApplicationLayer.Services
             movie.Version = request.Version;
             movie.TrailerUrl = request.TrailerUrl;
             movie.Description = request.Description;
-            movie.Status = request.Status;
+            // movie.Status = request.Status;
+            movie.Status = GetMovieStatus(request.FromDate, request.ToDate);
 
             // Update genres
             var genres = await _unitOfWork.genreRepository.GetGenresByIdsAsync(request.GenreIds);
@@ -272,6 +274,9 @@ namespace MV.ApplicationLayer.Services
 
         private MovieResponse MapToResponse(Movie movie)
         {
+            // Update status based on current time
+            movie.Status = GetMovieStatus(movie.FromDate, movie.ToDate);
+
             return new MovieResponse
             {
                 MovieId = movie.MovieId,
@@ -398,6 +403,27 @@ namespace MV.ApplicationLayer.Services
 
             if (request.GenreIds == null || !request.GenreIds.Any())
                 throw new ValidationException("At least one genre is required");
+        }
+
+        private string GetMovieStatus(DateTime fromDate, DateTime toDate)
+        {
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var currentVietnamTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, vietnamTimeZone);
+            var fromDateVietnam = TimeZoneInfo.ConvertTime(fromDate, vietnamTimeZone);
+            var toDateVietnam = TimeZoneInfo.ConvertTime(toDate, vietnamTimeZone);
+
+            if (currentVietnamTime < fromDateVietnam)
+            {
+                return "ComingSoon";
+            }
+            else if (currentVietnamTime >= fromDateVietnam && currentVietnamTime <= toDateVietnam)
+            {
+                return "Active";
+            }
+            else
+            {
+                return "InActive";
+            }
         }
     }
 }
