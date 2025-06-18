@@ -251,8 +251,9 @@ namespace MV.ApplicationLayer.Services
             if (string.IsNullOrWhiteSpace(request.PromotionName))
                 throw new ValidationException("Promotion Name is required");
 
-            if (request.Image == null || request.Image.Length == 0)
-                throw new ValidationException("Image is required");
+            // Remove image validation for update
+            // if (request.Image == null || request.Image.Length == 0)
+            //     throw new ValidationException("Image is required");
 
             if (request.DiscountRate < 0 || request.DiscountRate > 100)
                 throw new ValidationException("Discount Rate must be between 0 and 100");

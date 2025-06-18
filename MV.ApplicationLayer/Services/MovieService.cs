@@ -390,8 +390,9 @@ namespace MV.ApplicationLayer.Services
             if (string.IsNullOrWhiteSpace(request.Title))
                 throw new ValidationException("Title is required");
 
-            if (request.Poster == null || request.Poster.Length == 0)
-                throw new ValidationException("Poster is required");
+            // Remove poster validation for update
+            // if (request.Poster == null || request.Poster.Length == 0)
+            //     throw new ValidationException("Poster is required");
 
             if (string.IsNullOrWhiteSpace(request.Actors))
                 throw new ValidationException("Actors is required");

@@ -53,39 +53,64 @@ namespace MV.InfrastructureLayer.Services
         {
             try
             {
-                var uri = new Uri(oldImageUrl);
-
-                string path = HttpUtility.UrlDecode(uri.AbsolutePath);
-
-                // xoa "/v0/b/[bucket-name]/o/"
-                string[] pathParts = path.Split(new[] { "/o/" }, StringSplitOptions.None);
-
-                string oldFileName = pathParts[1];
-
-                // xoa parameters
-                int indexOfQueryParam = oldFileName.IndexOf('?');
-                if (indexOfQueryParam != -1)
+                // If no new image is provided, return the old image URL
+                if (imageStream == null)
                 {
-                    oldFileName = oldFileName.Substring(0, indexOfQueryParam);
+                    return oldImageUrl;
                 }
 
-                //lay path : Images/cat.jpg
-                string objectPath = oldFileName;
-
-                string oldImageFolderName = objectPath.Split('/')[0];
-
-                // Delete old image if exists
-                if (!string.IsNullOrEmpty(oldImageUrl))
+                try
                 {
-                    await DeleteImageAsync(oldImageUrl);
-                }
+                    var uri = new Uri(oldImageUrl);
+                    string path = HttpUtility.UrlDecode(uri.AbsolutePath);
 
-                // Upload new image
-                return await UploadImageAsync(imageStream, fileName, oldImageFolderName);
+                    // xoa "/v0/b/[bucket-name]/o/"
+                    string[] pathParts = path.Split(new[] { "/o/" }, StringSplitOptions.None);
+
+                    string oldFileName = pathParts[1];
+
+                    // xoa parameters
+                    int indexOfQueryParam = oldFileName.IndexOf('?');
+                    if (indexOfQueryParam != -1)
+                    {
+                        oldFileName = oldFileName.Substring(0, indexOfQueryParam);
+                    }
+
+                    //lay path : Images/cat.jpg
+                    string objectPath = oldFileName;
+
+                    string oldImageFolderName = objectPath.Split('/')[0];
+
+                    // Try to delete old image if exists
+                    if (!string.IsNullOrEmpty(oldImageUrl))
+                    {
+                        try
+                        {
+                            await DeleteImageAsync(oldImageUrl);
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log the error but continue with upload
+                            Console.WriteLine($"Warning: Error deleting old image: {ex.Message}");
+                        }
+                    }
+
+                    // Upload new image to the same folder as the old image
+                    return await UploadImageAsync(imageStream, fileName, oldImageFolderName);
+                }
+                catch (Exception ex)
+                {
+                    // If there's any error with the old image URL or deletion,
+                    // return the old image URL
+                    Console.WriteLine($"Warning: Error processing old image: {ex.Message}");
+                    return oldImageUrl;
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error updating image in Firebase Storage: {ex.Message}");
+                // If everything fails, return the old image URL
+                Console.WriteLine($"Error updating image: {ex.Message}");
+                return oldImageUrl;
             }
         }
 
