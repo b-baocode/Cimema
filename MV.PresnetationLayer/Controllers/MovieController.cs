@@ -109,14 +109,13 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<ActionResult<MovieResponse>> UpdateMovie(
             int id, [FromForm] MovieUpdateRequest request)
         {
-            if (request.Poster == null || request.Poster.Length == 0)
+            // Only validate image format if a new poster is provided
+            if (request.Poster != null)
             {
-                return BadRequest("Image is required");
-            }
-
-            if (request.Poster.ContentType != "image/jpeg" && request.Poster.ContentType != "image/jpg")
-            {
-                return BadRequest("Only JPEG or JPG images are allowed.");
+                if (request.Poster.ContentType != "image/jpeg" && request.Poster.ContentType != "image/jpg")
+                {
+                    return BadRequest("Only JPEG or JPG images are allowed.");
+                }
             }
 
             try
