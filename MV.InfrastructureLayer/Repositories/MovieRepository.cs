@@ -90,8 +90,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.Movies
                 .Include(m => m.Genres)
-                //.FirstOrDefaultAsync(m => m.MovieId == id); // Giữ khi có trường IsDelete
-                .FirstOrDefaultAsync(m => m.MovieId == id && !EF.Functions.Like(m.Status, "InActive")); // Xóa đi nếu có trường IsDelete
+                .FirstOrDefaultAsync(m => m.MovieId == id); // Lấy phim theo ID mà không lọc status
         }
 
         public async Task<bool> IsTitleExistsAsync(string title)
