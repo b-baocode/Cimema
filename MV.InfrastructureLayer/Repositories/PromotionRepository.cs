@@ -2,10 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -115,21 +111,21 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<Promotion?> GetPromotionByIdAsync(int id)
         {
             var promotion = await _context.Promotions.FirstOrDefaultAsync(p => p.PromotionId == id);
-            
+
             //if (promotion != null && promotion.Status != "InActive")
             //{
-                // Update status based on current date
+            // Update status based on current date
             // if (promotion != null && promotion.Status != "InActive")
             //if (promotion != null)
             //{
-                // Update status based on current date (cập nhật cho tất cả promotion)
-                // var newStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
-                // if (promotion.Status != newStatus)
-                // {
-                //     promotion.Status = newStatus;
-                //     _context.Promotions.Update(promotion);
-                //     await _context.SaveChangesAsync();
-                // }
+            // Update status based on current date (cập nhật cho tất cả promotion)
+            // var newStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
+            // if (promotion.Status != newStatus)
+            // {
+            //     promotion.Status = newStatus;
+            //     _context.Promotions.Update(promotion);
+            //     await _context.SaveChangesAsync();
+            // }
             //}
             //}
             return promotion;
@@ -182,7 +178,7 @@ namespace MV.InfrastructureLayer.Repositories
         private string DeterminePromotionStatus(DateTime startDate, DateTime endDate)
         {
             var now = DateTime.Now;
-            
+
             if (startDate > now)
             {
                 return "ComingSoon";

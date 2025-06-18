@@ -4,11 +4,6 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -103,7 +98,7 @@ namespace MV.ApplicationLayer.Services
             }
 
             // Determine initial status based on dates
-            string initialStatus = DeterminePromotionStatus(request.StartDate, request.EndDate);
+            // string initialStatus = DeterminePromotionStatus(request.StartDate, request.EndDate);
 
             var promotion = new Promotion
             {
@@ -114,8 +109,9 @@ namespace MV.ApplicationLayer.Services
                 EndDate = DateTime.SpecifyKind(request.EndDate, DateTimeKind.Unspecified),
                 DiscountRate = (decimal)request.DiscountRate,
                 Description = request.Description,
-                // Status = request.Status
-                Status = initialStatus
+                //Status = request.Status
+                // Status = initialStatus
+                Status = "Active" // Set mặc định là Active
             };
 
             try
@@ -169,7 +165,7 @@ namespace MV.ApplicationLayer.Services
             // promotion.Status = request.Status;
 
             // Update status based on new dates
-            promotion.Status = DeterminePromotionStatus(request.StartDate, request.EndDate);
+            // promotion.Status = DeterminePromotionStatus(request.StartDate, request.EndDate);
 
             var updatedPromotion = await _unitOfWork.promotionRepository.UpdatePromotionAsync(promotion);
             return MapToResponse(updatedPromotion);
@@ -197,8 +193,33 @@ namespace MV.ApplicationLayer.Services
             }
         }
 
+        public async Task UnUpdatePromotionAsync(int id)
+        {
+            var promotion = await _unitOfWork.promotionRepository.GetPromotionByIdAsync(id);
+            if (promotion == null)
+                throw new ValidationException("Promotion not found.");
+
+            try
+            {
+                // Update promotion status to Active
+                promotion.Status = "Active";
+                await _unitOfWork.promotionRepository.UpdatePromotionAsync(promotion);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error restoring promotion: {ex.Message}");
+            }
+        }
+
         private PromotionResponse MapToResponse(Promotion promotion)
         {
+            // Tự động set status ComingSoon/Expired dựa trên StartDate và EndDate
+            string currentStatus = promotion.Status;
+            if (promotion.Status != "InActive") // Chỉ cập nhật nếu không phải InActive
+            {
+                currentStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
+            }
+
             return new PromotionResponse
             {
                 PromotionId = promotion.PromotionId,
@@ -208,7 +229,8 @@ namespace MV.ApplicationLayer.Services
                 EndDate = promotion.EndDate,
                 DiscountRate = (int)promotion.DiscountRate,
                 Description = promotion.Description,
-                Status = promotion.Status
+                // Status = promotion.Status
+                Status = currentStatus
             };
         }
 
@@ -271,7 +293,7 @@ namespace MV.ApplicationLayer.Services
         private string DeterminePromotionStatus(DateTime startDate, DateTime endDate)
         {
             var now = DateTime.Now;
-            
+
             if (startDate > now)
             {
                 return "ComingSoon";
@@ -290,4 +312,4 @@ namespace MV.ApplicationLayer.Services
             }
         }
     }
-} 
+}

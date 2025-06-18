@@ -12,5 +12,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<PromotionResponse> CreatePromotionAsync(PromotionCreateRequest request);
         Task<PromotionResponse> UpdatePromotionAsync(int id, PromotionUpdateRequest request);
         Task DeletePromotionAsync(int id);
+        Task UnUpdatePromotionAsync(int id);
     }
 }

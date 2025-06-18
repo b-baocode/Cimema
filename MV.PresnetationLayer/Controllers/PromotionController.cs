@@ -106,6 +106,21 @@ namespace MV.PresnetationLayer.Controllers
             }
         }
 
+        [HttpPut("UnUpdate/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> UnUpdatePromotion(int id)
+        {
+            try
+            {
+                await _promotionService.UnUpdatePromotionAsync(id);
+                return NoContent();
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("coming-soon")]
         public async Task<ActionResult<PagedResult<PromotionResponse>>> GetComingSoonPromotions([FromQuery] PromotionSearchRequest request)
         {
