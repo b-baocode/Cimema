@@ -26,9 +26,12 @@ namespace MV.ApplicationLayer.Services
                 request.PageSize);
 
             // Lọc ra những phim chưa bị xóa (status khác "InActive")
-            var filteredMovies = movies.Where(m => m.Status != "InActive").ToList();
+            // var filteredMovies = movies.Where(m => m.Status != "InActive").ToList();
 
-            var totalItems = filteredMovies.Count;
+            // var totalItems = filteredMovies.Count;
+
+            // Không lọc phim đã xóa nữa, hiển thị tất cả phim
+            var totalItems = movies.Count();
 
             return new PagedResult<MovieResponse>
             {
