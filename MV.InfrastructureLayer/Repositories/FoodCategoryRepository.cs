@@ -27,7 +27,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<FoodCategory>> GetAllFoodCategoriesAsync()
         {
             return await _context.FoodCategories
-                .Where(fc => fc.Status != "UnActive")
+                .Where(fc => fc.Status == "Active")
                 .ToListAsync();
         }
 

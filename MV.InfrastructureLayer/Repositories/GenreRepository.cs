@@ -27,7 +27,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<Genre>> GetAllGenresAsync()
         {
             return await _context.Genres
-                .Where(g => g.Status != "UnActive")
+                .Where(g => g.Status == "Active")
                 .ToListAsync();
         }
 

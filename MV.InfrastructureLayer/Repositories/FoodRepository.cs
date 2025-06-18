@@ -28,8 +28,8 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<Food>> GetAllFoodsAsync()
         {
             return await _context.Foods
-                .Include(f => f.FoodCates)
-                .Where(f => f.Status != "UnActive")
+                .Include(f => f.FoodCates.Where(fc => fc.Status == "Active"))
+                .Where(f => f.Status == "Active")
                 .ToListAsync();
         }
 

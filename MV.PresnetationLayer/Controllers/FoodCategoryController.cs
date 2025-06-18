@@ -52,7 +52,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Manager,Staff,Customer")]
+        [Authorize(Roles = "Admin,Manager,Employee,Customer")]
         public async Task<ActionResult<FoodCategoryResponse>> GetFoodCategoryById(int id)
         {
             try

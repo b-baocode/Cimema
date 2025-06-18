@@ -23,7 +23,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,Staff,Customer")]
+        [Authorize(Roles = "Admin,Manager,Employee,Customer")]
         public async Task<ActionResult<IEnumerable<FoodResponse>>> GetAllFoods()
         {
             try
@@ -53,7 +53,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Manager,Staff,Customer")]
+        [Authorize(Roles = "Admin,Manager,Employee,Customer")]
         public async Task<ActionResult<FoodResponse>> GetFoodById(int id)
         {
             try
