@@ -26,9 +26,12 @@ namespace MV.ApplicationLayer.Services
                 request.PageSize);
 
             // Lọc ra những phim chưa bị xóa (status khác "InActive")
-            var filteredMovies = movies.Where(m => m.Status != "InActive").ToList();
+            // var filteredMovies = movies.Where(m => m.Status != "InActive").ToList();
 
-            var totalItems = filteredMovies.Count;
+            // var totalItems = filteredMovies.Count;
+
+            // Không lọc phim đã xóa nữa, hiển thị tất cả phim
+            var totalItems = movies.Count();
 
             return new PagedResult<MovieResponse>
             {
@@ -283,11 +286,13 @@ namespace MV.ApplicationLayer.Services
             // Update status based on current time
             // movie.Status = GetMovieStatus(movie.FromDate, movie.ToDate);
             // Only update status if it's not InActive (deleted)
-            if (movie.Status != "InActive")
-            {
-                movie.Status = GetMovieStatus(movie.FromDate, movie.ToDate);
-            }
+            // if (movie.Status != "InActive")
+            // {
+            //     movie.Status = GetMovieStatus(movie.FromDate, movie.ToDate);
+            // }
 
+            // Không cập nhật lại status dựa trên thời gian hiện tại nữa
+            // Trả về thông tin movie như hiện tại
             return new MovieResponse
             {
                 MovieId = movie.MovieId,

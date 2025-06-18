@@ -21,8 +21,10 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<Promotion>> GetPromotionsAsync(string? keyword, int skip, int take)
         {
             var query = _context.Promotions
-                .Where(p => p.Status != "InActive")
-                .AsQueryable();
+                // Lọc Status
+                // .Where(p => p.Status != "InActive")
+                // .AsQueryable();
+                .AsQueryable(); // Không lọc theo status nữa, hiển thị tất cả promotion
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -39,17 +41,17 @@ namespace MV.InfrastructureLayer.Repositories
                 .ToListAsync();
 
             // Update status based on current date
-            var now = DateTime.Now;
-            foreach (var promotion in promotions)
-            {
-                var newStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
-                if (promotion.Status != newStatus)
-                {
-                    promotion.Status = newStatus;
-                    _context.Promotions.Update(promotion);
-                }
-            }
-            await _context.SaveChangesAsync(); // SaveChanges: Set Status in Database
+            // var now = DateTime.Now;
+            // foreach (var promotion in promotions)
+            // {
+            //     var newStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
+            //     if (promotion.Status != newStatus)
+            //     {
+            //         promotion.Status = newStatus;
+            //         _context.Promotions.Update(promotion);
+            //     }
+            // }
+            // await _context.SaveChangesAsync(); // SaveChanges: Set Status in Database
 
             return promotions;
 
@@ -94,8 +96,10 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<int> GetTotalPromotionsAsync(string? keyword)
         {
             var query = _context.Promotions
-                .Where(p => p.Status != "InActive")
-                .AsQueryable();
+                // Lọc Status, lấy tất cả Status nhưng không lấy Status InActive
+                // .Where(p => p.Status != "InActive")
+                // .AsQueryable();
+                .AsQueryable(); // Không lọc theo status nữa, tính tất cả promotion
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -111,17 +115,23 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<Promotion?> GetPromotionByIdAsync(int id)
         {
             var promotion = await _context.Promotions.FirstOrDefaultAsync(p => p.PromotionId == id);
-            if (promotion != null && promotion.Status != "InActive")
-            {
+            
+            //if (promotion != null && promotion.Status != "InActive")
+            //{
                 // Update status based on current date
-                var newStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
-                if (promotion.Status != newStatus)
-                {
-                    promotion.Status = newStatus;
-                    _context.Promotions.Update(promotion);
-                    await _context.SaveChangesAsync();
-                }
-            }
+            // if (promotion != null && promotion.Status != "InActive")
+            //if (promotion != null)
+            //{
+                // Update status based on current date (cập nhật cho tất cả promotion)
+                // var newStatus = DeterminePromotionStatus(promotion.StartDate, promotion.EndDate);
+                // if (promotion.Status != newStatus)
+                // {
+                //     promotion.Status = newStatus;
+                //     _context.Promotions.Update(promotion);
+                //     await _context.SaveChangesAsync();
+                // }
+            //}
+            //}
             return promotion;
         }
 
