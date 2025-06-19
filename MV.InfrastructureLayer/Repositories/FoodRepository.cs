@@ -71,7 +71,7 @@ namespace MV.InfrastructureLayer.Repositories
             if (food != null)
             {
                 // Soft delete by updating status to UnActive
-                food.Status = "UnActive";
+                food.Status = "InActive";
                 _context.Foods.Update(food);
                 await _context.SaveChangesAsync();
             }

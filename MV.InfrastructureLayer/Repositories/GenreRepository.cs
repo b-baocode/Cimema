@@ -64,7 +64,7 @@ namespace MV.InfrastructureLayer.Repositories
             if (genre != null)
             {
                 // Soft delete by updating status to UnActive
-                genre.Status = "UnActive";
+                genre.Status = "InActive";
                 _context.Genres.Update(genre);
                 await _context.SaveChangesAsync();
             }

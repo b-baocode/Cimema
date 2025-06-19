@@ -64,7 +64,7 @@ namespace MV.InfrastructureLayer.Repositories
             if (foodCategory != null)
             {
                 // Soft delete by updating status to UnActive
-                foodCategory.Status = "UnActive";
+                foodCategory.Status = "InActive";
                 _context.FoodCategories.Update(foodCategory);
                 await _context.SaveChangesAsync();
             }
