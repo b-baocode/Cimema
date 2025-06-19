@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
@@ -95,7 +95,7 @@ namespace MV.ApplicationLayer.Services
             // Get food categories
             var foodCategories = await _unitOfWork.foodCategoryRepository.GetFoodCategoriesByIdsAsync(request.FoodCateIds);
             if (!foodCategories.Any())
-                throw new ValidationException("No valid food categories found for the provided category IDs");
+                throw new ValidationException("No xvalid food categories found for the provided category IDs");
 
             try
             {
