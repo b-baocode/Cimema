@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MV.ApplicationLayer.DTO.ResponseModel
+﻿namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class RoomUpdateResponse
     {
@@ -18,6 +12,6 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public int SeatsAddedCount { get; set; } = 0;
         public int SeatsReactivatedCount { get; set; } = 0;
         public int SeatsDeactivatedCount { get; set; } = 0;
-        public int CoupleSeatsDeleted {  get; set; } = 0;
+        public int CoupleSeatsDeleted { get; set; } = 0;
     }
 }

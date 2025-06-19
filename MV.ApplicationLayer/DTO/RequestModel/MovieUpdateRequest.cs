@@ -1,4 +1,3 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
@@ -9,7 +8,7 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [Required(ErrorMessage = "Title is required")]
         public string Title { get; set; }
 
-        [Required(ErrorMessage = "Poster is required")]
+        //[Required(ErrorMessage = "Poster is required")]
         public IFormFile Poster { get; set; }
 
         [Required(ErrorMessage = "Publish date is required")]
@@ -46,10 +45,12 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
+        /* Status đã được tự động set theo thời gian FromDate-ToDate
         [MaxLength(25)]
         public string? Status { get; set; }
+        */
 
         [Required(ErrorMessage = "At least one genre is required")]
         public List<int> GenreIds { get; set; }
     }
-} 
+}

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
-using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
 
 namespace MV.PresnetationLayer.Controllers

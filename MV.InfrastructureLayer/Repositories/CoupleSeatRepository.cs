@@ -2,11 +2,6 @@
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -30,12 +25,12 @@ namespace MV.InfrastructureLayer.Repositories
 
         public void Remove(CoupleSeat coupleSeat)
         {
-             _context.CoupleSeats.Remove(coupleSeat);
+            _context.CoupleSeats.Remove(coupleSeat);
         }
 
         public async Task<IEnumerable<CoupleSeat>> GetAllCoupleSeatsForRoomAsync(int roomId)
         {
-            
+
             return await _context.Set<CoupleSeat>()
                 .Where(cs => _context.Set<Seat>().Any(s => s.RoomId == roomId && s.SeatId == cs.SeatId1) ||
                              _context.Set<Seat>().Any(s => s.RoomId == roomId && s.SeatId == cs.SeatId2))

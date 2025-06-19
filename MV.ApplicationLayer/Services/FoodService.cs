@@ -1,14 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -67,7 +62,7 @@ namespace MV.ApplicationLayer.Services
             {
                 FoodName = request.FoodName,
                 FoodPrice = request.FoodPrice,
-                FoodPoster = "posterUrl",
+                FoodPoster = posterUrl,
                 Quantity = request.Quantity,
                 Status = "Active",
                 FoodCates = foodCategories.ToList()
@@ -132,6 +127,17 @@ namespace MV.ApplicationLayer.Services
             }
         }
 
+        public async Task<FoodResponse> UpdateFoodQuantityAsync(int id, FoodQuantityUpdateRequest request)
+        {
+            var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(id);
+            if (food == null)
+                throw new ValidationException("Food not found");
+
+            food.Quantity = request.Quantity;
+            var updatedFood = await _unitOfWork.foodRepository.UpdateFoodAsync(food);
+            return MapToResponse(updatedFood);
+        }
+
         public async Task DeleteFoodAsync(int id)
         {
             var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(id);
@@ -163,4 +169,4 @@ namespace MV.ApplicationLayer.Services
             };
         }
     }
-} 
+}

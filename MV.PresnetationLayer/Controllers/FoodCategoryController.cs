@@ -1,12 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading.Tasks;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -52,7 +49,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Manager,Staff,Customer")]
+        [Authorize(Roles = "Admin,Manager,Employee,Customer")]
         public async Task<ActionResult<FoodCategoryResponse>> GetFoodCategoryById(int id)
         {
             try
@@ -133,4 +130,4 @@ namespace MV.PresnetationLayer.Controllers
             }
         }
     }
-} 
+}

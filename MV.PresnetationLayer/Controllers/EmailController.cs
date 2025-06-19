@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
-using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
-using System.Text;
+using MV.ApplicationLayer.ServiceInterfaces;
 
 namespace MV.PresnetationLayer.Controllers
 {

@@ -1,9 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
-using System.ComponentModel.DataAnnotations;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -20,7 +20,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Customer")]
+        [AllowAnonymous] // Allow all users to view promotions
         public async Task<ActionResult<PagedResult<PromotionResponse>>> GetPromotions(
             [FromQuery] PromotionSearchRequest request)
         {
@@ -29,6 +29,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("{id}")]
+        [AllowAnonymous] // Allow all users to view promotion details
         public async Task<ActionResult<PromotionResponse>> GetPromotion(int id)
         {
             var promotion = await _promotionService.GetPromotionByIdAsync(id);
@@ -69,14 +70,13 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<ActionResult<PromotionResponse>> UpdatePromotion(
             int id, [FromForm] PromotionUpdateRequest request)
         {
-            if (request.Image == null || request.Image.Length == 0)
+            // Only validate image format if a new image is provided
+            if (request.Image != null)
             {
-                return BadRequest("Image is required");
-            }
-
-            if (request.Image.ContentType != "image/jpeg" && request.Image.ContentType != "image/jpg")
-            {
-                return BadRequest("Only JPEG or JPG images are allowed.");
+                if (request.Image.ContentType != "image/jpeg" && request.Image.ContentType != "image/jpg")
+                {
+                    return BadRequest("Only JPEG or JPG images are allowed.");
+                }
             }
 
             try
@@ -104,5 +104,27 @@ namespace MV.PresnetationLayer.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpPut("UnUpdate/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> UnUpdatePromotion(int id)
+        {
+            try
+            {
+                await _promotionService.UnUpdatePromotionAsync(id);
+                return NoContent();
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpGet("coming-soon")]
+        public async Task<ActionResult<PagedResult<PromotionResponse>>> GetComingSoonPromotions([FromQuery] PromotionSearchRequest request)
+        {
+            var promotions = await _promotionService.GetComingSoonPromotionsAsync(request);
+            return Ok(promotions);
+        }
     }
-} 
+}

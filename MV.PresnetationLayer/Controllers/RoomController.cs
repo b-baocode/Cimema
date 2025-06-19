@@ -1,10 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
-using MV.ApplicationLayer.SpecificExceptionReport;
 using MV.ApplicationLayer.ServiceInterfaces;
-using Microsoft.OpenApi.Services;
+using MV.ApplicationLayer.SpecificExceptionReport;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -236,7 +234,7 @@ namespace MV.PresnetationLayer.Controllers
             {
                 var checkTypeExist = await _roomTypeService.CheckTypeExistByIdAsync(roomUpdateRequest.RoomTypeId);
 
-                if(checkTypeExist == false)
+                if (checkTypeExist == false)
                 {
                     return BadRequest(
                         new ProblemDetails

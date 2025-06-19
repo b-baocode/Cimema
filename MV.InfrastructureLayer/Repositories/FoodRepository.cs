@@ -2,9 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -28,8 +25,8 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<Food>> GetAllFoodsAsync()
         {
             return await _context.Foods
-                .Include(f => f.FoodCates)
-                .Where(f => f.Status != "UnActive")
+                .Include(f => f.FoodCates.Where(fc => fc.Status == "Active"))
+                .Where(f => f.Status == "Active")
                 .ToListAsync();
         }
 
@@ -74,10 +71,10 @@ namespace MV.InfrastructureLayer.Repositories
             if (food != null)
             {
                 // Soft delete by updating status to UnActive
-                food.Status = "UnActive";
+                food.Status = "InActive";
                 _context.Foods.Update(food);
                 await _context.SaveChangesAsync();
             }
         }
     }
-} 
+}

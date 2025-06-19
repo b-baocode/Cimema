@@ -25,6 +25,7 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
-        public string? Status { get; set; }
+        // Status is automatic, no need to enter information
+        // public string? Status { get; set; }
     }
-} 
+}

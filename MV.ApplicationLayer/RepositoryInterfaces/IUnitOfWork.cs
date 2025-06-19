@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MV.ApplicationLayer.RepositoryInterfaces
+﻿namespace MV.ApplicationLayer.RepositoryInterfaces
 {
     public interface IUnitOfWork : IDisposable
     {
@@ -21,6 +15,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         IFoodRepository foodRepository { get; }
         ISeatTypeRepository seatTypeRepository { get; }
         IRoomTypeRepository roomTypeRepository { get; }
+        ICommentRatingRepository commentRatingRepository { get; }
 
         //Single commit point
         Task<int> SaveChangesAsync();

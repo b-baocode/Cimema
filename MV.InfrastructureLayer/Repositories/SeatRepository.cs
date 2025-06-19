@@ -3,11 +3,6 @@ using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -63,7 +58,7 @@ namespace MV.InfrastructureLayer.Repositories
                 .Where(s => s.RoomId == roomId)
                 .ToListAsync();
         }
-        
+
         public async Task AddAsync(Seat seat)
         {
             await _context.Seats.AddAsync(seat);
