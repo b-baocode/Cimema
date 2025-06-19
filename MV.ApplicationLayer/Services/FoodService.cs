@@ -62,7 +62,7 @@ namespace MV.ApplicationLayer.Services
             {
                 FoodName = request.FoodName,
                 FoodPrice = request.FoodPrice,
-                FoodPoster = "posterUrl",
+                FoodPoster = posterUrl,
                 Quantity = request.Quantity,
                 Status = "Active",
                 FoodCates = foodCategories.ToList()
@@ -125,6 +125,17 @@ namespace MV.ApplicationLayer.Services
             {
                 throw new Exception($"Error updating food: {ex.Message}");
             }
+        }
+
+        public async Task<FoodResponse> UpdateFoodQuantityAsync(int id, FoodQuantityUpdateRequest request)
+        {
+            var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(id);
+            if (food == null)
+                throw new ValidationException("Food not found");
+
+            food.Quantity = request.Quantity;
+            var updatedFood = await _unitOfWork.foodRepository.UpdateFoodAsync(food);
+            return MapToResponse(updatedFood);
         }
 
         public async Task DeleteFoodAsync(int id)

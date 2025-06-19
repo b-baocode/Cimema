@@ -11,5 +11,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<FoodResponse> CreateFoodAsync(FoodRequest request);
         Task<FoodResponse> UpdateFoodAsync(int id, FoodUpdateRequest request);
         Task DeleteFoodAsync(int id);
+        Task<FoodResponse> UpdateFoodQuantityAsync(int id, FoodQuantityUpdateRequest request);
     }
 }

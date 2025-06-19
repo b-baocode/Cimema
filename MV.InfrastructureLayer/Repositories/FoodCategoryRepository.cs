@@ -24,7 +24,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<FoodCategory>> GetAllFoodCategoriesAsync()
         {
             return await _context.FoodCategories
-                .Where(fc => fc.Status != "UnActive")
+                .Where(fc => fc.Status == "Active")
                 .ToListAsync();
         }
 
@@ -64,7 +64,7 @@ namespace MV.InfrastructureLayer.Repositories
             if (foodCategory != null)
             {
                 // Soft delete by updating status to UnActive
-                foodCategory.Status = "UnActive";
+                foodCategory.Status = "InActive";
                 _context.FoodCategories.Update(foodCategory);
                 await _context.SaveChangesAsync();
             }
