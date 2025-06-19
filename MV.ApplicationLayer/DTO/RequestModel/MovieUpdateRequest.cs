@@ -9,7 +9,7 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         public string Title { get; set; }
 
         //[Required(ErrorMessage = "Poster is required")]
-        public IFormFile Poster { get; set; }
+        public IFormFile? Poster { get; set; }
 
         [Required(ErrorMessage = "Publish date is required")]
         public DateOnly PublishDate { get; set; }
