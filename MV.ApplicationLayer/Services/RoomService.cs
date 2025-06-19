@@ -151,6 +151,7 @@ namespace MV.ApplicationLayer.Services
                     SeatId = s.SeatId,
                     RowLabel = s.RowLabel,
                     ColumnNumber = s.ColumnNumber,
+                    SeatTypeId = s.SeatTypeId,
                     SeatTypeName = s.SeatTypeName,
                     SeatPrice = s.SeatPrice,
                     PairedWithSeatId = s.PairedWithSeatId,
