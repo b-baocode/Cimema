@@ -63,5 +63,16 @@ namespace MV.InfrastructureLayer.Repositories
         {
             await _context.Seats.AddAsync(seat);
         }
+
+        public async Task<IEnumerable<Seat>> GetSeatsOfRoomForSetTypeAsync(int roomId)
+        {
+            return await _context.Set<Seat>()
+                .Where(r => r.RoomId == roomId)
+                .Include(st => st.CoupleSeatSeatId2Navigation)
+                .Include(st => st.CoupleSeatSeatId1Navigation)
+                .ToListAsync();
+        }
+
+        
     }
 }

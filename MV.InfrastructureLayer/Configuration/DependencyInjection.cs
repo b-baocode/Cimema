@@ -67,6 +67,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IFoodCategoryService, FoodCategoryService>();
             services.AddScoped<IFoodService, FoodService>();
             services.AddScoped<IRoomTypeService, RoomTypeService>();
+            services.AddScoped<ISeatService, SeatService>();
             services.AddScoped<ICommentRatingService, CommentRatingService>();
             services.AddScoped<IShowtimeService, ShowtimeService>();
 

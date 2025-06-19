@@ -27,6 +27,12 @@ namespace MV.InfrastructureLayer.Repositories
                 .FirstOrDefaultAsync(room => room.RoomId == searchedRoomId);
         }
 
+        public async Task<bool> CheckRoomExistAsync(int roomIdToCheck)
+        {
+            return await _context.Set<CinemaRoom>()
+                .AnyAsync(r => r.RoomId == roomIdToCheck);
+        }
+
         public async Task<IEnumerable<GetAllRoomWithSeatCountCustom?>> GetAllRoomAsync(int skip, int take)
         {
             var resultForPage = _context.Set<CinemaRoom>().Select(

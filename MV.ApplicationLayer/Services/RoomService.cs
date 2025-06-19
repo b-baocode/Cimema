@@ -136,6 +136,7 @@ namespace MV.ApplicationLayer.Services
                 RoomName = roomResult.Name,
                 Rows = roomResult.Rows,
                 Columns = roomResult.Columns,
+                RoomTypeId = roomResult.RoomTypeId,
                 RoomTypeName = roomResult.RoomType.RoomTypeName,
                 RoomTypePrice = roomResult.RoomType.RoomTypePrice,
                 RoomTypeStatus = roomResult.RoomType.Status,
