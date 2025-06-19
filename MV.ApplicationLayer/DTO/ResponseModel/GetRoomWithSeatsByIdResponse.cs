@@ -41,6 +41,8 @@
 
         public int ColumnNumber { get; set; }
 
+        public int? SeatTypeId { get; set; }
+
         public string? SeatTypeName { get; set; }
 
         public decimal SeatPrice { get; set; }

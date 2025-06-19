@@ -25,6 +25,7 @@ namespace MV.InfrastructureLayer.Repositories
                     SeatId = s.SeatId,
                     RowLabel = s.RowLabel,
                     ColumnNumber = s.ColumnNumber,
+                    SeatTypeId = s.SeatTypeId,
                     SeatTypeName = s.SeatType != null ? s.SeatType.SeatTypeName : null,
                     SeatPrice = s.SeatType != null ? s.SeatType.SeatTypePrice : 0,
                     SeatStatus = s.Status,
