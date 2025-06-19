@@ -68,6 +68,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IFoodCategoryService, FoodCategoryService>();
             services.AddScoped<IFoodService, FoodService>();
             services.AddScoped<IRoomTypeService, RoomTypeService>();
+            services.AddScoped<ISeatService, SeatService>();
 
 
             //Unit of work

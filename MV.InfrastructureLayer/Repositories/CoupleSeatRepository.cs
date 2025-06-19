@@ -41,5 +41,37 @@ namespace MV.InfrastructureLayer.Repositories
                              _context.Set<Seat>().Any(s => s.RoomId == roomId && s.SeatId == cs.SeatId2))
                 .ToListAsync();
         }
+
+
+        //bad
+        public async Task<IEnumerable<CoupleSeat>> GetAllCoupleSeatsOfRoomToAdd(Dictionary<int, Seat> currentSeatsInRoom)
+        {
+            //return await _context.Set<CoupleSeat>()
+            //    .Where(cs => currentSeatsInRoom.ContainsKey(cs.SeatId1) && currentSeatsInRoom.ContainsKey(cs.SeatId2))
+            //    .ToListAsync();
+
+            var coupleSeats = await _context.Set<CoupleSeat>().ToListAsync();
+
+            return coupleSeats
+                .Where(cs => currentSeatsInRoom.ContainsKey(cs.SeatId1) && currentSeatsInRoom.ContainsKey(cs.SeatId2));
+        }
+
+        public async Task<IEnumerable<CoupleSeat>> GetAllCoupleSeatsOfRoomInPairsByRoomIdAsync(int roomId)
+        {
+            return await _context.Set<CoupleSeat>()
+                .Where(cs => _context.Set<Seat>().Any(s => s.RoomId == roomId && s.SeatId == cs.SeatId1) &&
+                             _context.Set<Seat>().Any(s => s.RoomId == roomId && s.SeatId == cs.SeatId2))
+                .ToListAsync();
+        }
+
+        public async Task AddRangeAsync(List<CoupleSeat> coupleSeatToAdd)
+        {
+            await _context.Set<CoupleSeat>().AddRangeAsync(coupleSeatToAdd);
+        }
+
+        public void RemoveRangeAsync(List<CoupleSeat> coupleSeatToDelete)
+        {
+            _context.Set<CoupleSeat>().RemoveRange(coupleSeatToDelete);
+        }
     }
 }
