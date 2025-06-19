@@ -1,5 +1,3 @@
-using System;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class CommentRatingResponse
@@ -13,4 +11,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public string Comment { get; set; }
         public DateTime CreatedAt { get; set; }
     }
-} 
+}

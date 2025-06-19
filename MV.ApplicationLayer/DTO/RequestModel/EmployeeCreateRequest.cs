@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace MV.ApplicationLayer.DTO.RequestModel
 {
@@ -12,7 +11,7 @@ namespace MV.ApplicationLayer.DTO.RequestModel
 
         [Required(ErrorMessage = "Password is required")]
         [StringLength(50, MinimumLength = 6, ErrorMessage = "Password must be between 6-50 characters")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$", 
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$",
             ErrorMessage = "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character")]
         public string Password { get; set; }
 

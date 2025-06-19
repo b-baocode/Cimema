@@ -1,11 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -100,4 +96,4 @@ namespace MV.InfrastructureLayer.Repositories
             return await _context.CommentRatings.FirstOrDefaultAsync(cr => cr.Userid == userId && cr.MovieId == movieId);
         }
     }
-} 
+}

@@ -2,10 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -73,7 +69,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                //.Where(m => m.FromDate >= fromDate && m.ToDate <= toDate) // Giữ khi có trường IsDelete
+                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && !EF.Functions.Like(m.Status, "InActive"))
                 .AsQueryable();
 
             return await query
@@ -94,8 +90,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.Movies
                 .Include(m => m.Genres)
-                //.FirstOrDefaultAsync(m => m.MovieId == id); // Giữ khi có trường IsDelete
-                .FirstOrDefaultAsync(m => m.MovieId == id && !EF.Functions.Like(m.Status, "InActive")); // Xóa đi nếu có trường IsDelete
+                .FirstOrDefaultAsync(m => m.MovieId == id); // Lấy phim theo ID mà không lọc status
         }
 
         public async Task<bool> IsTitleExistsAsync(string title)

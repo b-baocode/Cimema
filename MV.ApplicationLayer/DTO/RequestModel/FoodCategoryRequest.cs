@@ -8,4 +8,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [MaxLength(100, ErrorMessage = "Category name cannot exceed 100 characters")]
         public string CateName { get; set; }
     }
-} 
+}

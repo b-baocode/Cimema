@@ -6,4 +6,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public string Name { get; set; }
         public string? Status { get; set; }
     }
-} 
+}

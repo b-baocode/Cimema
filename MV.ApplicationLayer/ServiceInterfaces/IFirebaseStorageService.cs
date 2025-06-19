@@ -1,6 +1,3 @@
-using System.IO;
-using System.Threading.Tasks;
-
 namespace MV.ApplicationLayer.ServiceInterfaces
 {
     public interface IFirebaseStorageService
@@ -9,4 +6,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task DeleteImageAsync(string imageUrl);
         Task<string> UpdateImageAsync(Stream imageStream, string fileName, string oldImageUrl);
     }
-} 
+}

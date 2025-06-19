@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MV.ApplicationLayer.DTO.ResponseModel
+﻿namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class RoomCreateResponse
     {
         public int RowsAffected { get; set; }
-        public int RoomAddCount { get; set; } 
-        public int SeatAddCount { get; set; } 
+        public int RoomAddCount { get; set; }
+        public int SeatAddCount { get; set; }
         public int RoomId { get; set; }
         public string Name { get; set; } = null!;
-      
+
         public int Rows { get; set; }
-        
+
         public int Columns { get; set; }
 
         public string? Status { get; set; }

@@ -6,4 +6,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public string CateName { get; set; }
         public string? Status { get; set; }
     }
-} 
+}

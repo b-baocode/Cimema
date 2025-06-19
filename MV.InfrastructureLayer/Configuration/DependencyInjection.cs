@@ -4,10 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services;
-using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.DBContext;
 using MV.InfrastructureLayer.Repositories;
-using MV.InfrastructureLayer.Configuration;
 using MV.InfrastructureLayer.Services;
 // using MV.InfrastructureLayer.Interfaces;
 
@@ -56,10 +54,11 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IFoodRepository, FoodRepository>();
             services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
+            services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
 
 
             //Service injection
-            services.AddScoped<ILoginService,LoginService>();
+            services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUserService, UserService>();
@@ -69,7 +68,10 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IFoodService, FoodService>();
             services.AddScoped<IRoomTypeService, RoomTypeService>();
             services.AddScoped<ICommentRatingService, CommentRatingService>();
+            services.AddScoped<IShowtimeService, ShowtimeService>();
 
+            // Background services
+            services.AddHostedService<ShowtimeBackgroundService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();

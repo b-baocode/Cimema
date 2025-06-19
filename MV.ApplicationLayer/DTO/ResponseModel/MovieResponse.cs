@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class MovieResponse
@@ -22,5 +19,5 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public List<GenreResponse> Genres { get; set; }
     }
 
-    
-} 
+
+}

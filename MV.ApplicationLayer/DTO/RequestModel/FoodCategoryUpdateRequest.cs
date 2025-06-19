@@ -11,4 +11,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [MaxLength(25)]
         public string Status { get; set; }
     }
-} 
+}

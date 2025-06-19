@@ -1,12 +1,6 @@
 ﻿using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
-using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -50,7 +44,7 @@ namespace MV.ApplicationLayer.Services
         {
             var getUser = await _unitOfWork.userRepository.GetUserByUsername(changePasswordRequest.Username);
 
-            if(getUser == null)
+            if (getUser == null)
             {
                 return "User not exist";
             }
@@ -69,6 +63,6 @@ namespace MV.ApplicationLayer.Services
             return string.Empty;
         }
 
-        
+
     }
 }

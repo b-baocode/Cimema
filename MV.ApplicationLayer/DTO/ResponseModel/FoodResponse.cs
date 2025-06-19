@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class FoodResponse
@@ -12,4 +10,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public string? Status { get; set; }
         public List<FoodCategoryResponse> FoodCategories { get; set; }
     }
-} 
+}

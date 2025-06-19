@@ -1,7 +1,5 @@
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.ServiceInterfaces
 {
@@ -15,4 +13,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task DeleteFoodAsync(int id);
         Task<FoodResponse> UpdateFoodQuantityAsync(int id, FoodQuantityUpdateRequest request);
     }
-} 
+}

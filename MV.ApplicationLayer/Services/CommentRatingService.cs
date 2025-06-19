@@ -5,10 +5,6 @@ using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.SpecificExceptionReport;
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -21,8 +17,8 @@ namespace MV.ApplicationLayer.Services
             _unitOfWork = unitOfWork;
         }
 
-    
-      
+
+
 
         public async Task<PagedResult<CommentRatingResponse>> GetByMovieIdAsync(int movieId, CommentRatingPagingRequest request)
         {
@@ -43,7 +39,7 @@ namespace MV.ApplicationLayer.Services
             };
         }
 
-      
+
 
         public async Task<CommentRatingResponse> CreateAsync(CommentRatingRequest request)
         {
@@ -94,4 +90,4 @@ namespace MV.ApplicationLayer.Services
             };
         }
     }
-} 
+}

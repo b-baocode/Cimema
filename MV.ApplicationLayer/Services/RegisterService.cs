@@ -1,13 +1,7 @@
-﻿using MV.ApplicationLayer.DTO.RequestModel;
+﻿using System.Text.RegularExpressions;
+using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 
 namespace MV.ApplicationLayer.Services
 {

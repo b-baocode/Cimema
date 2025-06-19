@@ -1,14 +1,9 @@
+using System.ComponentModel.DataAnnotations;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -174,4 +169,4 @@ namespace MV.ApplicationLayer.Services
             };
         }
     }
-} 
+}

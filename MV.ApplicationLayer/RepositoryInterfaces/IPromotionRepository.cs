@@ -1,7 +1,4 @@
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.RepositoryInterfaces
 {
@@ -15,5 +12,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<Promotion> UpdatePromotionAsync(Promotion promotion);
         Task DeletePromotionAsync(int id);
         Task<Promotion?> GetLastPromotionAsync();
+        Task<IEnumerable<Promotion>> GetComingSoonPromotionsAsync(int skip, int take);
+        Task<int> GetTotalComingSoonPromotionsAsync();
     }
-} 
+}

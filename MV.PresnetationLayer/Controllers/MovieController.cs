@@ -1,6 +1,6 @@
+using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
@@ -19,8 +19,14 @@ namespace MV.PresnetationLayer.Controllers
             _movieService = movieService;
         }
 
+        /// <summary>
+        /// [AllowAnonymous]: is an Attribute in ASP.NET Core used to bypass the Authorization steps.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedResult<MovieResponse>>> GetMovies(
             [FromQuery] MovieSearchRequest request)
         {
@@ -30,6 +36,7 @@ namespace MV.PresnetationLayer.Controllers
 
         [HttpGet("SearchByTime")]
         //[Authorize(Roles = "Customer")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByTime(
             [FromQuery] MovieSearchByTimeRequest request)
         {
@@ -45,7 +52,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("SearchByMovie")]
-        [Authorize(Roles = "Customer")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByMovie(
             [FromQuery] MovieSearchByCustomerRequest request)
         {
@@ -102,14 +109,13 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<ActionResult<MovieResponse>> UpdateMovie(
             int id, [FromForm] MovieUpdateRequest request)
         {
-            if (request.Poster == null || request.Poster.Length == 0)
+            // Only validate image format if a new poster is provided
+            if (request.Poster != null)
             {
-                return BadRequest("Image is required");
-            }
-
-            if (request.Poster.ContentType != "image/jpeg" && request.Poster.ContentType != "image/jpg")
-            {
-                return BadRequest("Only JPEG or JPG images are allowed.");
+                if (request.Poster.ContentType != "image/jpeg" && request.Poster.ContentType != "image/jpg")
+                {
+                    return BadRequest("Only JPEG or JPG images are allowed.");
+                }
             }
 
             try

@@ -2,7 +2,6 @@
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
-using MV.ApplicationLayer.Services;
 using MV.ApplicationLayer.SpecificExceptionReport;
 
 namespace MV.PresnetationLayer.Controllers
@@ -32,7 +31,8 @@ namespace MV.PresnetationLayer.Controllers
 
                 return Ok(result);
 
-            }catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return Problem(
                     detail: "An unexpected error occurred while getting all the room. Please try again later.",
@@ -68,7 +68,7 @@ namespace MV.PresnetationLayer.Controllers
             {
                 var createRoomType = await _roomTypeService.CreateRoomTypeAsync(roomTypeCreateRequest, imgStream, imgName);
 
-                if(createRoomType == null)
+                if (createRoomType == null)
                 {
                     return BadRequest("Image url is null");
                 }
@@ -79,7 +79,7 @@ namespace MV.PresnetationLayer.Controllers
                     createRoomType
                     );
             }
-            catch(RoomTypeNameAlreadyExistException ex)
+            catch (RoomTypeNameAlreadyExistException ex)
             {
                 return Conflict(
                     new ProblemDetails
@@ -157,7 +157,7 @@ namespace MV.PresnetationLayer.Controllers
 
                 if (!deleteResult)
                 {
-                    if(errorMessage == "Not exist")
+                    if (errorMessage == "Not exist")
                     {
                         return NotFound(
                         new ProblemDetails
