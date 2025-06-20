@@ -12,5 +12,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<IEnumerable<GetAllRoomWithSeatCountCustom?>> GetAllRoomAsync(int skip, int take);
 
         Task<int> GetTotalRoomsCountAsync();
+
+        Task<bool> CheckRoomExistAsync(int roomIdToCheck);
     }
 }

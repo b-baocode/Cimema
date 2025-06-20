@@ -25,6 +25,7 @@ namespace MV.InfrastructureLayer.Repositories
                     SeatId = s.SeatId,
                     RowLabel = s.RowLabel,
                     ColumnNumber = s.ColumnNumber,
+                    SeatTypeId = s.SeatTypeId,
                     SeatTypeName = s.SeatType != null ? s.SeatType.SeatTypeName : null,
                     SeatPrice = s.SeatType != null ? s.SeatType.SeatTypePrice : 0,
                     SeatStatus = s.Status,
@@ -63,5 +64,16 @@ namespace MV.InfrastructureLayer.Repositories
         {
             await _context.Seats.AddAsync(seat);
         }
+
+        public async Task<IEnumerable<Seat>> GetSeatsOfRoomForSetTypeAsync(int roomId)
+        {
+            return await _context.Set<Seat>()
+                .Where(r => r.RoomId == roomId)
+                .Include(st => st.CoupleSeatSeatId2Navigation)
+                .Include(st => st.CoupleSeatSeatId1Navigation)
+                .ToListAsync();
+        }
+
+        
     }
 }
