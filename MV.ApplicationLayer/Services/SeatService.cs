@@ -183,7 +183,7 @@ namespace MV.ApplicationLayer.Services
 
             if (seatTypeFind == null)
             {
-                return (false, $"Room type with ID {seatTypePriceUpdateRequest.SeatTypeId} not found.");
+                return (false, $"Seat type with ID {seatTypePriceUpdateRequest.SeatTypeId} not found.");
             }
 
             if (seatTypePriceUpdateRequest.SeatTypePriceUpdate != null)
