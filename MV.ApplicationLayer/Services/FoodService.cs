@@ -46,12 +46,17 @@ namespace MV.ApplicationLayer.Services
             if (existingFood != null)
                 throw new ValidationException("Food with this name already exists");
 
-            // Upload food poster to Firebase Storage
+            // --- BẮT ĐẦU THAY ĐỔI ---
             string posterUrl;
             using (var stream = request.FoodPoster.OpenReadStream())
             {
-                posterUrl = await _firebaseStorageService.UploadImageAsync(stream, request.FoodPoster.Name, "FoodImages");
+                // Tạo tên file duy nhất bằng cách kết hợp GUID và đuôi file gốc
+                var fileExtension = Path.GetExtension(request.FoodPoster.FileName);
+                var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+
+                posterUrl = await _firebaseStorageService.UploadImageAsync(stream, uniqueFileName, "FoodImages");
             }
+            // --- KẾT THÚC THAY ĐỔI ---
 
             // Get food categories
             var foodCategories = await _unitOfWork.foodCategoryRepository.GetFoodCategoriesByIdsAsync(request.FoodCateIds);
@@ -75,40 +80,53 @@ namespace MV.ApplicationLayer.Services
             }
             catch (Exception ex)
             {
-                // If food creation fails, delete the uploaded image
                 await _firebaseStorageService.DeleteImageAsync(posterUrl);
                 throw new Exception($"Error creating food: {ex.Message}");
             }
         }
-
         public async Task<FoodResponse> UpdateFoodAsync(int id, FoodUpdateRequest request)
         {
             var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(id);
             if (food == null)
                 throw new ValidationException("Food not found");
 
-            // Check if new name conflicts with existing food
             var existingFood = await _unitOfWork.foodRepository.GetFoodByNameAsync(request.FoodName);
             if (existingFood != null && existingFood.FoodId != id)
                 throw new ValidationException("Food with this name already exists");
 
-            // Get food categories
             var foodCategories = await _unitOfWork.foodCategoryRepository.GetFoodCategoriesByIdsAsync(request.FoodCateIds);
             if (!foodCategories.Any())
-                throw new ValidationException("No xvalid food categories found for the provided category IDs");
+                throw new ValidationException("No valid food categories found for the provided category IDs");
 
             try
             {
-                // Only update poster if a new one is provided
+                // Chỉ cập nhật poster nếu một poster mới được cung cấp
                 if (request.FoodPoster != null)
                 {
                     string posterUrl;
                     using (var stream = request.FoodPoster.OpenReadStream())
                     {
-                        posterUrl = await _firebaseStorageService.UploadImageAsync(stream, request.FoodPoster.Name, "FoodImages");
+                        var fileExtension = Path.GetExtension(request.FoodPoster.FileName);
+                        var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+                        posterUrl = await _firebaseStorageService.UploadImageAsync(stream, uniqueFileName, "FoodImages");
                     }
-                    // Delete old poster
-                    await _firebaseStorageService.DeleteImageAsync(food.FoodPoster);
+
+
+                    try
+                    {
+                        // Chỉ thử xóa nếu đường dẫn ảnh cũ không rỗng hoặc không phải là giá trị mặc định/không hợp lệ
+                        if (!string.IsNullOrEmpty(food.FoodPoster))
+                        {
+                            await _firebaseStorageService.DeleteImageAsync(food.FoodPoster);
+                        }
+                    }
+                    catch (Exception deleteEx)
+                    {
+                        // Nếu việc xóa file cũ bị lỗi (ví dụ file không tồn tại),
+                        // chúng ta chỉ cần ghi log ra console và bỏ qua để tiếp tục quy trình cập nhật.
+                        Console.WriteLine($"--> INFO: Failed to delete old image (maybe it's already gone or path was invalid). Error: {deleteEx.Message}");
+                    }
+
                     food.FoodPoster = posterUrl;
                 }
 
@@ -116,7 +134,12 @@ namespace MV.ApplicationLayer.Services
                 food.FoodPrice = request.FoodPrice;
                 food.Quantity = request.Quantity;
                 food.Status = request.Status ?? "Active";
-                food.FoodCates = foodCategories.ToList();
+
+                food.FoodCates.Clear();
+                foreach (var category in foodCategories)
+                {
+                    food.FoodCates.Add(category);
+                }
 
                 var updatedFood = await _unitOfWork.foodRepository.UpdateFoodAsync(food);
                 return MapToResponse(updatedFood);
