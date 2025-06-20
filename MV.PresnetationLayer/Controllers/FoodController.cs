@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
@@ -104,32 +104,46 @@ namespace MV.PresnetationLayer.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<FoodResponse>> UpdateFood(int id, [FromForm] FoodUpdateRequest request)
         {
-            if (request.FoodPoster == null || request.FoodPoster.Length == 0)
-            {
-                return BadRequest("Image is required");
-            }
-
-            if (request.FoodPoster.ContentType != "image/jpeg" && request.FoodPoster.ContentType != "image/jpg")
-            {
-                return BadRequest("Only JPEG or JPG images are allowed.");
-            }
 
             try
             {
+
+                if (request.FoodPoster != null)
+                {
+                    if (request.FoodPoster.Length == 0)
+                    {
+                        return BadRequest("Image file cannot be empty.");
+                    }
+                    if (request.FoodPoster.ContentType != "image/jpeg" && request.FoodPoster.ContentType != "image/jpg" && request.FoodPoster.ContentType != "image/png")
+                    {
+                        return BadRequest("Only JPEG, JPG, or PNG images are allowed.");
+                    }
+                }
+
                 if (request == null)
                     return BadRequest("Invalid request data");
+
 
                 var food = await _foodService.UpdateFoodAsync(id, request);
                 return Ok(food);
             }
-            catch (ValidationException ex)
+            catch (Exception ex)
             {
-                return NotFound(ex.Message);
+
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                Console.WriteLine("!!!      AN EXCEPTION WAS CAUGHT IN CONTROLLER   !!!");
+                Console.WriteLine("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                Console.WriteLine(ex.ToString()); // In ra TOÀN BỘ thông tin lỗi và stack trace
+
+
+                return StatusCode(500, new
+                {
+                    message = $"Lỗi Thực Thi: {ex.Message}",
+                    innerException = $"Lỗi Bên Trong: {ex.InnerException?.Message}",
+                    stackTrace = ex.ToString()
+                });
             }
-            catch (Exception)
-            {
-                return StatusCode(500, "An unexpected error occurred");
-            }
+
         }
 
         [HttpDelete("{id}")]
