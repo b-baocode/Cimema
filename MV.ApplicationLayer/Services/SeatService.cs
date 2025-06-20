@@ -176,5 +176,24 @@ namespace MV.ApplicationLayer.Services
             }
             return (false, "Valid couple seats");
         }
+
+        public async Task<(bool IsSuccess, string message)> UpdateSeatTypePriceAsync(SeatTypePriceUpdateRequest seatTypePriceUpdateRequest)
+        {
+            var seatTypeFind = await _unitOfWork.seatTypeRepository.GetSeatTypeByIdAsync(seatTypePriceUpdateRequest.SeatTypeId);
+
+            if (seatTypeFind == null)
+            {
+                return (false, $"Seat type with ID {seatTypePriceUpdateRequest.SeatTypeId} not found.");
+            }
+
+            if (seatTypePriceUpdateRequest.SeatTypePriceUpdate != null)
+            {
+                seatTypeFind.SeatTypePrice = seatTypePriceUpdateRequest.SeatTypePriceUpdate.Value;
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return (true, seatTypeFind.SeatTypeName);
+        }
     }
 }

@@ -21,5 +21,11 @@ namespace MV.InfrastructureLayer.Repositories
                 .Select(st => st.SeatTypeId)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<SeatType?> GetSeatTypeByIdAsync(int seatTypeId)
+        {
+            return await _context.Set<SeatType>()
+                .FirstOrDefaultAsync(st => st.SeatTypeId == seatTypeId);
+        }
     }
 }

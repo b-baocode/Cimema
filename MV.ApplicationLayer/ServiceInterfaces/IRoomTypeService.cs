@@ -16,5 +16,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<(bool, string)> DeleteRoomTypeAsync(int deleteRoomTypeId);
 
         Task<bool> UnDeleteRoomTypeAsync(int unDeleteRoomTypeId);
+
+        Task<(bool IsSuccess, string message)> UpdateRoomTypePriceAsync(RoomTypePriceUpdateRequest roomTypePriceUpdateRequest);
     }
 }

@@ -69,5 +69,43 @@ namespace MV.PresnetationLayer.Controllers
             }
         }
 
+
+        [HttpPut("UpdateSeatTypePrice")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<ActionResult> UpdateSeatTypePrice([FromBody] SeatTypePriceUpdateRequest seatTypePriceUpdateRequest)
+        {
+            try
+            {
+                var updateResult = await _seatService.UpdateSeatTypePriceAsync(seatTypePriceUpdateRequest);
+
+                if(!updateResult.IsSuccess)
+                {
+                    return NotFound(
+                       new ProblemDetails
+                       {
+                           Title = "Seat Type not found",
+                           Status = StatusCodes.Status404NotFound,
+                           Detail = $"{updateResult.message}",
+                           Instance = HttpContext.Request.Path
+                       });
+                }
+                if (seatTypePriceUpdateRequest.SeatTypePriceUpdate == null)
+                {
+                    return Ok($"{updateResult.message} seat type price not updated");
+                }
+
+                return Ok($"{updateResult.message} seat type price updated to: {seatTypePriceUpdateRequest.SeatTypePriceUpdate}");
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                  detail: "An unexpected error occurred",
+                  title: "Internal Server Error",
+                  statusCode: StatusCodes.Status500InternalServerError,
+                  instance: HttpContext.Request.Path
+              );
+            }
+        }
     }
 }
