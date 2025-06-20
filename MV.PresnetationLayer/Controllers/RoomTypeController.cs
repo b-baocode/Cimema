@@ -227,5 +227,45 @@ namespace MV.PresnetationLayer.Controllers
                );
             }
         }
+
+
+        [HttpPut("UpdateRoomTypePrice")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        public async Task<ActionResult> UpdatePriceForRoomType([FromBody] RoomTypePriceUpdateRequest roomTypePriceUpdateRequest)
+        {
+            try
+            {
+                var updateResult = await _roomTypeService.UpdateRoomTypePriceAsync(roomTypePriceUpdateRequest);
+
+                if (!updateResult.IsSuccess)
+                {
+                    return NotFound(
+                        new ProblemDetails
+                        {
+                            Title = "Room Type not found",
+                            Status = StatusCodes.Status404NotFound,
+                            Detail = $"{updateResult.message}",
+                            Instance = HttpContext.Request.Path
+                        });
+                }
+
+                if (roomTypePriceUpdateRequest.RoomTypePriceUpdate == null)
+                {
+                    return Ok($"{updateResult.message} room type price not updated");
+                }
+
+                return Ok($"{updateResult.message} room type price updated to: {roomTypePriceUpdateRequest.RoomTypePriceUpdate}");
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                   detail: "An unexpected error occurred",
+                   title: "Internal Server Error",
+                   statusCode: StatusCodes.Status500InternalServerError,
+                   instance: HttpContext.Request.Path
+               );
+            }
+        }
     }
 }

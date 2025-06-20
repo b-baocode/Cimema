@@ -192,5 +192,24 @@ namespace MV.ApplicationLayer.Services
             return true;
         }
 
+        public async Task<(bool IsSuccess, string message)> UpdateRoomTypePriceAsync(RoomTypePriceUpdateRequest roomTypePriceUpdateRequest)
+        {
+            var roomTypeFind = await _unitOfWork.roomTypeRepository.GetRoomTypeByIdWithoutRoomAsync(roomTypePriceUpdateRequest.RoomTypeId);
+
+            if (roomTypeFind == null)
+            {
+                return (false, $"Room type with ID {roomTypePriceUpdateRequest.RoomTypeId} not found.");
+            }
+
+            if (roomTypePriceUpdateRequest.RoomTypePriceUpdate != null)
+            {
+                roomTypeFind.RoomTypePrice = roomTypePriceUpdateRequest.RoomTypePriceUpdate.Value;
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return (true, roomTypeFind.RoomTypeName);
+        }
+
     }
 }

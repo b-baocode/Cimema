@@ -7,5 +7,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<bool> SetTypeForSeatsAsync(SeatSetTypeRequest seatSetTypeRequest, int roomId);
 
         (bool checkCouple, string errorMessage) CheckInvalidDoubleSeats(List<CoupleSeatRequest>? coupleSeatList);
+
+        Task<(bool IsSuccess, string message)> UpdateSeatTypePriceAsync(SeatTypePriceUpdateRequest seatTypePriceUpdateRequest);
     }
 }
