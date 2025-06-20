@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
@@ -35,7 +35,10 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<FoodCategory?> GetFoodCategoryByIdAsync(int id)
         {
-            return await _context.FoodCategories.FindAsync(id);
+            // Cần .Include(fc => fc.Foods) để có thể kiểm tra ở tầng service
+            return await _context.FoodCategories
+                                 .Include(fc => fc.Foods)
+                                 .FirstOrDefaultAsync(fc => fc.FoodCateId == id);
         }
 
         public async Task<FoodCategory?> GetFoodCategoryByNameAsync(string name)

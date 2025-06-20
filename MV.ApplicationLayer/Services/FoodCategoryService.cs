@@ -74,12 +74,20 @@ namespace MV.ApplicationLayer.Services
 
         public async Task DeleteFoodCategoryAsync(int id)
         {
+
             var foodCategory = await _unitOfWork.foodCategoryRepository.GetFoodCategoryByIdAsync(id);
             if (foodCategory == null)
                 throw new ValidationException("Food category not found");
 
-            if (foodCategory.Status == "UnActive")
+            if (foodCategory.Status == "InActive")
                 throw new ValidationException("Food category is already deleted");
+
+
+            if (foodCategory.Foods.Any(f => f.Status == "Active"))
+            {
+                throw new ValidationException("Cannot delete category as it is still being used by active foods.");
+            }
+
 
             await _unitOfWork.foodCategoryRepository.DeleteFoodCategoryAsync(id);
         }
