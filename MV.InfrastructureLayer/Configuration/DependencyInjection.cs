@@ -55,6 +55,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
             services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
+            services.AddScoped<IPaymentOnlineRepository, PaymentOnlineRepository>();
 
 
             //Service injection
@@ -77,6 +78,8 @@ namespace MV.InfrastructureLayer.Configuration
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            // Add VnPay services
+            services.AddScoped<IVnPayService, MV.ApplicationLayer.Services.Vnpay.VnpayService>();
 
             return services;
         }
