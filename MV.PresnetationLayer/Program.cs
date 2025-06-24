@@ -6,6 +6,7 @@ using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.Repositories;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.InfrastructureLayer.Services;
+using MV.ApplicationLayer.Services.Vnpay;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -74,6 +75,7 @@ builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
+
 
 var app = builder.Build();
 
