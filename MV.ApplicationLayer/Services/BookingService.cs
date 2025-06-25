@@ -120,15 +120,15 @@ namespace MV.ApplicationLayer.Services
             return new BookingResponse
             {
                 InvoiceId = invoice.InvoiceId,
-                TotalPrice = invoice.ScoreDiscountAmount,
+                TotalPrice = (decimal)invoice.ScoreDiscountAmount,
                 Status = invoice.Status,
                 CreatedAt = invoice.CreatedAt,
                 PaymentType = invoice.PaymentType,
                 PromotionId = invoice.PromotionId,
                 PromotionName = invoice.Promotion?.PromotionName,
                 UserId = user.Userid,
-                ScoresUsed = invoice.ScoresUsed,
-                ScoreDiscountAmount = invoice.ScoreDiscountAmount,
+                ScoresUsed = (int)invoice.ScoresUsed,
+                ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
                 Seats = invoice.TicketDetails.Select(td => new BookingSeatResponse
                 {
                     SeatId = td.SeatDataId,
@@ -172,15 +172,15 @@ namespace MV.ApplicationLayer.Services
             var response = new BookingResponse
             {
                 InvoiceId = invoice.InvoiceId,
-                TotalPrice = invoice.ScoreDiscountAmount,
+                TotalPrice = (decimal)invoice.ScoreDiscountAmount,
                 Status = invoice.Status,
                 CreatedAt = invoice.CreatedAt,
                 PaymentType = invoice.PaymentType,
                 PromotionId = invoice.PromotionId,
                 PromotionName = invoice.Promotion?.PromotionName,
                 UserId = userId,
-                ScoresUsed = invoice.ScoresUsed,
-                ScoreDiscountAmount = invoice.ScoreDiscountAmount,
+                ScoresUsed = (int)invoice.ScoresUsed,
+                ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
                 Seats = ticketDetails.Select(td => new BookingSeatResponse
                 {
                     SeatId = td.SeatDataId,
@@ -201,57 +201,48 @@ namespace MV.ApplicationLayer.Services
 
         public async Task<List<BookingResponse>> GetBookingsByUserAsync(string userId)
         {
-            try
+            // Lấy tất cả hóa đơn của user
+            var invoices = await _unitOfWork.ticketInvoiceRepository.GetByUserIdAsync(userId);
+            var responses = new List<BookingResponse>();
+            foreach (var invoice in invoices)
             {
-                // Lấy tất cả hóa đơn của user
-                var invoices = await _unitOfWork.ticketInvoiceRepository.GetByUserIdAsync(userId);
-                var responses = new List<BookingResponse>();
-                foreach (var invoice in invoices)
+                var ticketDetails = invoice.TicketDetails.ToList();
+                var showtimeInstanceId = ticketDetails.FirstOrDefault()?.ShowtimeInstanceId;
+                var seatDataDict = showtimeInstanceId.HasValue
+                    ? await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeInstanceId.Value)
+                    : new Dictionary<int, SeatDataForShowtime>();
+                var foods = invoice.TicketInvoiceFoodItems.ToList();
+                var foodIds = foods.Select(f => f.FoodId).ToList();
+                var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
+                responses.Add(new BookingResponse
                 {
-                    var ticketDetails = invoice.TicketDetails.ToList();
-                    var showtimeInstanceId = ticketDetails.FirstOrDefault()?.ShowtimeInstanceId;
-                    var seatDataDict = showtimeInstanceId.HasValue
-                        ? await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeInstanceId.Value)
-                        : new Dictionary<int, SeatDataForShowtime>();
-                    var foods = invoice.TicketInvoiceFoodItems.ToList();
-                    var foodIds = foods.Select(f => f.FoodId).ToList();
-                    var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
-                    responses.Add(new BookingResponse
+                    InvoiceId = invoice.InvoiceId,
+                    TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                    Status = invoice.Status,
+                    CreatedAt = invoice.CreatedAt,
+                    PaymentType = invoice.PaymentType,
+                    PromotionId = invoice.PromotionId,
+                    PromotionName = invoice.Promotion?.PromotionName,
+                    UserId = invoice.Userid,
+                    ScoresUsed = (int)invoice.ScoresUsed,
+                    ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
+                    Seats = ticketDetails.Select(td => new BookingSeatResponse
                     {
-                        InvoiceId = invoice.InvoiceId,
-                        TotalPrice = invoice.ScoreDiscountAmount,
-                        Status = invoice.Status,
-                        CreatedAt = invoice.CreatedAt,
-                        PaymentType = invoice.PaymentType,
-                        PromotionId = invoice.PromotionId,
-                        PromotionName = invoice.Promotion?.PromotionName,
-                        UserId = invoice.Userid,
-                        ScoresUsed = invoice.ScoresUsed,
-                        ScoreDiscountAmount = invoice.ScoreDiscountAmount,
-                        Seats = ticketDetails.Select(td => new BookingSeatResponse
-                        {
-                            SeatId = td.SeatDataId,
-                            SeatName = seatDataDict.ContainsKey(td.SeatDataId) ? seatDataDict[td.SeatDataId].RowLabel + seatDataDict[td.SeatDataId].ColumnNumber : "",
-                            Price = td.TicketPrice,
-                            Status = td.Status
-                        }).ToList(),
-                        Foods = foods.Select(fi => new BookingFoodResponse
-                        {
-                            FoodId = fi.FoodId,
-                            FoodName = foodEntities.FirstOrDefault(f => f.FoodId == fi.FoodId)?.FoodName ?? "",
-                            Quantity = fi.BoughtQuantity,
-                            Price = fi.TotalFoodPrice
-                        }).ToList()
-                    });
-                }
-                return responses;
+                        SeatId = td.SeatDataId,
+                        SeatName = seatDataDict.ContainsKey(td.SeatDataId) ? seatDataDict[td.SeatDataId].RowLabel + seatDataDict[td.SeatDataId].ColumnNumber : "",
+                        Price = td.TicketPrice,
+                        Status = td.Status
+                    }).ToList(),
+                    Foods = foods.Select(fi => new BookingFoodResponse
+                    {
+                        FoodId = fi.FoodId,
+                        FoodName = foodEntities.FirstOrDefault(f => f.FoodId == fi.FoodId)?.FoodName ?? "",
+                        Quantity = fi.BoughtQuantity,
+                        Price = fi.TotalFoodPrice
+                    }).ToList()
+                });
             }
-            catch (Exception ex)
-            {
-                // Log error và trả về empty list
-                Console.WriteLine($"Error in GetBookingsByUserAsync: {ex.Message}");
-                return new List<BookingResponse>();
-            }
+            return responses;
         }
 
         public async Task<List<BookingResponse>> GetAllBookingsAsync()
@@ -272,15 +263,15 @@ namespace MV.ApplicationLayer.Services
                 responses.Add(new BookingResponse
                 {
                     InvoiceId = invoice.InvoiceId,
-                    TotalPrice = invoice.ScoreDiscountAmount,
+                    TotalPrice = (decimal)invoice.ScoreDiscountAmount,
                     Status = invoice.Status,
                     CreatedAt = invoice.CreatedAt,
                     PaymentType = invoice.PaymentType,
                     PromotionId = invoice.PromotionId,
                     PromotionName = invoice.Promotion?.PromotionName,
                     UserId = invoice.Userid,
-                    ScoresUsed = invoice.ScoresUsed,
-                    ScoreDiscountAmount = invoice.ScoreDiscountAmount,
+                    ScoresUsed = (int)invoice.ScoresUsed,
+                    ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
                     Seats = ticketDetails.Select(td => new BookingSeatResponse
                     {
                         SeatId = td.SeatDataId,
