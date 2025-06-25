@@ -70,7 +70,12 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<ISeatService, SeatService>();
             services.AddScoped<ICommentRatingService, CommentRatingService>();
             services.AddScoped<IShowtimeService, ShowtimeService>();
-
+            services.AddScoped<IShowtimeRoomInstanceService, ShowtimeRoomInstanceService>();
+            services.AddScoped<ISeatDataForShowtimeService, SeatDataForShowtimeService>();
+            services.AddScoped<ITicketInvoiceService, TicketInvoiceService>();
+            services.AddScoped<IScoreService, ScoreService>();
+            services.AddScoped<IScoreHistoryRepository, ScoreHistoryRepository>();
+              services.AddScoped<IBookingService, BookingService>();
             // Background services
             services.AddHostedService<ShowtimeBackgroundService>();
 
