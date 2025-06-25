@@ -21,7 +21,7 @@ namespace MV.PresnetationLayer.Controllers
         [HttpPost("create-vnpay-url")]
         public IActionResult CreateVnPayUrl([FromBody] PaymentInformationRequest request)
         {
-            if (request == null || request.Amount <= 0 || string.IsNullOrEmpty(request.OrderType))
+            if (request == null || request.Amount <= 0)
                 return BadRequest("Invalid payment request");
             var url = _vnPayService.CreatePaymentUrl(request, HttpContext);
             return Ok(new { paymentUrl = url });
@@ -34,13 +34,33 @@ namespace MV.PresnetationLayer.Controllers
         public IActionResult VnPayCallback([FromQuery] int? invoiceId = null)
         {
             var response = _vnPayService.PaymentExecute(Request.Query);
-            // Có thể lưu log giao dịch tại đây
-            // Nếu muốn redirect về FE, có thể trả về Redirect(url)
-            if (response.Success)
+            
+            // Lưu tất cả các trường hợp thanh toán để tracking
+            _vnPayService.SavePaymentOnline(response, invoiceId);
+            
+            // Trả về thông tin chi tiết về kết quả thanh toán
+            var result = new
             {
-                _vnPayService.SavePaymentOnline(response, invoiceId);
-            }
-            return Ok(response);
+                success = response.Success,
+                responseCode = response.VnPayResponseCode,
+                message = GetPaymentMessage(response.VnPayResponseCode),
+                orderId = response.OrderId,
+                transactionId = response.TransactionId,
+                amount = response.OrderDescription
+            };
+            
+            return Ok(result);
+        }
+
+        private string GetPaymentMessage(string vnPayResponseCode)
+        {
+            return vnPayResponseCode switch
+            {
+                "00" => "Thanh toán thành công",
+                "24" => "Khách hàng hủy giao dịch",
+                "INVALID_SIGNATURE" => "Chữ ký không hợp lệ",
+                _ => $"Giao dịch thất bại (Mã lỗi: {vnPayResponseCode})"
+            };
         }
     }
 } 

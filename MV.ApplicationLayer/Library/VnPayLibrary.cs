@@ -39,15 +39,24 @@ namespace MV.ApplicationLayer.Library
             var amount = vnPay.GetResponseData("vnp_Amount");
             var checkSignature =
                 vnPay.ValidateSignature(vnpSecureHash!, hashSecret); //check Signature
+            
             if (!checkSignature)
                 return new PaymentInformationResponse()
                 {
                     Success = false,
+                    VnPayResponseCode = "INVALID_SIGNATURE",
+                    OrderDescription = "Invalid signature"
                 };
 
+            // Kiểm tra response code từ VnPay
+            // 00: Giao dịch thành công
+            // 24: Khách hàng hủy giao dịch
+            // Các mã khác: Giao dịch thất bại
+            var isSuccess = vnpResponseCode == "00";
+            
             return new PaymentInformationResponse()
             {
-                Success = true,
+                Success = isSuccess,
                 PaymentMethod = "VnPay",
                 OrderDescription = orderInfo,
                 OrderId = orderId.ToString(),
