@@ -47,6 +47,7 @@ namespace MV.InfrastructureLayer
         private IFoodRepository _foodRepository;
         private ISeatTypeRepository _seatTypeRepository;
         private IRoomTypeRepository _roomTypeRepository;
+        private IShowtimeRepository _showtimeRepository;
 
         // Expose repository INTERFACES
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
@@ -57,6 +58,7 @@ namespace MV.InfrastructureLayer
         public IFoodRepository foodRepository => _foodRepository ??= new FoodRepository(_context);
         public ISeatTypeRepository seatTypeRepository => _seatTypeRepository ??= new SeatTypeRepository(_context);
         public IRoomTypeRepository roomTypeRepository => _roomTypeRepository ??= new RoomTypeRepository(_context);
+        public IShowtimeRepository showtimeRepository => _showtimeRepository ??= new ShowtimeRepository(_context);
 
         // CONSTRUCTOR INJECTION for DbContext
         public UnitOfWork(MovietheatermanagementContext context)

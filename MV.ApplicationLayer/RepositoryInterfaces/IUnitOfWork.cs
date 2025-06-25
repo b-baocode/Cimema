@@ -17,6 +17,8 @@
         IRoomTypeRepository roomTypeRepository { get; }
         ICommentRatingRepository commentRatingRepository { get; }
 
+        IShowtimeRepository showtimeRepository { get; }
+
         //Single commit point
         Task<int> SaveChangesAsync();
     }

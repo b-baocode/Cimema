@@ -1,13 +1,17 @@
 using Microsoft.OpenApi.Models;
-using MV.InfrastructureLayer.Configuration;
+using MV.ApplicationLayer.QuarztInterfaces;
+using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services;
 using MV.InfrastructureLayer;
-using MV.InfrastructureLayer.Repositories;
-using MV.ApplicationLayer.RepositoryInterfaces;
+using MV.InfrastructureLayer.Configuration;
 using MV.InfrastructureLayer.Services;
+using MV.PresnetationLayer.Hubs;
+using MV.PresnetationLayer.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//builder.Logging.AddConsole();
 
 // Add services to the container.
 
@@ -56,18 +60,27 @@ builder.Services.AddSwaggerGen(options =>
                 Reference = new OpenApiReference
                 {
                     Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer" 
+                    Id = "Bearer"
                 }
             },
-            new string[] {} 
+            new string[] {}
         }
     });
 });
 
+//SignalR Configure
+builder.Services.AddSignalR();
 
+builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
 
 // Configure JWT Authentication using the extension method
 builder.Services.AddJwtAuthentication(builder.Configuration);
+
+//Configure Quartz
+builder.Services.AddQuartzConfiguration(builder.Configuration);
+
+//Configure Redis
+builder.Services.AddRedisConfiguration(builder.Configuration);
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMovieService, MovieService>();
@@ -93,14 +106,23 @@ if (app.Environment.IsDevelopment())
 //    });
 //}
 
+app.UseWebSockets();
+
+//Add hubs here
+
 app.UseCors("AllowReactApp");
 
-app.UseHttpsRedirection();
+app.MapHub<ShowtimeHub>("/showtimeHub");
+
+
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+
 
 app.Run();
