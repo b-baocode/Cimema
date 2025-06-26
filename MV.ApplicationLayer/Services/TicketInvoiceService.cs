@@ -23,7 +23,7 @@ namespace MV.ApplicationLayer.Services
             User user, 
             Promotion? promotion, 
             decimal totalPrice,
-            int showtimeInstanceId,
+            ShowtimeRoomInstance showtimeRoomInstance,
             Dictionary<int, SeatDataForShowtime> seatDataDict,
             List<Food> foods,
             int scoresUsed,
@@ -49,9 +49,9 @@ namespace MV.ApplicationLayer.Services
                 var seatData = seatDataDict[seatReq.SeatId];
                 var ticketDetail = new TicketDetail
                 {
-                    TicketPrice = seatData.SeatTypePrice,
+                    TicketPrice = seatData.SeatTypePrice + showtimeRoomInstance.RoomTypePrice + (showtimeRoomInstance.MoviePrice ?? 0),
                     Status = "Booked",
-                    ShowtimeInstanceId = showtimeInstanceId,
+                    ShowtimeInstanceId = showtimeRoomInstance.ShowtimeInstanceId,
                     SeatDataId = seatData.SeatDataId
                 };
                 invoice.TicketDetails.Add(ticketDetail);

@@ -11,7 +11,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
             User user,
             Promotion? promotion,
             decimal totalPrice,
-            int showtimeInstanceId,
+            ShowtimeRoomInstance showtimeRoomInstance,
             Dictionary<int, SeatDataForShowtime> seatDataDict,
             List<Food> foods,
             int scoresUsed,

@@ -76,7 +76,10 @@ namespace MV.ApplicationLayer.Services
             }
 
             // 6. Calculate total price
-            decimal totalTicketPrice = request.Seats.Sum(seatReq => seatDataDict[seatReq.SeatId].SeatTypePrice);
+            decimal totalTicketPrice = request.Seats.Sum(seatReq => 
+                seatDataDict[seatReq.SeatId].SeatTypePrice + 
+                showtimeRoomInstance.RoomTypePrice +
+                (showtimeRoomInstance.MoviePrice ?? 0));
             decimal totalFoodPrice = 0;
             if (request.Foods != null && request.Foods.Any())
             {
@@ -98,7 +101,7 @@ namespace MV.ApplicationLayer.Services
             }
 
             // 7. Create Invoice and associated details
-            var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstance.ShowtimeInstanceId, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
+            var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstance, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
 
             // 8. Update seat status
             await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "Booked", showtimeRoomInstance.ShowtimeInstanceId);
@@ -120,7 +123,7 @@ namespace MV.ApplicationLayer.Services
             return new BookingResponse
             {
                 InvoiceId = invoice.InvoiceId,
-                TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                TotalPrice = (decimal)invoice.TotalPrice,
                 Status = invoice.Status,
                 CreatedAt = invoice.CreatedAt,
                 PaymentType = invoice.PaymentType,
@@ -172,7 +175,7 @@ namespace MV.ApplicationLayer.Services
             var response = new BookingResponse
             {
                 InvoiceId = invoice.InvoiceId,
-                TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                TotalPrice = (decimal)invoice.TotalPrice,
                 Status = invoice.Status,
                 CreatedAt = invoice.CreatedAt,
                 PaymentType = invoice.PaymentType,
@@ -217,7 +220,7 @@ namespace MV.ApplicationLayer.Services
                 responses.Add(new BookingResponse
                 {
                     InvoiceId = invoice.InvoiceId,
-                    TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                    TotalPrice = (decimal)invoice.TotalPrice,
                     Status = invoice.Status,
                     CreatedAt = invoice.CreatedAt,
                     PaymentType = invoice.PaymentType,
@@ -263,7 +266,7 @@ namespace MV.ApplicationLayer.Services
                 responses.Add(new BookingResponse
                 {
                     InvoiceId = invoice.InvoiceId,
-                    TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                    TotalPrice = (decimal)invoice.TotalPrice,
                     Status = invoice.Status,
                     CreatedAt = invoice.CreatedAt,
                     PaymentType = invoice.PaymentType,
