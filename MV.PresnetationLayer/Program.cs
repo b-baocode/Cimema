@@ -79,8 +79,6 @@ builder.Services.AddJwtAuthentication(builder.Configuration);
 //Configure Quartz
 builder.Services.AddQuartzConfiguration(builder.Configuration);
 
-//Configure Redis
-builder.Services.AddRedisConfiguration(builder.Configuration);
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IMovieService, MovieService>();

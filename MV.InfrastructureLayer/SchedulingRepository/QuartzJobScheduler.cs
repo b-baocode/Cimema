@@ -53,13 +53,25 @@ namespace MV.InfrastructureLayer.SchedulingRepository
         public async Task UnscheduleShowtimeStatusUpdatesAsync(int showtimeId)
         {
             var scheduler = await _schedulerFactory.GetScheduler();
-            var jobKey = new JobKey($"showtime-status-update-job-{showtimeId}");
-            if (await scheduler.CheckExists(jobKey))
+            var startJobKey = new JobKey($"showtime-job-start-{showtimeId}");
+            var endJobKey = new JobKey($"showtime-job-end-{showtimeId}");
+
+            bool deleted = false;
+            if (await scheduler.CheckExists(startJobKey))
             {
-                await scheduler.DeleteJob(jobKey);
-                Console.WriteLine($"Unscheduled all status updates for Showtime {showtimeId}.");
+                await scheduler.DeleteJob(startJobKey);
+                deleted = true;
+            }
+            if (await scheduler.CheckExists(endJobKey))
+            {
+                await scheduler.DeleteJob(endJobKey);
+                deleted = true;
             }
 
+            if (deleted)
+            {
+                Console.WriteLine($"Unscheduled all status updates for Showtime {showtimeId}.");
+            }
         }
     }
 }

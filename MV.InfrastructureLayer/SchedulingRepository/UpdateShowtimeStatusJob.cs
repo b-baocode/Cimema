@@ -1,31 +1,33 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
+using MV.ApplicationLayer.QuarztInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using Quartz;
-using StackExchange.Redis;
 using System.Text.Json;
 
 namespace MV.InfrastructureLayer.SchedulingRepository
 {
     public class UpdateShowtimeStatusJob : IJob
     {
-        //private readonly MovietheatermanagementContext _context;
-
-        private readonly IConnectionMultiplexer _redis;
 
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly ILogger<UpdateShowtimeStatusJob> _logger;
 
+        private readonly IServiceScopeFactory _scopeFactory;
+
+        private static readonly System.Text.Json.JsonSerializerOptions _camelCaseOptions = new(JsonSerializerDefaults.Web);
+
         public UpdateShowtimeStatusJob(
-            //MovietheatermanagementContext context,
-            IConnectionMultiplexer redis,
             IUnitOfWork unitOfWork,
-            ILogger<UpdateShowtimeStatusJob> logger)
+            ILogger<UpdateShowtimeStatusJob> logger,
+            IServiceScopeFactory serviceScopeFactory
+            )
         {
-            //_context = context;
-            _redis = redis;
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _scopeFactory = serviceScopeFactory;
         }
 
         public async Task Execute(IJobExecutionContext context)
@@ -52,17 +54,16 @@ namespace MV.InfrastructureLayer.SchedulingRepository
                 EndTime = showtime.EndTime,
             };
 
-            //new json
-            var jsonMessage = JsonSerializer.Serialize(payload);
+            var jsonMessage = JsonSerializer.Serialize(payload, _camelCaseOptions);
 
-            //var message = $"ShowtimeId:{showtime.ShowtimeId}:Status:{newStatus}:MovieTitle:{movieTitle}";
-            var redisDb = _redis.GetDatabase();
+            var groupName = MovieNameGroupHelpers.GetGroupNameForMovie(movieTitle!);
 
-            var channel = new RedisChannel("showtime-updates", RedisChannel.PatternMode.Literal);
-            await redisDb.PublishAsync(channel, jsonMessage);
+            using var scope = _scopeFactory.CreateScope();
+            var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-            _logger.LogInformation("Quartz Job: Successfully published message to Redis channel '{ChannelName}': '{Message}'" + Environment.NewLine
-                , channel.ToString(), jsonMessage);
+            await notificationService.SendMessageToGroupAsync(groupName, jsonMessage);
+
+            return;
         }
     }
 }
