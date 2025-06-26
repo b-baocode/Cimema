@@ -49,6 +49,8 @@ namespace MV.ApplicationLayer.DTO.RequestModel
 
         public string? Address { get; set; }
 
+        public int? RoleId { get; set; }
+
         public static ValidationResult ValidateBirthDate(DateOnly? birthDate, ValidationContext context)
         {
             if (birthDate == null)
