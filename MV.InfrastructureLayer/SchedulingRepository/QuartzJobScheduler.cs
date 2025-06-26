@@ -1,11 +1,6 @@
 ﻿using MV.ApplicationLayer.QuarztInterfaces;
 using MV.DomainLayer.Entities;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.SchedulingRepository
 {
@@ -53,6 +48,18 @@ namespace MV.InfrastructureLayer.SchedulingRepository
 
             await scheduler.ScheduleJob(startJob, startTrigger);
             await scheduler.ScheduleJob(endJob, endTrigger);
+        }
+
+        public async Task UnscheduleShowtimeStatusUpdatesAsync(int showtimeId)
+        {
+            var scheduler = await _schedulerFactory.GetScheduler();
+            var jobKey = new JobKey($"showtime-status-update-job-{showtimeId}");
+            if (await scheduler.CheckExists(jobKey))
+            {
+                await scheduler.DeleteJob(jobKey);
+                Console.WriteLine($"Unscheduled all status updates for Showtime {showtimeId}.");
+            }
+
         }
     }
 }
