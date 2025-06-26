@@ -95,8 +95,8 @@ namespace MV.ApplicationLayer.Services
             int scoresUsed = 0;
             if (request.ScoresToUse.HasValue && request.ScoresToUse.Value > 0)
             {
-                (scoresUsed, decimal scoreDiscount) = await _scoreService.UseScoreAsync(user.Userid, request.ScoresToUse.Value, totalPrice);
-                scoreDiscountAmount = totalPrice - scoreDiscount; // Giá sau khi trừ điểm
+                scoresUsed = request.ScoresToUse.Value;
+                scoreDiscountAmount = totalPrice - scoresUsed;
                 if (scoreDiscountAmount < 0) scoreDiscountAmount = 0;
             }
 

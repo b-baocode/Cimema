@@ -90,7 +90,23 @@ namespace MV.ApplicationLayer.Services
 
         public async Task DeleteAsync(int invoiceId)
         {
-            await _unitOfWork.ticketInvoiceRepository.DeleteAsync(invoiceId);
+            var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
+            if (invoice != null)
+            {
+                // Lấy danh sách seatId và showtimeInstanceId từ TicketDetails
+                var seatIds = invoice.TicketDetails.Select(td => td.SeatDataId).ToList();
+                var showtimeInstanceId = invoice.TicketDetails.FirstOrDefault()?.ShowtimeInstanceId;
+                if (seatIds.Any() && showtimeInstanceId.HasValue)
+                {
+                    // Cập nhật trạng thái ghế về 'Active'
+                    var seatDataForShowtimeService = (ISeatDataForShowtimeService)AppDomain.CurrentDomain.GetData("SeatDataForShowtimeService");
+                    if (seatDataForShowtimeService != null)
+                    {
+                        await seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
+                    }
+                }
+                await _unitOfWork.ticketInvoiceRepository.DeleteAsync(invoiceId);
+            }
         }
     }
 } 

@@ -30,9 +30,10 @@ namespace MV.PresnetationLayer.Controllers
                 return BadRequest("Invoice not found");
             if (invoice.ScoreDiscountAmount == null || invoice.ScoreDiscountAmount <= 0)
                 return BadRequest("Invalid invoice amount");
-            var url = _vnPayService.CreatePaymentUrl(request, (double)invoice.ScoreDiscountAmount.Value, HttpContext);
+            var url = _vnPayService.CreatePaymentUrl(request, (double)invoice.ScoreDiscountAmount/**.value*/, HttpContext);
             return Ok(new { paymentUrl = url });
         }
+        
 
         /// <summary>
         /// Nhận callback từ VnPay

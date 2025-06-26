@@ -21,12 +21,14 @@ namespace MV.ApplicationLayer.Services.Vnpay
         private readonly string TimeZoneID = "SE Asia Standard Time";
         private readonly IPaymentOnlineRepository _paymentOnlineRepository;
         private readonly ITicketInvoiceService _ticketInvoiceService;
+        private readonly IScoreService _scoreService;
 
-        public VnpayService(IConfiguration configuration, IPaymentOnlineRepository paymentOnlineRepository, ITicketInvoiceService ticketInvoiceService)
+        public VnpayService(IConfiguration configuration, IPaymentOnlineRepository paymentOnlineRepository, ITicketInvoiceService ticketInvoiceService, IScoreService scoreService)
         {
             _configuration = configuration;
             _paymentOnlineRepository = paymentOnlineRepository;
             _ticketInvoiceService = ticketInvoiceService;
+            _scoreService = scoreService;
         }
 
         public string CreatePaymentUrl(PaymentInformationRequest model, double amount, HttpContext context)
@@ -90,12 +92,22 @@ namespace MV.ApplicationLayer.Services.Vnpay
                     {
                         invoice.Status = "Success";
                         _ticketInvoiceService.UpdateAsync(invoice).GetAwaiter().GetResult();
+
+                        // Trừ điểm nếu có sử dụng điểm
+                        if (((int?)invoice.ScoresUsed ?? 0) > 0)
+                        {
+                            _scoreService.UseScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, (int?)invoice.ScoresUsed ?? 0).GetAwaiter().GetResult();
+                        }
+                        // Cộng điểm thưởng cho user
+                        _scoreService.AddScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, invoice.TotalPrice).GetAwaiter().GetResult();
                     }
                 }
                 else
                 {
+                    // Đã cập nhật trạng thái ghế trong khi xóa
                     _ticketInvoiceService.DeleteAsync(invoiceId.Value).GetAwaiter().GetResult();
                 }
+                
             }
         }
 
