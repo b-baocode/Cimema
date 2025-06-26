@@ -10,6 +10,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<List<TicketInvoice>> GetByUserIdAsync(string userId);
         Task<List<TicketInvoice>> GetAllAsync();
         Task UpdateAsync(TicketInvoice invoice);
+        Task DeleteAsync(int invoiceId);
         // Có thể bổ sung các method khác nếu cần (GetByUser, ...)
     }
 } 

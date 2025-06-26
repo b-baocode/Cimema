@@ -17,5 +17,10 @@ namespace MV.ApplicationLayer.ServiceInterfaces
             int scoresUsed,
             decimal scoreDiscountAmount
         );
+
+        Task<TicketInvoice?> GetByIdAsync(int invoiceId);
+
+        Task UpdateAsync(TicketInvoice invoice);
+        Task DeleteAsync(int invoiceId);
     }
 } 
