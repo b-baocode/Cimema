@@ -77,5 +77,20 @@ namespace MV.ApplicationLayer.Services
             
             return invoice;
         }
+
+        public async Task<TicketInvoice?> GetByIdAsync(int invoiceId)
+        {
+            return await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
+        }
+
+        public async Task UpdateAsync(TicketInvoice invoice)
+        {
+            await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
+        }
+
+        public async Task DeleteAsync(int invoiceId)
+        {
+            await _unitOfWork.ticketInvoiceRepository.DeleteAsync(invoiceId);
+        }
     }
 } 

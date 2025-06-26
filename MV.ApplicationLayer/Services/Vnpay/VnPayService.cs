@@ -20,30 +20,32 @@ namespace MV.ApplicationLayer.Services.Vnpay
         private readonly IConfiguration _configuration;
         private readonly string TimeZoneID = "SE Asia Standard Time";
         private readonly IPaymentOnlineRepository _paymentOnlineRepository;
+        private readonly ITicketInvoiceService _ticketInvoiceService;
 
-        public VnpayService(IConfiguration configuration, IPaymentOnlineRepository paymentOnlineRepository)
+        public VnpayService(IConfiguration configuration, IPaymentOnlineRepository paymentOnlineRepository, ITicketInvoiceService ticketInvoiceService)
         {
             _configuration = configuration;
             _paymentOnlineRepository = paymentOnlineRepository;
+            _ticketInvoiceService = ticketInvoiceService;
         }
 
-        public string CreatePaymentUrl(PaymentInformationRequest model, HttpContext context)
+        public string CreatePaymentUrl(PaymentInformationRequest model, double amount, HttpContext context)
         {
             var timeZoneById = TimeZoneInfo.FindSystemTimeZoneById(_configuration["TimeZoneId"]);
             var timeNow = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, timeZoneById);
             var tick = DateTime.Now.Ticks.ToString();
             var pay = new VnPayLibrary();
-            var urlCallBack = _configuration["PaymentCallBack:ReturnUrl"];
+            var urlCallBack = $"{_configuration["PaymentCallBack:ReturnUrl"]}?invoiceId={model.InvoiceId}";
 
             pay.AddRequestData("vnp_Version", _configuration["Vnpay:Version"]);
             pay.AddRequestData("vnp_Command", _configuration["Vnpay:Command"]);
             pay.AddRequestData("vnp_TmnCode", _configuration["Vnpay:TmnCode"]);
-            pay.AddRequestData("vnp_Amount", ((int)model.Amount * 100).ToString());
+            pay.AddRequestData("vnp_Amount", ((int)amount * 100).ToString());
             pay.AddRequestData("vnp_CreateDate", timeNow.ToString("yyyyMMddHHmmss"));
             pay.AddRequestData("vnp_CurrCode", _configuration["Vnpay:CurrCode"]);
             pay.AddRequestData("vnp_IpAddr", pay.GetIpAddress(context));
             pay.AddRequestData("vnp_Locale", _configuration["Vnpay:Locale"]);
-            pay.AddRequestData("vnp_OrderInfo", $"{model.OrderDescription} {model.Amount}");
+            pay.AddRequestData("vnp_OrderInfo", $"{model.OrderDescription} {amount}");
             pay.AddRequestData("vnp_OrderType", "other");
             pay.AddRequestData("vnp_ReturnUrl", urlCallBack);
             pay.AddRequestData("vnp_TxnRef", tick);
@@ -66,7 +68,6 @@ namespace MV.ApplicationLayer.Services.Vnpay
         public void SavePaymentOnline(PaymentInformationResponse response, int? invoiceId = null)
         {
             if (response == null) return;
-            
             var payment = new PaymentOnline
             {
                 Amount = decimal.TryParse(response.OrderDescription?.Split(' ').LastOrDefault(), out var amt) ? amt : 0,
@@ -79,6 +80,23 @@ namespace MV.ApplicationLayer.Services.Vnpay
                 InvoiceId = invoiceId
             };
             _paymentOnlineRepository.Add(payment);
+
+            if (invoiceId.HasValue)
+            {
+                if (payment.Status == "Success")
+                {
+                    var invoice = _ticketInvoiceService.GetByIdAsync(invoiceId.Value).GetAwaiter().GetResult();
+                    if (invoice != null)
+                    {
+                        invoice.Status = "Success";
+                        _ticketInvoiceService.UpdateAsync(invoice).GetAwaiter().GetResult();
+                    }
+                }
+                else
+                {
+                    _ticketInvoiceService.DeleteAsync(invoiceId.Value).GetAwaiter().GetResult();
+                }
+            }
         }
 
         private string GetPaymentStatus(string vnPayResponseCode)

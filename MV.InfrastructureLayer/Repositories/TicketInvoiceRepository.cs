@@ -53,5 +53,21 @@ namespace MV.InfrastructureLayer.Repositories
             _context.TicketInvoices.Update(invoice);
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteAsync(int invoiceId)
+        {
+            var invoice = await _context.TicketInvoices
+                .Include(i => i.TicketDetails)
+                .Include(i => i.TicketInvoiceFoodItems)
+                .FirstOrDefaultAsync(i => i.InvoiceId == invoiceId);
+
+            if (invoice != null)
+            {
+                _context.TicketDetails.RemoveRange(invoice.TicketDetails);
+                _context.TicketInvoiceFoodItems.RemoveRange(invoice.TicketInvoiceFoodItems);
+                _context.TicketInvoices.Remove(invoice);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 } 

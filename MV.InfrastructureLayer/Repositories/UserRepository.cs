@@ -106,7 +106,7 @@ namespace MV.InfrastructureLayer.Repositories
                 Address = registerRequest.Address,
                 //Accumulatedpoints = 0,
                 Status = 1,
-                Roleid = 4,
+                Roleid = 1,
             };
 
             _context.Users.Add(newUser);

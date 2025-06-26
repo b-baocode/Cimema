@@ -10,20 +10,27 @@ namespace MV.PresnetationLayer.Controllers
     public class PaymentController : ControllerBase
     {
         private readonly IVnPayService _vnPayService;
-        public PaymentController(IVnPayService vnPayService)
+        private readonly ITicketInvoiceService _ticketInvoiceService;
+        public PaymentController(IVnPayService vnPayService, ITicketInvoiceService ticketInvoiceService)
         {
             _vnPayService = vnPayService;
+            _ticketInvoiceService = ticketInvoiceService;
         }
 
         /// <summary>
         /// Tạo URL thanh toán VnPay
         /// </summary>
         [HttpPost("create-vnpay-url")]
-        public IActionResult CreateVnPayUrl([FromBody] PaymentInformationRequest request)
+        public async Task<IActionResult> CreateVnPayUrl([FromBody] PaymentInformationRequest request)
         {
-            if (request == null || request.Amount <= 0)
+            if (request == null || request.InvoiceId <= 0)
                 return BadRequest("Invalid payment request");
-            var url = _vnPayService.CreatePaymentUrl(request, HttpContext);
+            var invoice = await _ticketInvoiceService.GetByIdAsync(request.InvoiceId);
+            if (invoice == null)
+                return BadRequest("Invoice not found");
+            if (invoice.ScoreDiscountAmount == null || invoice.ScoreDiscountAmount <= 0)
+                return BadRequest("Invalid invoice amount");
+            var url = _vnPayService.CreatePaymentUrl(request, (double)invoice.ScoreDiscountAmount.Value, HttpContext);
             return Ok(new { paymentUrl = url });
         }
 
