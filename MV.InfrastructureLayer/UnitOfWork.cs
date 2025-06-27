@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using MV.ApplicationLayer.GenericExceptionReport;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.InfrastructureLayer.DBContext;
+using MV.DomainLayer.Entities;
 //using MV.InfrastructureLayer.Interfaces;
 using MV.InfrastructureLayer.Repositories;
 using Npgsql;
@@ -48,6 +49,11 @@ namespace MV.InfrastructureLayer
         private ISeatTypeRepository _seatTypeRepository;
         private IRoomTypeRepository _roomTypeRepository;
         private IShowtimeRepository _showtimeRepository;
+        private ISeatDataForShowtimeRepository _seatDataForShowtimeRepository;
+        private IShowtimeRoomInstanceRepository _showtimeRoomInstanceRepository;
+        private ITicketInvoiceRepository _ticketInvoiceRepository;
+        private IScoreHistoryRepository _scoreHistoryRepository;
+        private IScoreRepository _scoreRepository;
 
         // Expose repository INTERFACES
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
@@ -58,6 +64,15 @@ namespace MV.InfrastructureLayer
         public IFoodRepository foodRepository => _foodRepository ??= new FoodRepository(_context);
         public ISeatTypeRepository seatTypeRepository => _seatTypeRepository ??= new SeatTypeRepository(_context);
         public IRoomTypeRepository roomTypeRepository => _roomTypeRepository ??= new RoomTypeRepository(_context);
+        public ISeatDataForShowtimeRepository seatDataForShowtimeRepository =>
+            _seatDataForShowtimeRepository ??= new SeatDataForShowtimeRepository(_context);
+        public IShowtimeRoomInstanceRepository showtimeRoomInstanceRepository =>
+            _showtimeRoomInstanceRepository ??= new ShowtimeRoomInstanceRepository(_context);
+        public ITicketInvoiceRepository ticketInvoiceRepository => _ticketInvoiceRepository ??= new TicketInvoiceRepository(_context);
+        public IScoreHistoryRepository scoreHistoryRepository => _scoreHistoryRepository ??= new ScoreHistoryRepository(_context);
+        public IScoreRepository scoreRepository => _scoreRepository ??= new ScoreRepository(_context);
+
+        public DbSet<TicketInvoice> TicketInvoices => _context.TicketInvoices;
         public IShowtimeRepository showtimeRepository => _showtimeRepository ??= new ShowtimeRepository(_context);
 
         // CONSTRUCTOR INJECTION for DbContext

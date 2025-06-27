@@ -8,6 +8,7 @@ using MV.InfrastructureLayer.Configuration;
 using MV.InfrastructureLayer.Services;
 using MV.PresnetationLayer.Hubs;
 using MV.PresnetationLayer.SignalR;
+using MV.ApplicationLayer.Services.Vnpay;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -85,6 +86,7 @@ builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
+
 
 var app = builder.Build();
 

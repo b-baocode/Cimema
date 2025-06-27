@@ -54,6 +54,9 @@ namespace MV.ApplicationLayer.Services
             // Logic validation đã được chuyển sang ValidateRegistrationAsync
             // Bây giờ chỉ tập trung vào việc tạo user
 
+            // Gán RoleId mặc định cho người dùng mới. Giả sử RoleId=2 là "Customer"
+            registerRequest.RoleId = 2;
+
             string hashedPassword = _passwordRepository.HashPassword(registerRequest.Password);
             bool taskResult = await _unitOfWork.userRepository.RegisterUser(registerRequest, hashedPassword);
 

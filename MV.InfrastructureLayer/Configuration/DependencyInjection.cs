@@ -56,7 +56,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IFoodRepository, FoodRepository>();
             services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
-            services.AddScoped<IShowtimeRepository, ShowtimeRepository>();
+            services.AddScoped<IPaymentOnlineRepository, PaymentOnlineRepository>();
 
 
             //Service injection
@@ -73,12 +73,20 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<ICommentRatingService, CommentRatingService>();
             services.AddScoped<IShowtimeService, ShowtimeService>();
 
+            services.AddScoped<IShowtimeRoomInstanceService, ShowtimeRoomInstanceService>();
+            services.AddScoped<ISeatDataForShowtimeService, SeatDataForShowtimeService>();
+            services.AddScoped<ITicketInvoiceService, TicketInvoiceService>();
+            services.AddScoped<IScoreService, ScoreService>();
+            services.AddScoped<IScoreHistoryRepository, ScoreHistoryRepository>();
+            services.AddScoped<IBookingService, BookingService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             //Quartz
             services.AddScoped<IJobScheduler, QuartzJobScheduler>();
+            // Add VnPay services
+            services.AddScoped<IVnPayService, MV.ApplicationLayer.Services.Vnpay.VnpayService>();
 
             return services;
         }
