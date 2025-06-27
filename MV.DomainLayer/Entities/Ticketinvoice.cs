@@ -17,9 +17,10 @@ public partial class TicketInvoice
 
     public string? Status { get; set; }
 
-    public int? ScoresUsed { get; set; }
+    public int ScoresUsed { get; set; }
 
-    public decimal? ScoreDiscountAmount { get; set; }
+    public decimal ScoreDiscountAmount { get; set; }
+    //  public decimal? ScoreDiscountAmount { get; set; }
 
     public string PaymentType { get; set; } = null!;
 

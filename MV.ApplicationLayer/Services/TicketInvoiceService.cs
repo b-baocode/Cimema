@@ -12,10 +12,12 @@ namespace MV.ApplicationLayer.Services
     public class TicketInvoiceService : ITicketInvoiceService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
 
-        public TicketInvoiceService(IUnitOfWork unitOfWork)
+        public TicketInvoiceService(IUnitOfWork unitOfWork, ISeatDataForShowtimeService seatDataForShowtimeService)
         {
             _unitOfWork = unitOfWork;
+            _seatDataForShowtimeService = seatDataForShowtimeService;
         }
 
         public async Task<TicketInvoice> CreateInvoiceAsync(
@@ -23,7 +25,7 @@ namespace MV.ApplicationLayer.Services
             User user, 
             Promotion? promotion, 
             decimal totalPrice,
-            int showtimeInstanceId,
+            ShowtimeRoomInstance showtimeRoomInstance,
             Dictionary<int, SeatDataForShowtime> seatDataDict,
             List<Food> foods,
             int scoresUsed,
@@ -49,9 +51,9 @@ namespace MV.ApplicationLayer.Services
                 var seatData = seatDataDict[seatReq.SeatId];
                 var ticketDetail = new TicketDetail
                 {
-                    TicketPrice = seatData.SeatTypePrice,
+                    TicketPrice = seatData.SeatTypePrice + showtimeRoomInstance.RoomTypePrice + (showtimeRoomInstance.MoviePrice ?? 0),
                     Status = "Booked",
-                    ShowtimeInstanceId = showtimeInstanceId,
+                    ShowtimeInstanceId = showtimeRoomInstance.ShowtimeInstanceId,
                     SeatDataId = seatData.SeatDataId
                 };
                 invoice.TicketDetails.Add(ticketDetail);
@@ -90,7 +92,22 @@ namespace MV.ApplicationLayer.Services
 
         public async Task DeleteAsync(int invoiceId)
         {
-            await _unitOfWork.ticketInvoiceRepository.DeleteAsync(invoiceId);
+            var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
+            if (invoice != null)
+            {
+                // Lấy danh sách seatId và showtimeInstanceId từ TicketDetails
+                var seatIds = invoice.TicketDetails.Select(td => td.SeatDataId).ToList();
+                var showtimeInstanceId = invoice.TicketDetails.FirstOrDefault()?.ShowtimeInstanceId;
+                
+                if (seatIds.Any() && showtimeInstanceId.HasValue)
+                {
+                    // Cập nhật trạng thái ghế về "Active" khi payment thất bại hoặc xóa invoice
+                    await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
+                }
+                
+                // Xóa invoice và tất cả dữ liệu liên quan
+                await _unitOfWork.ticketInvoiceRepository.DeleteAsync(invoiceId);
+            }
         }
     }
 } 

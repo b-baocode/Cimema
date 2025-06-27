@@ -76,7 +76,10 @@ namespace MV.ApplicationLayer.Services
             }
 
             // 6. Calculate total price
-            decimal totalTicketPrice = request.Seats.Sum(seatReq => seatDataDict[seatReq.SeatId].SeatTypePrice);
+            decimal totalTicketPrice = request.Seats.Sum(seatReq => 
+                seatDataDict[seatReq.SeatId].SeatTypePrice + 
+                showtimeRoomInstance.RoomTypePrice +
+                (showtimeRoomInstance.MoviePrice ?? 0));
             decimal totalFoodPrice = 0;
             if (request.Foods != null && request.Foods.Any())
             {
@@ -92,16 +95,16 @@ namespace MV.ApplicationLayer.Services
             int scoresUsed = 0;
             if (request.ScoresToUse.HasValue && request.ScoresToUse.Value > 0)
             {
-                (scoresUsed, decimal scoreDiscount) = await _scoreService.UseScoreAsync(user.Userid, request.ScoresToUse.Value, totalPrice);
-                scoreDiscountAmount = totalPrice - scoreDiscount; // Giá sau khi trừ điểm
+                scoresUsed = request.ScoresToUse.Value;
+                scoreDiscountAmount = totalPrice - scoresUsed;
                 if (scoreDiscountAmount < 0) scoreDiscountAmount = 0;
             }
 
             // 7. Create Invoice and associated details
-            var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstance.ShowtimeInstanceId, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
+            var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstance, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
 
             // 8. Update seat status
-            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "Booked", showtimeRoomInstance.ShowtimeInstanceId);
+            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "Inactive", showtimeRoomInstance.ShowtimeInstanceId);
 
             // 9. Update food quantity
             if (request.Foods != null && request.Foods.Any())
@@ -120,7 +123,7 @@ namespace MV.ApplicationLayer.Services
             return new BookingResponse
             {
                 InvoiceId = invoice.InvoiceId,
-                TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                TotalPrice = (decimal)invoice.TotalPrice,
                 Status = invoice.Status,
                 CreatedAt = invoice.CreatedAt,
                 PaymentType = invoice.PaymentType,
@@ -172,7 +175,7 @@ namespace MV.ApplicationLayer.Services
             var response = new BookingResponse
             {
                 InvoiceId = invoice.InvoiceId,
-                TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                TotalPrice = (decimal)invoice.TotalPrice,
                 Status = invoice.Status,
                 CreatedAt = invoice.CreatedAt,
                 PaymentType = invoice.PaymentType,
@@ -217,7 +220,7 @@ namespace MV.ApplicationLayer.Services
                 responses.Add(new BookingResponse
                 {
                     InvoiceId = invoice.InvoiceId,
-                    TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                    TotalPrice = (decimal)invoice.TotalPrice,
                     Status = invoice.Status,
                     CreatedAt = invoice.CreatedAt,
                     PaymentType = invoice.PaymentType,
@@ -263,7 +266,7 @@ namespace MV.ApplicationLayer.Services
                 responses.Add(new BookingResponse
                 {
                     InvoiceId = invoice.InvoiceId,
-                    TotalPrice = (decimal)invoice.ScoreDiscountAmount,
+                    TotalPrice = (decimal)invoice.TotalPrice,
                     Status = invoice.Status,
                     CreatedAt = invoice.CreatedAt,
                     PaymentType = invoice.PaymentType,
@@ -303,10 +306,10 @@ namespace MV.ApplicationLayer.Services
             // Cập nhật trạng thái hóa đơn
             invoice.Status = "Canceled";
 
-            // Cập nhật trạng thái ghế
+            // Cập nhật trạng thái ghế về "Active" (có thể đặt lại)
             var seatIdsToRelease = invoice.TicketDetails.Select(td => td.SeatDataId);
             var showtimeInstanceId = invoice.TicketDetails.First().ShowtimeInstanceId;
-            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIdsToRelease, "Available", showtimeInstanceId);
+            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIdsToRelease, "Active", showtimeInstanceId);
 
             foreach (var ticketDetail in invoice.TicketDetails)
             {

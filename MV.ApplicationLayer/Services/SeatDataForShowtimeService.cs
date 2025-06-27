@@ -34,9 +34,9 @@ namespace MV.ApplicationLayer.Services
             foreach (var seatId in requestedSeatIds)
             {
                 var seatData = seatDataDict[seatId];
-                if (seatData.Status == "Booked")
+                if (seatData.Status != null && seatData.Status != "Active")
                 {
-                    throw new Exception($"Ghế {seatId} đã được đặt.");
+                    throw new Exception($"Ghế {seatId} đã được đặt hoặc không khả dụng.");
                 }
             }
             return Task.CompletedTask;

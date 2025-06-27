@@ -23,12 +23,24 @@ namespace MV.ApplicationLayer.Services.Vnpay
         private readonly ITicketInvoiceService _ticketInvoiceService;
         private readonly IEmailService _emailService;
         private readonly IUserRepository _userRepository;
+        private readonly IScoreService _scoreService;
+        private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
 
-        public VnpayService(IConfiguration configuration, IPaymentOnlineRepository paymentOnlineRepository, ITicketInvoiceService ticketInvoiceService, IEmailService emailService, IUserRepository userRepository)
+        public VnpayService(
+            IConfiguration configuration,
+            IPaymentOnlineRepository paymentOnlineRepository,
+            ITicketInvoiceService ticketInvoiceService,
+            IScoreService scoreService,
+            ISeatDataForShowtimeService seatDataForShowtimeService,
+            IEmailService emailService,
+            IUserRepository userRepository
+        )
         {
             _configuration = configuration;
             _paymentOnlineRepository = paymentOnlineRepository;
             _ticketInvoiceService = ticketInvoiceService;
+            _scoreService = scoreService;
+            _seatDataForShowtimeService = seatDataForShowtimeService;
             _emailService = emailService;
             _userRepository = userRepository;
         }
@@ -97,12 +109,22 @@ namespace MV.ApplicationLayer.Services.Vnpay
                         
                         // Gửi email thông báo thanh toán thành công
                         await SendPaymentSuccessEmailAsync(invoice, payment);
+
+                        // Trừ điểm nếu có sử dụng điểm
+                        if (((int?)invoice.ScoresUsed ?? 0) > 0)
+                        {
+                            _scoreService.UseScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, (int?)invoice.ScoresUsed ?? 0).GetAwaiter().GetResult();
+                        }
+                        // Cộng điểm thưởng cho user
+                        _scoreService.AddScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, invoice.TotalPrice).GetAwaiter().GetResult();
                     }
                 }
                 else
                 {
+                    // Payment thất bại - xóa invoice và cập nhật trạng thái ghế về Active
                     _ticketInvoiceService.DeleteAsync(invoiceId.Value).GetAwaiter().GetResult();
                 }
+                
             }
         }
 

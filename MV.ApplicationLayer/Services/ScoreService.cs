@@ -73,22 +73,62 @@ namespace MV.ApplicationLayer.Services
         /// <summary>
         /// Tính toán discount amount từ điểm (chỉ tính toán, không trừ điểm thực tế)
         /// </summary>
-        public async Task<(int scoresUsed, decimal discountAmount)> UseScoreAsync(string userId, int? scoresToUse, decimal totalPrice, int? invoiceId = null)
+        public async Task UseScoreAsync(string userId, int? scoresToUse, decimal totalPrice, int? invoiceId = null)
         {
             var score = await _unitOfWork.scoreRepository.GetByUserIdAsync(userId);
             if (score == null || !scoresToUse.HasValue || scoresToUse.Value <= 0)
-                return (0, 0);
-            
+                return;
+
             int usableScore = Math.Min(score.TotalScore, scoresToUse.Value);
             decimal discount = usableScore; // 1 điểm = 1đ
             if (discount > totalPrice) discount = totalPrice;
-            
-            // Không trừ điểm thực tế, chỉ tính toán
-            // score.TotalScore -= usableScore;
-            // score.LastUpdatedAt = DateTime.Now;
-            // await _unitOfWork.scoreRepository.UpdateAsync(score);
-            
-            return (usableScore, discount);
+            int scoresActuallyUsed = (int)discount;
+
+            // Trừ điểm thực tế
+            score.TotalScore -= scoresActuallyUsed;
+            score.LastUpdatedAt = DateTime.Now;
+            await _unitOfWork.scoreRepository.UpdateAsync(score);
+
+            // Lưu lịch sử trừ điểm
+            var history = new ScoreHistory
+            {
+                ScoreId = score.ScoreId,
+                ScoreIn = 0,
+                ScoreOut = scoresActuallyUsed,
+                Description = $"Trừ điểm khi sử dụng cho hóa đơn{(invoiceId.HasValue ? $" {invoiceId}" : "")}",
+                ChangeDate = DateTime.Now,
+                InvoiceId = invoiceId
+            };
+            await _unitOfWork.scoreHistoryRepository.AddAsync(history);
+        }
+        public async Task<Score?> GetScoreByUserIdAsync(string userId)
+        {
+            return await _unitOfWork.scoreRepository.GetByUserIdAsync(userId);
+        }
+        public async Task UseScoreForInvoiceAsync(string userId, int invoiceId, int scoresUsed)
+        {
+            var score = await _unitOfWork.scoreRepository.GetByUserIdAsync(userId);
+            if (score == null || scoresUsed <= 0)
+                return;
+
+            int usableScore = Math.Min(score.TotalScore, scoresUsed);
+
+            // Trừ điểm thực tế
+            score.TotalScore -= usableScore;
+            score.LastUpdatedAt = DateTime.Now;
+            await _unitOfWork.scoreRepository.UpdateAsync(score);
+
+            // Lưu lịch sử trừ điểm
+            var history = new ScoreHistory
+            {
+                ScoreId = score.ScoreId,
+                ScoreIn = 0,
+                ScoreOut = usableScore,
+                Description = $"Trừ điểm khi sử dụng cho hóa đơn {invoiceId}",
+                ChangeDate = DateTime.Now,
+                InvoiceId = invoiceId
+            };
+            await _unitOfWork.scoreHistoryRepository.AddAsync(history);
         }
     }
 
