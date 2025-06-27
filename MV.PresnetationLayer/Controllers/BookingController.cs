@@ -34,8 +34,26 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
 
-    
-      
+        [HttpPut("cancel/{invoiceId}")]
+        public async Task<IActionResult> CancelBooking(int invoiceId)
+        {
+            try
+            {
+                var result = await _bookingService.CancelBookingAsync(invoiceId);
+                if (result)
+                {
+                    return Ok(new { message = "Đơn hàng đã được hủy thành công. Ghế đã được giải phóng." });
+                }
+                else
+                {
+                    return BadRequest(new { message = "Không thể hủy đơn hàng. Có thể đơn hàng đã được hủy trước đó." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetBookingsByUserId(string userId)

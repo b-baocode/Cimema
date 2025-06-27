@@ -23,6 +23,11 @@ namespace MV.ApplicationLayer.Services
             return seatDataList.ToDictionary(s => s.SeatDataId);
         }
 
+        public async Task<ShowtimeRoomInstance?> GetShowtimeInstanceByShowtimeIdAsync(int showtimeId)
+        {
+            return await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeIdAsync(showtimeId);
+        }
+
         public Task ValidateSeatsAsync(List<int> requestedSeatIds, Dictionary<int, SeatDataForShowtime> seatDataDict)
         {
             var invalidSeats = requestedSeatIds.Where(id => !seatDataDict.ContainsKey(id)).ToList();
@@ -34,9 +39,9 @@ namespace MV.ApplicationLayer.Services
             foreach (var seatId in requestedSeatIds)
             {
                 var seatData = seatDataDict[seatId];
-                if (seatData.Status == "Booked")
+                if (seatData.Status != null && seatData.Status != "Active")
                 {
-                    throw new Exception($"Ghế {seatId} đã được đặt.");
+                    throw new Exception($"Ghế {seatId} đã được đặt hoặc không khả dụng.");
                 }
             }
             return Task.CompletedTask;
@@ -51,8 +56,15 @@ namespace MV.ApplicationLayer.Services
                 var seatToUpdate = seatDataList.FirstOrDefault(s => s.SeatDataId == seatId);
                 if (seatToUpdate != null)
                 {
+                    Console.WriteLine($"[Before] SeatId: {seatToUpdate.SeatDataId}, Status: {seatToUpdate.Status}");
                     seatToUpdate.Status = newStatus;
+                    _unitOfWork.seatDataForShowtimeRepository.AttachIfNotTracked(seatToUpdate);
                     await _unitOfWork.seatDataForShowtimeRepository.UpdateAsync(seatToUpdate);
+                    Console.WriteLine($"[After] SeatId: {seatToUpdate.SeatDataId}, Status: {seatToUpdate.Status}");
+                }
+                else
+                {
+                    Console.WriteLine($"[Warning] SeatId {seatId} not found in showtimeInstanceId {showtimeInstanceId}");
                 }
             }
         }

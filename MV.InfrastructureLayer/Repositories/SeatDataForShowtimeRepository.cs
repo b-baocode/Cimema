@@ -31,8 +31,17 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task UpdateAsync(SeatDataForShowtime seatData)
         {
-            _context.SeatDataForShowtimes.Update(seatData);
-            await _context.SaveChangesAsync();
+            // _context.SeatDataForShowtimes.Update(seatData);
+            _context.Entry(seatData).State = EntityState.Modified;
+            // Không gọi SaveChangesAsync ở đây, để UnitOfWork quản lý
+        }
+
+        public void AttachIfNotTracked(SeatDataForShowtime seatData)
+        {
+            if (_context.Entry(seatData).State == EntityState.Detached)
+            {
+                _context.SeatDataForShowtimes.Attach(seatData);
+            }
         }
     }
 } 

@@ -9,5 +9,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<Dictionary<int, SeatDataForShowtime>> GetSeatsDictionaryByShowtimeInstanceIdAsync(int showtimeInstanceId);
         Task ValidateSeatsAsync(List<int> requestedSeatIds, Dictionary<int, SeatDataForShowtime> seatDataDict);
         Task UpdateSeatsStatusAsync(IEnumerable<int> seatIds, string newStatus, int showtimeInstanceId);
+        Task<ShowtimeRoomInstance?> GetShowtimeInstanceByShowtimeIdAsync(int showtimeId);
     }
 } 

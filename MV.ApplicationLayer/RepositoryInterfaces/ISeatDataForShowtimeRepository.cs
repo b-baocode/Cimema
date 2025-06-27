@@ -9,5 +9,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<List<SeatDataForShowtime>> GetSeatsByShowtimeInstanceIdAsync(int showtimeInstanceId);
         Task<SeatDataForShowtime?> GetSeatDataAsync(int seatDataId);
         Task UpdateAsync(SeatDataForShowtime seatData);
+        void AttachIfNotTracked(SeatDataForShowtime seatData);
     }
 } 

@@ -13,4 +13,4 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task DeleteAsync(int invoiceId);
         // Có thể bổ sung các method khác nếu cần (GetByUser, ...)
     }
-} 
+}
