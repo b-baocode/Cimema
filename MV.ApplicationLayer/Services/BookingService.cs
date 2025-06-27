@@ -104,7 +104,7 @@ namespace MV.ApplicationLayer.Services
             var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstance, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
 
             // 8. Update seat status
-            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "Inactive", showtimeRoomInstance.ShowtimeInstanceId);
+            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "InActive", showtimeRoomInstance.ShowtimeInstanceId);
 
             // 9. Update food quantity
             if (request.Foods != null && request.Foods.Any())

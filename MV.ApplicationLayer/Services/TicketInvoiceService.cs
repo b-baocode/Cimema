@@ -103,6 +103,8 @@ namespace MV.ApplicationLayer.Services
                 {
                     // Cập nhật trạng thái ghế về "Active" khi payment thất bại hoặc xóa invoice
                     await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
+                    // Đảm bảo lưu thay đổi trạng thái ghế vào database
+                    await _unitOfWork.SaveChangesAsync();
                 }
                 
                 // Xóa invoice và tất cả dữ liệu liên quan
