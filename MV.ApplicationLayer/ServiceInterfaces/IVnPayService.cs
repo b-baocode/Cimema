@@ -11,8 +11,8 @@ namespace MV.ApplicationLayer.ServiceInterfaces
 {
     public interface IVnPayService
     {
-        string CreatePaymentUrl(PaymentInformationRequest model, HttpContext context);
+        string CreatePaymentUrl(PaymentInformationRequest model, double amount, HttpContext context);
         PaymentInformationResponse PaymentExecute(IQueryCollection collections);
-        void SavePaymentOnline(PaymentInformationResponse response, int? invoiceId = null);
+        Task SavePaymentOnline(PaymentInformationResponse response, int? invoiceId = null);
     }
 }

@@ -16,7 +16,11 @@
         ISeatTypeRepository seatTypeRepository { get; }
         IRoomTypeRepository roomTypeRepository { get; }
         ICommentRatingRepository commentRatingRepository { get; }
-
+        IShowtimeRoomInstanceRepository showtimeRoomInstanceRepository { get; }
+        ISeatDataForShowtimeRepository seatDataForShowtimeRepository { get; }
+        ITicketInvoiceRepository ticketInvoiceRepository { get; }
+        IScoreRepository scoreRepository { get; }
+        IScoreHistoryRepository scoreHistoryRepository { get; }
         //Single commit point
         Task<int> SaveChangesAsync();
     }
