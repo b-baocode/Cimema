@@ -20,6 +20,8 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddQuartz(q =>
             {
 
+                q.MisfireThreshold = TimeSpan.FromSeconds(2);
+
                 q.UsePersistentStore(s =>
                 {
                     s.UseNewtonsoftJsonSerializer();
