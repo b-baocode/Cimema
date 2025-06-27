@@ -218,7 +218,7 @@ namespace MV.ApplicationLayer.Services
                 ((getAllShowtimeWithDataOnlyByMovieRequest.Page - 1) * getAllShowtimeWithDataOnlyByMovieRequest.PageSize
                 , getAllShowtimeWithDataOnlyByMovieRequest.PageSize, getAllShowtimeWithDataOnlyByMovieRequest.MovieId);
 
-            var totalItems = await _unitOfWork.showtimeRepository.GetTotalFinishedShowtimeCountAsync();
+            var totalItems = await _unitOfWork.showtimeRepository.GetTotalShowtimeByMovieCountAsync(getAllShowtimeWithDataOnlyByMovieRequest.MovieId);
 
             var showtimeResponse = showtimes.Select(
                 s => new GetAllShowtimeWithDataOnlyResponse
