@@ -22,13 +22,15 @@ namespace MV.ApplicationLayer.Services.Vnpay
         private readonly IPaymentOnlineRepository _paymentOnlineRepository;
         private readonly ITicketInvoiceService _ticketInvoiceService;
         private readonly IScoreService _scoreService;
+        private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
 
-        public VnpayService(IConfiguration configuration, IPaymentOnlineRepository paymentOnlineRepository, ITicketInvoiceService ticketInvoiceService, IScoreService scoreService)
+        public VnpayService(IConfiguration configuration, IPaymentOnlineRepository paymentOnlineRepository, ITicketInvoiceService ticketInvoiceService, IScoreService scoreService, ISeatDataForShowtimeService seatDataForShowtimeService)
         {
             _configuration = configuration;
             _paymentOnlineRepository = paymentOnlineRepository;
             _ticketInvoiceService = ticketInvoiceService;
             _scoreService = scoreService;
+            _seatDataForShowtimeService = seatDataForShowtimeService;
         }
 
         public string CreatePaymentUrl(PaymentInformationRequest model, double amount, HttpContext context)
@@ -104,7 +106,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
                 }
                 else
                 {
-                    // Đã cập nhật trạng thái ghế trong khi xóa
+                    // Payment thất bại - xóa invoice và cập nhật trạng thái ghế về Active
                     _ticketInvoiceService.DeleteAsync(invoiceId.Value).GetAwaiter().GetResult();
                 }
                 

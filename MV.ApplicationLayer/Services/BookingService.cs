@@ -104,7 +104,7 @@ namespace MV.ApplicationLayer.Services
             var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstance, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
 
             // 8. Update seat status
-            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "Booked", showtimeRoomInstance.ShowtimeInstanceId);
+            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "Inactive", showtimeRoomInstance.ShowtimeInstanceId);
 
             // 9. Update food quantity
             if (request.Foods != null && request.Foods.Any())
@@ -306,10 +306,10 @@ namespace MV.ApplicationLayer.Services
             // Cập nhật trạng thái hóa đơn
             invoice.Status = "Canceled";
 
-            // Cập nhật trạng thái ghế
+            // Cập nhật trạng thái ghế về "Active" (có thể đặt lại)
             var seatIdsToRelease = invoice.TicketDetails.Select(td => td.SeatDataId);
             var showtimeInstanceId = invoice.TicketDetails.First().ShowtimeInstanceId;
-            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIdsToRelease, "Available", showtimeInstanceId);
+            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIdsToRelease, "Active", showtimeInstanceId);
 
             foreach (var ticketDetail in invoice.TicketDetails)
             {

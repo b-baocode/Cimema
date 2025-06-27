@@ -1,4 +1,6 @@
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
@@ -17,7 +19,6 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task AddAsync(TicketInvoice invoice)
         {
             _context.TicketInvoices.Add(invoice);
-            await _context.SaveChangesAsync();
         }
 
         public async Task<TicketInvoice?> GetByIdAsync(int invoiceId)
@@ -51,7 +52,6 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task UpdateAsync(TicketInvoice invoice)
         {
             _context.TicketInvoices.Update(invoice);
-            await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int invoiceId)
@@ -66,8 +66,19 @@ namespace MV.InfrastructureLayer.Repositories
                 _context.TicketDetails.RemoveRange(invoice.TicketDetails);
                 _context.TicketInvoiceFoodItems.RemoveRange(invoice.TicketInvoiceFoodItems);
                 _context.TicketInvoices.Remove(invoice);
-                await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<List<TicketDetail>> GetTicketDetailsBySeatsAndShowtimeAsync(IEnumerable<int> seatIds, int showtimeInstanceId)
+        {
+            return await _context.TicketDetails
+                .Where(td => seatIds.Contains(td.SeatDataId) && td.ShowtimeInstanceId == showtimeInstanceId)
+                .ToListAsync();
+        }
+
+        public async Task RemoveTicketDetail(TicketDetail ticketDetail)
+        {
+            _context.TicketDetails.Remove(ticketDetail);
         }
     }
 } 

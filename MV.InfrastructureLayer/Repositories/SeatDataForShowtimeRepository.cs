@@ -32,7 +32,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task UpdateAsync(SeatDataForShowtime seatData)
         {
             _context.SeatDataForShowtimes.Update(seatData);
-            await _context.SaveChangesAsync();
+            // Không gọi SaveChangesAsync ở đây, để UnitOfWork quản lý
         }
     }
 } 

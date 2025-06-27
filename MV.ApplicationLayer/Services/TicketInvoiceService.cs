@@ -12,10 +12,12 @@ namespace MV.ApplicationLayer.Services
     public class TicketInvoiceService : ITicketInvoiceService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
 
-        public TicketInvoiceService(IUnitOfWork unitOfWork)
+        public TicketInvoiceService(IUnitOfWork unitOfWork, ISeatDataForShowtimeService seatDataForShowtimeService)
         {
             _unitOfWork = unitOfWork;
+            _seatDataForShowtimeService = seatDataForShowtimeService;
         }
 
         public async Task<TicketInvoice> CreateInvoiceAsync(
@@ -96,15 +98,14 @@ namespace MV.ApplicationLayer.Services
                 // Lấy danh sách seatId và showtimeInstanceId từ TicketDetails
                 var seatIds = invoice.TicketDetails.Select(td => td.SeatDataId).ToList();
                 var showtimeInstanceId = invoice.TicketDetails.FirstOrDefault()?.ShowtimeInstanceId;
+                
                 if (seatIds.Any() && showtimeInstanceId.HasValue)
                 {
-                    // Cập nhật trạng thái ghế về 'Active'
-                    var seatDataForShowtimeService = (ISeatDataForShowtimeService)AppDomain.CurrentDomain.GetData("SeatDataForShowtimeService");
-                    if (seatDataForShowtimeService != null)
-                    {
-                        await seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
-                    }
+                    // Cập nhật trạng thái ghế về "Active" khi payment thất bại hoặc xóa invoice
+                    await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
                 }
+                
+                // Xóa invoice và tất cả dữ liệu liên quan
                 await _unitOfWork.ticketInvoiceRepository.DeleteAsync(invoiceId);
             }
         }
