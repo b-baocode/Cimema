@@ -1,11 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MV.ApplicationLayer.QuarztInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services;
 using MV.InfrastructureLayer.DBContext;
 using MV.InfrastructureLayer.Repositories;
+using MV.InfrastructureLayer.SchedulingRepository;
 using MV.InfrastructureLayer.Services;
 // using MV.InfrastructureLayer.Interfaces;
 
@@ -69,6 +71,8 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IRoomTypeService, RoomTypeService>();
             services.AddScoped<ISeatService, SeatService>();
             services.AddScoped<ICommentRatingService, CommentRatingService>();
+            services.AddScoped<IShowtimeService, ShowtimeService>();
+
             services.AddScoped<IShowtimeRoomInstanceService, ShowtimeRoomInstanceService>();
             services.AddScoped<ISeatDataForShowtimeService, SeatDataForShowtimeService>();
             services.AddScoped<ITicketInvoiceService, TicketInvoiceService>();
@@ -79,6 +83,8 @@ namespace MV.InfrastructureLayer.Configuration
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            //Quartz
+            services.AddScoped<IJobScheduler, QuartzJobScheduler>();
             // Add VnPay services
             services.AddScoped<IVnPayService, MV.ApplicationLayer.Services.Vnpay.VnpayService>();
 

@@ -21,6 +21,9 @@
         ITicketInvoiceRepository ticketInvoiceRepository { get; }
         IScoreRepository scoreRepository { get; }
         IScoreHistoryRepository scoreHistoryRepository { get; }
+
+        IShowtimeRepository showtimeRepository { get; }
+
         //Single commit point
         Task<int> SaveChangesAsync();
     }
