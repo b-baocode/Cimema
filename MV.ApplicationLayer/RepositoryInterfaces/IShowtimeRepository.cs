@@ -1,9 +1,5 @@
-﻿using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MV.DomainLayer.CustomQueryModels;
+using MV.DomainLayer.Entities;
 
 namespace MV.ApplicationLayer.RepositoryInterfaces
 {
@@ -14,5 +10,26 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<Showtime?> GetByIdAsync(int showtimeId);
 
         Task<string?> GetMovieTitleForScheduling(int showtimeId);
+
+        Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetAllShowtimeWithDataOnlyAsync(int skip, int take);
+
+        Task<int> GetTotalShowtimeCountAsync();
+
+        Task<int> GetTotalNowShowingShowtimeCountAsync();
+
+        Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetNowShowingShowtimeWithDataOnlyAsync(int skip, int take);
+
+        Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetScheduledShowtimeWithDataOnlyAsync(int skip, int take);
+
+        Task<int> GetTotalScheduledShowtimeCountAsync();
+
+        Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetFinishedShowtimeWithDataOnlyAsync(int skip, int take);
+
+        Task<int> GetTotalFinishedShowtimeCountAsync();
+
+
+        Task<int> GetTotalShowtimeByMovieCountAsync(int movieId);
+
+        Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetShowtimeWithDataOnlyByMovieAsync(int skip, int take, int movieId);
     }
 }

@@ -72,7 +72,7 @@ namespace MV.InfrastructureLayer
         public IScoreHistoryRepository scoreHistoryRepository => _scoreHistoryRepository ??= new ScoreHistoryRepository(_context);
         public IScoreRepository scoreRepository => _scoreRepository ??= new ScoreRepository(_context);
 
-        public DbSet<TicketInvoice> TicketInvoices => _context.TicketInvoices;
+        //public DbSet<TicketInvoice> TicketInvoices => _context.TicketInvoices;
         public IShowtimeRepository showtimeRepository => _showtimeRepository ??= new ShowtimeRepository(_context);
 
         // CONSTRUCTOR INJECTION for DbContext
