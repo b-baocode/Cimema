@@ -309,5 +309,13 @@ namespace MV.InfrastructureLayer.Repositories
 
             return await query.CountAsync();
         }
+
+        public async Task<Movie?> CheckMovieStatusByIdAsync(int movieId)
+        {
+            var result = await _context.Set<Movie>()
+                .FirstOrDefaultAsync(m => m.MovieId == movieId && m.Status == "Active");
+
+            return result;
+        }
     }
 }

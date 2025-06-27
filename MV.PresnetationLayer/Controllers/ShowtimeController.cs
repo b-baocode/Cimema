@@ -19,10 +19,10 @@ namespace MV.PresnetationLayer.Controllers
             _showtimeService = showtimeService;
         }
 
-        [HttpPost("AddTest")]
-        public async Task<ActionResult<Showtime>> AddShowTimeTest(ShowtimeTestRequest showtimeTest)
+        [HttpPost("AddShowtime")]
+        public async Task<ActionResult<Showtime>> AddShowTime(ShowtimeAddRequest showtimeAddRequest)
         {
-            var result = await _showtimeService.AddShowTimeTest(showtimeTest);
+            var result = await _showtimeService.AddShowTimeAsync(showtimeAddRequest);
 
             if (result)
             {

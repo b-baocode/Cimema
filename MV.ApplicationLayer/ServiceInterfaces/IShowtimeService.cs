@@ -10,6 +10,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
 {
     public interface IShowtimeService
     {
-        Task<bool> AddShowTimeTest(ShowtimeTestRequest showtimeTest);
+        Task<bool> AddShowTimeAsync(ShowtimeAddRequest showtimeAddRequest);
     }
 }

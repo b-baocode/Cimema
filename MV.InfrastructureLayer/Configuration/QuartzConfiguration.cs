@@ -21,6 +21,7 @@ namespace MV.InfrastructureLayer.Configuration
             {
 
                 q.MisfireThreshold = TimeSpan.FromSeconds(2);
+                q.SetProperty("quartz.scheduler.idleWaitTime", "5000");
 
                 q.UsePersistentStore(s =>
                 {
