@@ -13,6 +13,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
     {
         string CreatePaymentUrl(PaymentInformationRequest model, double amount, HttpContext context);
         PaymentInformationResponse PaymentExecute(IQueryCollection collections);
-        void SavePaymentOnline(PaymentInformationResponse response, int? invoiceId = null);
+        Task SavePaymentOnline(PaymentInformationResponse response, int? invoiceId = null);
     }
 }
