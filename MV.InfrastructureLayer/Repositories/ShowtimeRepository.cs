@@ -166,22 +166,72 @@ namespace MV.InfrastructureLayer.Repositories
             .ToListAsync();
         }
 
-        //public async Task<IEnumerable<>> GetNowShowingShowtimeByMovie(int movieId)
-        //{
-        //    var resultForPage = _context.Set<Showtime>()
-        //        .
-        //}
+        public async Task<int> GetTotalShowtimeByDateCountAsync(DateOnly date)
+        {
+            DateTime startOfDay = date.ToDateTime(TimeOnly.MinValue);
 
-        //public async Task<IEnumerable<>> GetFinishedShowtimeByMovie(int movieId)
-        //{
-        //    var resultForPage = _context.Set<Showtime>()
-        //        .
-        //}
+            DateTime endOfDay = date.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
-        //public async Task<IEnumerable<>> GetShowtimeById(int movieId)
-        //{
-        //    var resultForPage = _context.Set<Showtime>()
-        //        .
-        //}
+            return await _context.Set<Showtime>().CountAsync(s => s.StartTime < endOfDay && s.EndTime > startOfDay);
+        }
+
+        public async Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetShowtimeWithDataOnlyByDateAsync(int skip, int take, DateOnly dateOnly)
+        {
+            DateTime startOfDay = dateOnly.ToDateTime(TimeOnly.MinValue);
+
+            DateTime endOfDay = dateOnly.AddDays(1).ToDateTime(TimeOnly.MinValue);
+
+            var resultForPage = _context.Set<Showtime>()
+                .Where(s => s.StartTime < endOfDay && s.EndTime > startOfDay)
+                .OrderBy(s => s.StartTime)
+                .Select(s => new GetAllShowtimeDataOnlyCustom
+                {
+                    ShowtimeId = s.ShowtimeId,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    MovieId = s.MovieId,
+                    MovieTitle = s.Movie != null ? s.Movie.Title : string.Empty,
+                    Status = s.Status,
+                }).AsQueryable();
+
+            return await resultForPage
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
+        }
+
+        public async Task<int> GetTotalShowtimeByDateRangeCountAsync(DateOnly fromDate, DateOnly toDate)
+        {
+            DateTime rangeStartDateTime = fromDate.ToDateTime(TimeOnly.MinValue);
+
+            DateTime rangeEndDateTimeExclusive = toDate.AddDays(1).ToDateTime(TimeOnly.MinValue);
+
+            return await _context.Set<Showtime>().CountAsync(s => s.StartTime < rangeEndDateTimeExclusive && s.EndTime > rangeStartDateTime);
+        }
+
+        public async Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetShowtimeWithDataOnlyByDateRangeAsync(int skip, int take, DateOnly fromDate, DateOnly toDate)
+        {
+            DateTime rangeStartDateTime = fromDate.ToDateTime(TimeOnly.MinValue);
+
+            DateTime rangeEndDateTimeExclusive = toDate.AddDays(1).ToDateTime(TimeOnly.MinValue);
+
+            var resultForPage = _context.Set<Showtime>()
+                .Where(s => s.StartTime < rangeEndDateTimeExclusive && s.EndTime > rangeStartDateTime)
+                .OrderBy(s => s.StartTime)
+                .Select(s => new GetAllShowtimeDataOnlyCustom
+                {
+                    ShowtimeId = s.ShowtimeId,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    MovieId = s.MovieId,
+                    MovieTitle = s.Movie != null ? s.Movie.Title : string.Empty,
+                    Status = s.Status,
+                }).AsQueryable();
+
+            return await resultForPage
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
+        }
     }
 }
