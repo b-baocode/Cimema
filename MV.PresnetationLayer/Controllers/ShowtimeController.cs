@@ -136,5 +136,47 @@ namespace MV.PresnetationLayer.Controllers
                 );
             }
         }
+
+        [HttpGet("GetShowtimeWithDataOnlyByDate")]
+        public async Task<ActionResult<PagedResult<GetAllShowtimeWithDataOnlyResponse>>> GetShowtimeWithDataOnlyByDate
+            ([FromQuery] ShowtimeGetByDateRequest showtimeGetByDateRequest)
+        {
+            try
+            {
+                var result = await _showtimeService.GetShowtimeDataOnlyByDate(showtimeGetByDateRequest);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    detail: "An unexpected error occurred while getting all the room. Please try again later.",
+                    title: "Internal Server Error",
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    instance: HttpContext.Request.Path
+                );
+            }
+        }
+
+        [HttpGet("GetShowtimeWithDataOnlyByDateRange")]
+        public async Task<ActionResult<PagedResult<GetAllShowtimeWithDataOnlyResponse>>> GetShowtimeWithDataOnlyByDateRange
+            ([FromQuery] ShowtimeGetByDateRangeRequest showtimeGetByDateRangeRequest)
+        {
+            try
+            {
+                var result = await _showtimeService.GetShowtimeDataOnlyByDateRange(showtimeGetByDateRangeRequest);
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    detail: "An unexpected error occurred while getting all the room. Please try again later.",
+                    title: "Internal Server Error",
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    instance: HttpContext.Request.Path
+                );
+            }
+        }
     }
 }

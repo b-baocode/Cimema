@@ -241,5 +241,65 @@ namespace MV.ApplicationLayer.Services
             };
         }
 
+        public async Task<PagedResult<GetAllShowtimeWithDataOnlyResponse>> GetShowtimeDataOnlyByDate
+            (ShowtimeGetByDateRequest showtimeGetByDateRequest)
+        {
+            var showtimes = await _unitOfWork.showtimeRepository.GetShowtimeWithDataOnlyByDateAsync
+                ((showtimeGetByDateRequest.Page - 1) * showtimeGetByDateRequest.PageSize
+                , showtimeGetByDateRequest.PageSize, showtimeGetByDateRequest.SearchedDate);
+
+            var totalItems = await _unitOfWork.showtimeRepository.GetTotalShowtimeByDateCountAsync(showtimeGetByDateRequest.SearchedDate);
+
+            var showtimeResponse = showtimes.Select(
+                s => new GetAllShowtimeWithDataOnlyResponse
+                {
+                    ShowtimeId = s.ShowtimeId,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    MovieId = s.MovieId,
+                    MovieTitle = s.MovieTitle,
+                    Status = s.Status,
+                });
+
+            return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
+            {
+                Items = showtimeResponse.ToList(),
+                TotalItems = totalItems,
+                Page = showtimeGetByDateRequest.Page,
+                PageSize = showtimeGetByDateRequest.PageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)showtimeGetByDateRequest.PageSize)
+            };
+        }
+
+        public async Task<PagedResult<GetAllShowtimeWithDataOnlyResponse>> GetShowtimeDataOnlyByDateRange
+            (ShowtimeGetByDateRangeRequest showtimeGetByDateRangeRequest)
+        {
+            var showtimes = await _unitOfWork.showtimeRepository.GetShowtimeWithDataOnlyByDateRangeAsync
+                ((showtimeGetByDateRangeRequest.Page - 1) * showtimeGetByDateRangeRequest.PageSize
+                , showtimeGetByDateRangeRequest.PageSize, showtimeGetByDateRangeRequest.StartDate, showtimeGetByDateRangeRequest.EndDate);
+
+            var totalItems = await _unitOfWork.showtimeRepository.GetTotalShowtimeByDateRangeCountAsync(showtimeGetByDateRangeRequest.StartDate, showtimeGetByDateRangeRequest.EndDate);
+
+            var showtimeResponse = showtimes.Select(
+                s => new GetAllShowtimeWithDataOnlyResponse
+                {
+                    ShowtimeId = s.ShowtimeId,
+                    StartTime = s.StartTime,
+                    EndTime = s.EndTime,
+                    MovieId = s.MovieId,
+                    MovieTitle = s.MovieTitle,
+                    Status = s.Status,
+                });
+
+            return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
+            {
+                Items = showtimeResponse.ToList(),
+                TotalItems = totalItems,
+                Page = showtimeGetByDateRangeRequest.Page,
+                PageSize = showtimeGetByDateRangeRequest.PageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)showtimeGetByDateRangeRequest.PageSize)
+            };
+        }
+
     }
 }
