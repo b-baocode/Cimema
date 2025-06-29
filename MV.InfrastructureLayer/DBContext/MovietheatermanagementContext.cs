@@ -192,6 +192,7 @@ public partial class MovietheatermanagementContext : DbContext
 
             entity.Property(e => e.Director).HasMaxLength(255);
             entity.Property(e => e.FromDate).HasColumnType("timestamp without time zone");
+            entity.Property(e => e.MoviePrice).HasPrecision(18, 2);
             entity.Property(e => e.Status).HasMaxLength(25);
             entity.Property(e => e.Studio).HasMaxLength(255);
             entity.Property(e => e.ToDate).HasColumnType("timestamp without time zone");
@@ -411,6 +412,7 @@ public partial class MovietheatermanagementContext : DbContext
             entity.Property(e => e.RoomName).HasMaxLength(100);
             entity.Property(e => e.RoomTypeName).HasMaxLength(100);
             entity.Property(e => e.RoomTypePrice).HasPrecision(18, 2);
+            entity.Property(e => e.Status).HasMaxLength(25);
 
             entity.HasOne(d => d.OriginalRoom).WithMany(p => p.ShowtimeRoomInstances)
                 .HasForeignKey(d => d.OriginalRoomId)

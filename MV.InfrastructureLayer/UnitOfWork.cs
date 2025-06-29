@@ -94,6 +94,10 @@ namespace MV.InfrastructureLayer
                 {
                     throw new UniqueConstraintViolationException("A unique constraint was violated during a database operation.", ex);
                 }
+                if (IsExcludeExceptionViolation(ex))
+                {
+                    throw new ExcludeConstraintViolationException("A room is being used at this time range.", ex);
+                }
                 else
                 {
                     // For other DbUpdateException types (e.g., concurrency, foreign key),
@@ -116,6 +120,19 @@ namespace MV.InfrastructureLayer
             if (innerEx is PostgresException pgException)
             {
                 return pgException.SqlState == "23505";
+            }
+
+            return false;
+        }
+
+        private bool IsExcludeExceptionViolation(DbUpdateException ex)
+        {
+            var innerEx = ex.InnerException;
+            if (innerEx == null) return false;
+
+            if (innerEx is PostgresException pgException)
+            {
+                return pgException.SqlState == "23P01";
             }
 
             return false;

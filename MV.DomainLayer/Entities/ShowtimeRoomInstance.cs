@@ -27,9 +27,9 @@ public partial class ShowtimeRoomInstance
 
     public decimal? MoviePrice { get; set; }
 
-    public bool? IsExpired { get; set; }
-
     public DateTime AddedAt { get; set; }
+
+    public string? Status { get; set; }
 
     public virtual CinemaRoom OriginalRoom { get; set; } = null!;
 

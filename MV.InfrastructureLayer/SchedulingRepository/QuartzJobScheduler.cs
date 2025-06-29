@@ -17,6 +17,8 @@ namespace MV.InfrastructureLayer.SchedulingRepository
         {
             var scheduler = await _schedulerFactory.GetScheduler();
 
+            var startTimeOffset = new DateTimeOffset(showtime.StartTime, TimeSpan.Zero);
+            var endTimeOffset = new DateTimeOffset(showtime.EndTime, TimeSpan.Zero);
 
             var startJob = JobBuilder.Create<UpdateShowtimeStatusJob>()
                 .WithIdentity($"showtime-job-start-{showtime.ShowtimeId}")
@@ -26,7 +28,7 @@ namespace MV.InfrastructureLayer.SchedulingRepository
 
             var startTrigger = TriggerBuilder.Create()
                 .WithIdentity($"showtime-trigger-start-{showtime.ShowtimeId}")
-                .StartAt(showtime.StartTime)
+                .StartAt(startTimeOffset)
                 .WithSimpleSchedule(x => x
                     .WithMisfireHandlingInstructionFireNow()
                     .WithRepeatCount(0))
@@ -40,7 +42,7 @@ namespace MV.InfrastructureLayer.SchedulingRepository
 
             var endTrigger = TriggerBuilder.Create()
                 .WithIdentity($"showtime-trigger-end-{showtime.ShowtimeId}")
-                .StartAt(showtime.EndTime)
+                .StartAt(endTimeOffset)
                 .WithSimpleSchedule(x => x
                     .WithMisfireHandlingInstructionFireNow()
                     .WithRepeatCount(0))
@@ -51,6 +53,9 @@ namespace MV.InfrastructureLayer.SchedulingRepository
 
            Console.WriteLine($"Scheduled status updates for Showtime {showtime.ShowtimeId}: Start at {showtime.StartTime}" +
                 $", End at {showtime.EndTime}");
+            Console.WriteLine($"Scheduled status updates for Showtime {showtime.ShowtimeId}: " +
+                $"Start at {startTimeOffset.ToLocalTime()} local ({startTimeOffset.UtcDateTime} UTC), " +
+                $"End at {endTimeOffset.ToLocalTime()} local ({endTimeOffset.UtcDateTime} UTC)");
         }
 
         public async Task UnscheduleShowtimeStatusUpdatesAsync(int showtimeId)

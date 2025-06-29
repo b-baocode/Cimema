@@ -1,9 +1,12 @@
 ﻿using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
+using MV.ApplicationLayer.GenericExceptionReport;
 using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.QuarztInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
+using MV.ApplicationLayer.SpecificExceptionReport;
+using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 
 
@@ -13,7 +16,7 @@ namespace MV.ApplicationLayer.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IJobScheduler _jobScheduler;
-        
+
 
         public ShowtimeService(IUnitOfWork unitOfWork, IJobScheduler jobScheduler)
         {
@@ -50,25 +53,27 @@ namespace MV.ApplicationLayer.Services
             return adjustedDateTime;
         }
 
-        public async Task<bool> AddShowTimeAsync(ShowtimeAddRequest showtimeAddRequest)
+        public async Task<ShowtimeAddResponse> AddShowTimeAsync(ShowtimeAddRequest showtimeAddRequest)
         {
             var movieStatusCheck = await _unitOfWork.movieRepository.CheckMovieStatusByIdAsync(showtimeAddRequest.MovieId);
 
             if (movieStatusCheck == null)
             {
-                return false;
+                return null!;
             }
 
-            var rawStartTime = DateTime.SpecifyKind(showtimeAddRequest.StartTime, DateTimeKind.Unspecified);
-            
-            DateTime finalStartTime = AdjustShowtimeDateTime(rawStartTime);
+            //var rawStartTime = DateTime.SpecifyKind(showtimeAddRequest.StartTime, DateTimeKind.Unspecified);
 
-            var rawEndTime = finalStartTime.AddMinutes(movieStatusCheck.Duration);
+            DateTime startTimeUtc = showtimeAddRequest.StartTime;
 
-            DateTime finalEndTime = AdjustShowtimeDateTime(rawEndTime);
+            DateTime finalStartTime = AdjustShowtimeDateTime(startTimeUtc);
+
+            //var rawEndTime = finalStartTime.AddMinutes(movieStatusCheck.Duration);
+
+            DateTime finalEndTime = AdjustShowtimeDateTime(finalStartTime.AddMinutes(movieStatusCheck.Duration));
 
 
-            var obj = new Showtime
+            var newShowtime = new Showtime
             {
                 StartTime = finalStartTime,
                 //Test
@@ -79,14 +84,78 @@ namespace MV.ApplicationLayer.Services
                 Status = "Scheduled",
             };
 
-            await _unitOfWork.showtimeRepository.AddAsync(obj);
+            var listAddRoomId = showtimeAddRequest.OriginalRoomIdList;
 
-            await _unitOfWork.SaveChangesAsync();
+            var listRoomDataFromId = await _unitOfWork.roomRepository.GetListRoomDataForShowtimeAddAsync(listAddRoomId!);
 
-            await _jobScheduler.ScheduleShowtimeStatusUpdateAsync(obj);
+            var allSeats = await _unitOfWork.seatRepository.GetSeatsForRoomInstanceAsync(listAddRoomId!);
 
+            var seatsByRoomId = allSeats
+                .GroupBy(s => s.OriginalRoomId)
+                .ToDictionary(g => g.Key, g => g.ToList());
 
-            return true;
+            foreach (var room in listRoomDataFromId)
+            {
+                var seatsForThisRoom = seatsByRoomId.GetValueOrDefault(room.OriginalRoomId, new List<SeatOfRoomForAddShowtimeInstance>());
+
+                var instance = new ShowtimeRoomInstance
+                {
+                    OriginalRoomId = room.OriginalRoomId,
+                    RoomName = room.RoomName,
+                    RoomRows = room.RoomRows,
+                    RoomColumns = room.RoomColumns,
+                    RoomTypeName = room.RoomTypeName,
+                    RoomTypePrice = room.RoomTypePrice,
+                    ActualStartTime = finalStartTime,
+                    ActualEndTime = finalEndTime,
+                    MoviePrice = movieStatusCheck.MoviePrice,
+                    Status = newShowtime.Status,
+                    AddedAt = DateTime.UtcNow,
+                    SeatDataForShowtimes = seatsForThisRoom
+                    .Select(
+                        seat => new SeatDataForShowtime
+                        {
+                            RowLabel = seat.RowLabel,
+                            ColumnNumber = seat.ColumnNumber,
+                            SeatTypeName = seat.SeatTypeName,
+                            SeatTypePrice = seat.SeatTypePrice,
+                            PairedWithSeatLocation = seat.PairedWithSeatLocation,
+                            Status = "Active"
+                        })
+                    .ToList()
+                };
+                newShowtime.ShowtimeRoomInstances.Add(instance);
+            }
+
+            await _unitOfWork.showtimeRepository.AddAsync(newShowtime);
+
+            try
+            {
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (ExcludeConstraintViolationException ex)
+            {
+                throw new ShowtimeRoomInstanceIsUnAvailableException(newShowtime.ShowtimeId.ToString(), "Some rooms is being used at this time range", ex);
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+
+            await _jobScheduler.ScheduleShowtimeStatusUpdateAsync(newShowtime);
+
+            var addResult = new ShowtimeAddResponse
+            {
+                ShowtimeId = newShowtime.ShowtimeId,
+                MovieId = newShowtime.MovieId,
+                StartTime = newShowtime.StartTime,
+                EndTime = newShowtime.EndTime,
+                MovieDuration = newShowtime.MovieDuration,
+                Status = newShowtime.Status,
+                RoomInstanceCount = newShowtime.ShowtimeRoomInstances.Count(),
+            };
+
+            return addResult;
         }
 
         public async Task<PagedResult<GetAllShowtimeWithDataOnlyResponse>> GetAllShowtimeDataOnly
@@ -117,7 +186,7 @@ namespace MV.ApplicationLayer.Services
                 PageSize = getAllShowtimeWithDataOnlyRequest.PageSize,
                 TotalPages = (int)Math.Ceiling(totalItems / (double)getAllShowtimeWithDataOnlyRequest.PageSize)
             };
-                
+
         }
 
         public async Task<PagedResult<GetAllShowtimeWithDataOnlyResponse>> GetNowShowingShowtimeDataOnly
@@ -300,6 +369,58 @@ namespace MV.ApplicationLayer.Services
                 TotalPages = (int)Math.Ceiling(totalItems / (double)showtimeGetByDateRangeRequest.PageSize)
             };
         }
+
+        public async Task<PagedResult<RoomGetByTimeRangeForShowtimeAddResponse>> GetAllAvailableRoomForShowtimeAdd
+            (RoomGetByTimeRangeForShowtimeAddRequest roomGetByTimeRangeForShowtimeAddRequest)
+        {
+            var movieStatusCheck = await _unitOfWork.movieRepository.CheckMovieStatusByIdAsync(roomGetByTimeRangeForShowtimeAddRequest.MovieId);
+
+            if (movieStatusCheck == null)
+            {
+                return null!;
+            }
+
+            //var rawStartTime = DateTime.SpecifyKind(roomGetByTimeRangeForShowtimeAddRequest.StartTime, DateTimeKind.Unspecified);
+
+            DateTime startTimeUtc = roomGetByTimeRangeForShowtimeAddRequest.StartTime;
+
+            DateTime finalStartTime = AdjustShowtimeDateTime(startTimeUtc);
+
+            var rawEndTime = finalStartTime.AddMinutes(movieStatusCheck.Duration);
+
+            DateTime finalEndTime = AdjustShowtimeDateTime(rawEndTime);
+
+            var listUnAvailableRoomId = await _unitOfWork.showtimeRoomInstanceRepository.GetListUnAvailableRoomIdAtTimeAsync
+                (finalStartTime, finalEndTime);
+
+            var availableRoomList = await _unitOfWork.roomRepository.GetListAvailalbeRoomForInstanceAsync
+                ((roomGetByTimeRangeForShowtimeAddRequest.Page - 1) * roomGetByTimeRangeForShowtimeAddRequest.PageSize
+                , roomGetByTimeRangeForShowtimeAddRequest.PageSize, listUnAvailableRoomId);
+
+            var totalItems = await _unitOfWork.roomRepository.GetTotalRoomForInstanceCountAsync(listUnAvailableRoomId);
+
+            var roomForInstanceResponse = availableRoomList.Select
+                (
+                rfs => new RoomGetByTimeRangeForShowtimeAddResponse
+                {
+                    OriginalRoomId = rfs.RoomId,
+                    RoomName = rfs.RoomName,
+                    RoomStatus = rfs.RoomStatus,
+                    Rows = rfs.Rows,
+                    Columns = rfs.Column,
+                    RoomTypeName = rfs.RoomTypeName,
+                    RoomTypePrice = rfs.RoomTypePrice,
+                });
+            return new PagedResult<RoomGetByTimeRangeForShowtimeAddResponse>
+            {
+                Items = roomForInstanceResponse.ToList(),
+                TotalItems = totalItems,
+                Page = roomGetByTimeRangeForShowtimeAddRequest.Page,
+                PageSize = roomGetByTimeRangeForShowtimeAddRequest.PageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)roomGetByTimeRangeForShowtimeAddRequest.PageSize)
+            };
+        }
+
 
     }
 }

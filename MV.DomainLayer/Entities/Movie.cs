@@ -33,7 +33,7 @@ public partial class Movie
 
     public string? Status { get; set; }
 
-    public bool? IsDelete { get; set; }
+    public decimal MoviePrice { get; set; }
 
     public virtual ICollection<CommentRating> CommentRatings { get; set; } = new List<CommentRating>();
 
