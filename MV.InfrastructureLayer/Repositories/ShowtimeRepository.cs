@@ -45,6 +45,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetAllShowtimeWithDataOnlyAsync(int skip, int take)
         {
             var resultForPage = _context.Set<Showtime>()
+                .AsNoTracking()
                 .OrderBy(s => s.StartTime)
                 .Select(s => new GetAllShowtimeDataOnlyCustom
                 {
@@ -70,6 +71,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetNowShowingShowtimeWithDataOnlyAsync(int skip, int take)
         {
             var resultForPage = _context.Set<Showtime>()
+                .AsNoTracking()
                 .Where(s => s.Status == "Now Showing")
                 .OrderBy(s => s.StartTime)
                 .Select(s => new GetAllShowtimeDataOnlyCustom
@@ -96,6 +98,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetScheduledShowtimeWithDataOnlyAsync(int skip, int take)
         {
             var resultForPage = _context.Set<Showtime>()
+                .AsNoTracking()
                 .Where(s => s.Status == "Scheduled")
                 .OrderBy(s => s.StartTime)
                 .Select(s => new GetAllShowtimeDataOnlyCustom
@@ -122,6 +125,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetFinishedShowtimeWithDataOnlyAsync(int skip, int take)
         {
             var resultForPage = _context.Set<Showtime>()
+                .AsNoTracking()
                 .Where(s => s.Status == "Finished")
                 .OrderBy(s => s.StartTime)
                 .Select(s => new GetAllShowtimeDataOnlyCustom
@@ -148,6 +152,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetShowtimeWithDataOnlyByMovieAsync(int skip, int take, int movieId)
         {
             var resultForPage = _context.Set<Showtime>()
+                .AsNoTracking()
                 .Where(s => s.MovieId == movieId)
                 .OrderBy(s => s.StartTime)
                 .Select(s => new GetAllShowtimeDataOnlyCustom
@@ -182,6 +187,7 @@ namespace MV.InfrastructureLayer.Repositories
             DateTime endOfDay = dateOnly.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
             var resultForPage = _context.Set<Showtime>()
+                .AsNoTracking()
                 .Where(s => s.StartTime < endOfDay && s.EndTime > startOfDay)
                 .OrderBy(s => s.StartTime)
                 .Select(s => new GetAllShowtimeDataOnlyCustom
@@ -216,6 +222,7 @@ namespace MV.InfrastructureLayer.Repositories
             DateTime rangeEndDateTimeExclusive = toDate.AddDays(1).ToDateTime(TimeOnly.MinValue);
 
             var resultForPage = _context.Set<Showtime>()
+                .AsNoTracking()
                 .Where(s => s.StartTime < rangeEndDateTimeExclusive && s.EndTime > rangeStartDateTime)
                 .OrderBy(s => s.StartTime)
                 .Select(s => new GetAllShowtimeDataOnlyCustom

@@ -53,6 +53,35 @@ namespace MV.InfrastructureLayer.Repositories
             return getSeats;
         }
 
+        public async Task<IEnumerable<SeatOfRoomForAddShowtimeInstance>> GetSeatsForRoomInstanceAsync(List<int> roomIds)
+        {
+            var getSeats = await _context.Set<Seat>()
+                .Where(s => roomIds.Contains(s.RoomId) && s.Status == "Active")
+                //test - NO TOUCH
+                //.Where(s => s.RoomId == roomId)
+                .Select(s => new SeatOfRoomForAddShowtimeInstance
+                {
+                    OriginalRoomId = s.RoomId,
+                    RowLabel = s.RowLabel,
+                    ColumnNumber = s.ColumnNumber,
+                    SeatTypeName = s.SeatType != null ? s.SeatType.SeatTypeName : null,
+                    SeatTypePrice = s.SeatType != null ? s.SeatType.SeatTypePrice : 0,
+                    Status = s.Status,
+
+                    PairedWithSeatLocation = (s.SeatType != null && s.SeatType.SeatTypeName == "Couple")
+                    ? (s.CoupleSeatSeatId1Navigation != null
+                        ? $"{s.CoupleSeatSeatId1Navigation.SeatId2Navigation.RowLabel}{s.CoupleSeatSeatId1Navigation.SeatId2Navigation.ColumnNumber}"
+                        : (s.CoupleSeatSeatId2Navigation != null
+                            ? $"{s.CoupleSeatSeatId2Navigation.SeatId1Navigation.RowLabel}{s.CoupleSeatSeatId2Navigation.SeatId1Navigation.ColumnNumber}"
+                            : null))
+                    : null
+
+                })
+                .ToListAsync();
+
+            return getSeats;
+        }
+
         public async Task<IEnumerable<Seat>> GetExistingSeatsForRoomUpdateCheckAsync(int roomId)
         {
             return await _context.Set<Seat>()

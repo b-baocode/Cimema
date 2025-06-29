@@ -7,7 +7,7 @@ public partial class PromotionEvent
 {
     public int EventId { get; set; }
 
-    public string EventName { get; set; } = null!;  
+    public string EventName { get; set; } = null!;
 
     public string EventDesciption { get; set; } = null!;
 

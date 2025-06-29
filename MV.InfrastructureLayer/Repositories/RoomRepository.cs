@@ -66,5 +66,52 @@ namespace MV.InfrastructureLayer.Repositories
                 .CountAsync();
         }
 
+        public async Task<int> GetTotalRoomForInstanceCountAsync(IEnumerable<int> listUnAvailableRoomId)
+        {
+            return await _context.Set<CinemaRoom>().CountAsync(r => !listUnAvailableRoomId.Contains(r.RoomId) && r.Status == "Active");
+        }
+
+        public async Task<IEnumerable<ListOfAvailableForShowtimeWithoutSeat>> GetListAvailalbeRoomForInstanceAsync(int skip, int take, IEnumerable<int> listUnAvailableRoomId)
+        {
+            var resultForPage = _context.Set<CinemaRoom>()
+               .AsNoTracking()
+               .Where(r => !listUnAvailableRoomId.Contains(r.RoomId) && r.Status == "Active")
+               .OrderBy(r => r.RoomType.RoomTypePrice)
+               .ThenBy(r => r.Name)
+               .Select(r => new ListOfAvailableForShowtimeWithoutSeat
+               {
+                   RoomId = r.RoomId,
+                   RoomName = r.Name,
+                   Rows = r.Rows,
+                   Column = r.Columns,
+                   RoomStatus = r.Status,
+                   RoomTypeName = r.RoomType.RoomTypeName,
+                   RoomTypePrice = r.RoomType.RoomTypePrice,
+               })
+               .AsQueryable();
+
+            return await resultForPage
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
+        }
+
+        public async Task<IEnumerable<RoomForShowtimeRoomInstanceAdd>> GetListRoomDataForShowtimeAddAsync(List<int> orginalRoomIdsList)
+        {
+            return await _context.Set<CinemaRoom>()
+                .AsNoTracking()
+                .Where(r => orginalRoomIdsList.Contains(r.RoomId))
+                .Select(
+                r => new RoomForShowtimeRoomInstanceAdd
+                {
+                    OriginalRoomId = r.RoomId,
+                    RoomName = r.Name,
+                    RoomRows = r.Rows,
+                    RoomColumns = r.Columns,
+                    RoomTypeName = r.RoomType.RoomTypeName,
+                    RoomTypePrice = r.RoomType.RoomTypePrice,
+                })
+                .ToListAsync();
+        }
     }
 }

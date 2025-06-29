@@ -14,5 +14,12 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<int> GetTotalRoomsCountAsync();
 
         Task<bool> CheckRoomExistAsync(int roomIdToCheck);
+
+        Task<IEnumerable<ListOfAvailableForShowtimeWithoutSeat>> GetListAvailalbeRoomForInstanceAsync(int skip, int take, IEnumerable<int> listUnAvailableRoomId);
+
+
+        Task<int> GetTotalRoomForInstanceCountAsync(IEnumerable<int> listUnAvailableRoomId);
+
+        Task<IEnumerable<RoomForShowtimeRoomInstanceAdd>> GetListRoomDataForShowtimeAddAsync(List<int> orginalRoomIdsList);
     }
 }

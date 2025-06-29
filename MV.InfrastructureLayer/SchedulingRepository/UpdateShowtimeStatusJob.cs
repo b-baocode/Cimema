@@ -40,6 +40,9 @@ namespace MV.InfrastructureLayer.SchedulingRepository
             if (showtime == null) return;
 
             showtime.Status = newStatus!;
+            
+            await _unitOfWork.showtimeRoomInstanceRepository.UpdateStatusForShowtimeRoomInstanceQuarztAsync(showtimeId, newStatus!);
+
             await _unitOfWork.SaveChangesAsync();
 
             var movieTitle = await _unitOfWork.showtimeRepository.GetMovieTitleForScheduling(showtimeId);

@@ -11,7 +11,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
 {
     public interface IShowtimeService
     {
-        Task<bool> AddShowTimeAsync(ShowtimeAddRequest showtimeAddRequest);
+        Task<ShowtimeAddResponse> AddShowTimeAsync(ShowtimeAddRequest showtimeAddRequest);
         Task<PagedResult<GetAllShowtimeWithDataOnlyResponse>> GetAllShowtimeDataOnly(GetAllShowtimeWithDataOnlyRequest getAllShowtimeWithDataOnlyRequest);
         Task<PagedResult<GetAllShowtimeWithDataOnlyResponse>> GetNowShowingShowtimeDataOnly
             (GetAllShowtimeWithDataOnlyRequest getAllShowtimeWithDataOnlyRequest);
@@ -25,5 +25,8 @@ namespace MV.ApplicationLayer.ServiceInterfaces
             (ShowtimeGetByDateRequest showtimeGetByDateRequest);
         Task<PagedResult<GetAllShowtimeWithDataOnlyResponse>> GetShowtimeDataOnlyByDateRange
             (ShowtimeGetByDateRangeRequest showtimeGetByDateRangeRequest);
+
+        Task<PagedResult<RoomGetByTimeRangeForShowtimeAddResponse>> GetAllAvailableRoomForShowtimeAdd
+            (RoomGetByTimeRangeForShowtimeAddRequest roomGetByTimeRangeForShowtimeAddRequest);
     }
 }
