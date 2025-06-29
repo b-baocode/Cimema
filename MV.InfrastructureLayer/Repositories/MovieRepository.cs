@@ -18,6 +18,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
+                .Where(m => m.Status != "InActive") // Chỉ lọc phim không bị xóa (status khác InActive)
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
@@ -44,8 +45,9 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<int> GetTotalMoviesAsync(string? keyword)
         {
-            var query = _context.Movies.AsQueryable(); // Giữ khi có trường IsDelete
-
+            var query = _context.Movies
+                .Where(m => m.Status != "InActive") // Chỉ lọc phim không bị xóa (status khác InActive)
+                .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -69,7 +71,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && !EF.Functions.Like(m.Status, "InActive"))
+                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && m.Status != "InActive")
                 .AsQueryable();
 
             return await query
@@ -81,8 +83,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<int> GetTotalMoviesByDateRangeAsync(DateTime fromDate, DateTime toDate)
         {
             return await _context.Movies
-                //.Where(m => m.FromDate >= fromDate && m.ToDate <= toDate) // Giữ khi có trường IsDelete
-                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && !EF.Functions.Like(m.Status, "InActive")) // Xóa đi nếu có trường IsDelete
+                .Where(m => m.FromDate >= fromDate && m.ToDate <= toDate && m.Status != "InActive")
                 .CountAsync();
         }
 
@@ -95,8 +96,7 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<bool> IsTitleExistsAsync(string title)
         {
-            //return await _context.Movies.AnyAsync(m => m.Title == title); // Giữ khi có trường IsDelete
-            return await _context.Movies.AnyAsync(m => m.Title == title && !EF.Functions.Like(m.Status, "InActive")); // Xóa đi nếu có trường IsDelete
+            return await _context.Movies.AnyAsync(m => m.Title == title && m.Status != "InActive");
         }
 
         public async Task<Movie> CreateMovieAsync(Movie movie)
@@ -198,17 +198,16 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<Movie?> GetLastMovieAsync()
         {
             return await _context.Movies
+                .Where(m => m.Status != "InActive")
                 .OrderByDescending(m => m.MovieId)
-                //.FirstOrDefaultAsync(); // Giữ khi có trường IsDelete
-                .FirstOrDefaultAsync(m => !EF.Functions.Like(m.Status, "InActive")); // Xóa đi nếu có trường IsDelete
+                .FirstOrDefaultAsync();
         }
 
         public async Task<IEnumerable<Movie>> GetMoviesByCustomerCriteriaAsync(string? title, string? genre, string? actors, DateOnly? publishDate, int skip, int take)
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                //.Where(m => m.IsDeleted == true) // Giữ khi có trường IsDelete
-                .Where(m => !EF.Functions.Like(m.Status, "InActive")) // Xóa đi nếu có trường IsDelete
+                .Where(m => m.Status != "InActive")
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(title))
@@ -241,8 +240,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Movies
                 .Include(m => m.Genres)
-                //.Where(m => m.IsDeleted == true) // Giữ khi có trường IsDelete
-                .Where(m => !EF.Functions.Like(m.Status, "InActive")) // Xóa đi nếu có trường IsDelete
+                .Where(m => m.Status != "InActive")
                 .AsQueryable();
 
             if (!string.IsNullOrWhiteSpace(title))
@@ -316,6 +314,49 @@ namespace MV.InfrastructureLayer.Repositories
                 .FirstOrDefaultAsync(m => m.MovieId == movieId && m.Status == "Active");
 
             return result;
+        }
+
+        public async Task<IEnumerable<Movie>> GetMoviesByPriceRangeAsync(decimal minPrice, decimal maxPrice, string? keyword, int skip, int take)
+        {
+            var query = _context.Movies
+                .Include(m => m.Genres)
+                .Where(m => m.Status != "InActive" && m.MoviePrice >= minPrice && m.MoviePrice <= maxPrice)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower().Trim();
+                query = query.Where(m =>
+                    EF.Functions.Like(m.Title.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
+            }
+
+            return await query
+                .OrderBy(m => m.MoviePrice)
+                .Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetTotalMoviesByPriceRangeAsync(decimal minPrice, decimal maxPrice, string? keyword)
+        {
+            var query = _context.Movies
+                .Where(m => m.Status != "InActive" && m.MoviePrice >= minPrice && m.MoviePrice <= maxPrice)
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                keyword = keyword.ToLower().Trim();
+                query = query.Where(m =>
+                    EF.Functions.Like(m.Title.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
+                    EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
+            }
+
+            return await query.CountAsync();
         }
     }
 }

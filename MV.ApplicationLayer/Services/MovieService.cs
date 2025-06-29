@@ -25,13 +25,18 @@ namespace MV.ApplicationLayer.Services
                 (request.Page - 1) * request.PageSize,
                 request.PageSize);
 
+            /*
             // Lọc ra những phim chưa bị xóa (status khác "InActive")
             // var filteredMovies = movies.Where(m => m.Status != "InActive").ToList();
 
             // var totalItems = filteredMovies.Count;
 
             // Không lọc phim đã xóa nữa, hiển thị tất cả phim
-            var totalItems = movies.Count();
+            // var totalItems = movies.Count();
+
+            */
+
+            var totalItems = await _unitOfWork.movieRepository.GetTotalMoviesAsync(request.Keyword);
 
             return new PagedResult<MovieResponse>
             {
@@ -99,7 +104,7 @@ namespace MV.ApplicationLayer.Services
                 Version = request.Version,
                 TrailerUrl = request.TrailerUrl,
                 Description = request.Description,
-                // movie.Status = request.Status;
+                MoviePrice = request.MoviePrice,
                 Status = GetMovieStatus(request.FromDate, request.ToDate)
             };
 
@@ -163,7 +168,7 @@ namespace MV.ApplicationLayer.Services
             movie.Version = request.Version;
             movie.TrailerUrl = request.TrailerUrl;
             movie.Description = request.Description;
-            // movie.Status = request.Status;
+            movie.MoviePrice = request.MoviePrice;
             movie.Status = GetMovieStatus(request.FromDate, request.ToDate);
 
             // Update genres
@@ -261,6 +266,34 @@ namespace MV.ApplicationLayer.Services
             };
         }
 
+        public async Task<PagedResult<MovieResponse>> SearchMoviesByPriceAsync(MovieSearchByPriceRequest request)
+        {
+            // Validate price range
+            if (request.MinPrice > request.MaxPrice)
+                throw new ValidationException("MinPrice cannot be greater than MaxPrice");
+
+            var movies = await _unitOfWork.movieRepository.GetMoviesByPriceRangeAsync(
+                request.MinPrice,
+                request.MaxPrice,
+                request.Keyword,
+                (request.Page - 1) * request.PageSize,
+                request.PageSize);
+
+            var totalItems = await _unitOfWork.movieRepository.GetTotalMoviesByPriceRangeAsync(
+                request.MinPrice,
+                request.MaxPrice,
+                request.Keyword);
+
+            return new PagedResult<MovieResponse>
+            {
+                Items = movies.Select(MapToResponse).ToList(),
+                TotalItems = totalItems,
+                Page = request.Page,
+                PageSize = request.PageSize,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)request.PageSize)
+            };
+        }
+
         public async Task<PagedResult<MovieResponse>> GetComingSoonMoviesAsync(MovieSearchRequest request)
         {
             var movies = await _unitOfWork.movieRepository.GetComingSoonMoviesAsync(
@@ -309,6 +342,7 @@ namespace MV.ApplicationLayer.Services
                 TrailerUrl = movie.TrailerUrl,
                 Description = movie.Description,
                 Status = movie.Status,
+                MoviePrice = movie.MoviePrice,
                 Genres = movie.Genres.Select(g => new GenreResponse
                 {
                     GenreId = g.GenreId,
@@ -381,6 +415,9 @@ namespace MV.ApplicationLayer.Services
             if (string.IsNullOrWhiteSpace(request.Description))
                 throw new ValidationException("Description is required");
 
+            if (request.MoviePrice <= 0)
+                throw new ValidationException("Movie price must be greater than 0");
+
             if (request.GenreIds == null || !request.GenreIds.Any())
                 throw new ValidationException("At least one genre is required");
         }
@@ -417,6 +454,9 @@ namespace MV.ApplicationLayer.Services
 
             if (string.IsNullOrWhiteSpace(request.Description))
                 throw new ValidationException("Description is required");
+
+            if (request.MoviePrice <= 0)
+                throw new ValidationException("Movie price must be greater than 0");
 
             if (request.GenreIds == null || !request.GenreIds.Any())
                 throw new ValidationException("At least one genre is required");
