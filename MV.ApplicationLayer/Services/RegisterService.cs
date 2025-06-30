@@ -55,7 +55,7 @@ namespace MV.ApplicationLayer.Services
             // Bây giờ chỉ tập trung vào việc tạo user
 
             // Gán RoleId mặc định cho người dùng mới. Giả sử RoleId=2 là "Customer"
-            registerRequest.RoleId = 2;
+            registerRequest.RoleId = 4;
 
             string hashedPassword = _passwordRepository.HashPassword(registerRequest.Password);
             bool taskResult = await _unitOfWork.userRepository.RegisterUser(registerRequest, hashedPassword);
