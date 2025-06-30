@@ -115,7 +115,7 @@ app.UseWebSockets();
 app.UseCors("AllowReactApp");
 
 app.MapHub<ShowtimeHub>("/showtimeHub");
-
+app.MapHub<SeatHub>("/seatHub");
 
 //app.UseHttpsRedirection();
 

@@ -100,5 +100,13 @@ namespace MV.InfrastructureLayer.Repositories
                     RemainSeatsCount = s.SeatDataForShowtimes.Count(sta => sta.Status == "Active"),
                 }).FirstOrDefaultAsync();
         }
+
+        public async Task<string?> GetRoomInstanceNameByIdAsync(int roomInstanceId)
+        {
+            return await _context.Set<ShowtimeRoomInstance>()
+                .Where(sri => sri.ShowtimeInstanceId == roomInstanceId)
+                .Select(sri => sri.RoomName)
+                .FirstOrDefaultAsync();
+        }
     }
 }

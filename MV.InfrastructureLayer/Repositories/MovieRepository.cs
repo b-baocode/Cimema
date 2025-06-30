@@ -358,5 +358,13 @@ namespace MV.InfrastructureLayer.Repositories
 
             return await query.CountAsync();
         }
+
+        public async Task<string?> GetMovieNameByIdAsync(int movieId)
+        {
+            return await _context.Set<Movie>()
+                .Where(m => m.MovieId == movieId)
+                .Select(m => m.Title)
+                .FirstOrDefaultAsync();
+        }
     }
 }
