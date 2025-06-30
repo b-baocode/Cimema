@@ -45,6 +45,10 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
+        [Required(ErrorMessage = "Movie price is required")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Movie price must be greater than 0")]
+        public decimal MoviePrice { get; set; }
+
         /* Status đã được tự động set theo thời gian FromDate-ToDate
         [MaxLength(25)]
         public string? Status { get; set; }

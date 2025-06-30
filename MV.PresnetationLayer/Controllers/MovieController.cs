@@ -67,6 +67,22 @@ namespace MV.PresnetationLayer.Controllers
             }
         }
 
+        [HttpGet("SearchByPrice")]
+        [AllowAnonymous]
+        public async Task<ActionResult<PagedResult<MovieResponse>>> SearchMoviesByPrice(
+            [FromQuery] MovieSearchByPriceRequest request)
+        {
+            try
+            {
+                var result = await _movieService.SearchMoviesByPriceAsync(request);
+                return Ok(result);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<MovieResponse>> GetMovie(int id)

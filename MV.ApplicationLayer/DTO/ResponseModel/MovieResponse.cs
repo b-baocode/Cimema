@@ -16,6 +16,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public string TrailerUrl { get; set; }
         public string Description { get; set; }
         public string? Status { get; set; }
+        public decimal MoviePrice { get; set; }
         public List<GenreResponse> Genres { get; set; }
     }
 
