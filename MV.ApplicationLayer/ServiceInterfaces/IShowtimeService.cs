@@ -28,5 +28,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
 
         Task<PagedResult<RoomGetByTimeRangeForShowtimeAddResponse>> GetAllAvailableRoomForShowtimeAdd
             (RoomGetByTimeRangeForShowtimeAddRequest roomGetByTimeRangeForShowtimeAddRequest);
+
+        Task<ShowtimeGetByIdResponse> GetShowtimeByIdWithAllRoomInstance(ShowtimeGetByIdRequest showtimeGetByIdRequest);
     }
 }
