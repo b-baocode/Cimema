@@ -21,5 +21,9 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 
         Task<Movie?> CheckMovieStatusByIdAsync(int movieId);
 
+        // Check by Price
+        Task<IEnumerable<Movie>> GetMoviesByPriceRangeAsync(decimal minPrice, decimal maxPrice, string? keyword, int skip, int take);
+        Task<int> GetTotalMoviesByPriceRangeAsync(decimal minPrice, decimal maxPrice, string? keyword);
+
     }
 }
