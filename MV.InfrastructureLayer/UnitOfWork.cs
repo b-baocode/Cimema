@@ -54,6 +54,7 @@ namespace MV.InfrastructureLayer
         private ITicketInvoiceRepository _ticketInvoiceRepository;
         private IScoreHistoryRepository _scoreHistoryRepository;
         private IScoreRepository _scoreRepository;
+        private IPaymentUpFrontRepository _paymentUpFrontRepository;
 
         // Expose repository INTERFACES
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
@@ -71,6 +72,7 @@ namespace MV.InfrastructureLayer
         public ITicketInvoiceRepository ticketInvoiceRepository => _ticketInvoiceRepository ??= new TicketInvoiceRepository(_context);
         public IScoreHistoryRepository scoreHistoryRepository => _scoreHistoryRepository ??= new ScoreHistoryRepository(_context);
         public IScoreRepository scoreRepository => _scoreRepository ??= new ScoreRepository(_context);
+        public IPaymentUpFrontRepository paymentUpFrontRepository => _paymentUpFrontRepository ??= new PaymentUpFrontRepository(_context);
 
         //public DbSet<TicketInvoice> TicketInvoices => _context.TicketInvoices;
         public IShowtimeRepository showtimeRepository => _showtimeRepository ??= new ShowtimeRepository(_context);
