@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
+using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
 
@@ -42,6 +43,62 @@ namespace MV.InfrastructureLayer.Repositories
             await _context.Set<ShowtimeRoomInstance>()
                 .Where(sri => sri.ShowtimeId == showtimeId)
                 .ExecuteUpdateAsync(s => s.SetProperty(b => b.Status, newStatus));
+        }
+
+        public async Task<int> GetTotalAllRoomInstanceCountAsync(int showtimeId)
+        {
+            return await _context.Set<ShowtimeRoomInstance>().CountAsync(s => s.ShowtimeId == showtimeId);
+        }
+
+        public async Task<IEnumerable<GetAllRoomInstanceForShowtime?>> GetAllRoomInstanceAsync(int skip, int take, int showtimeId)
+        {
+            var resultForPage = _context.Set<ShowtimeRoomInstance>()
+                .AsNoTracking()
+                .Where(s => s.ShowtimeId == showtimeId)
+                .OrderBy(s => s.RoomTypePrice)
+                .ThenBy(s => s.RoomName)
+                .Select(s => new GetAllRoomInstanceForShowtime
+                {
+                    RoomInstanceId = s.ShowtimeInstanceId,
+                    RoomName = s.RoomName,
+                    RoomRows = s.RoomRows,
+                    RoomColumns = s.RoomColumns,
+                    RoomTypeName = s.RoomTypeName,
+                    RoomTypePrice = s.RoomTypePrice,
+                    RoomStatus = s.Status,
+                    TotalSeatCounts = s.SeatDataForShowtimes.Count(),
+                    StandardSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Standard"),
+                    VipSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "VIP"),
+                    CoupleSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Couple")/2,
+                    RemainSeatsCount = s.SeatDataForShowtimes.Count(sta => sta.Status == "Active"),
+                }).AsQueryable();
+
+            return await resultForPage
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
+        }
+
+        public async Task<GetAllRoomInstanceForShowtime?> GetRoomInstanceByIdAsync(int roomInstanceId)
+        {
+            return await _context.Set<ShowtimeRoomInstance>()
+                .AsNoTracking()
+                .Where(s => s.ShowtimeInstanceId == roomInstanceId)
+                .Select(s => new GetAllRoomInstanceForShowtime
+                {
+                    RoomInstanceId = s.ShowtimeInstanceId,
+                    RoomName = s.RoomName,
+                    RoomRows = s.RoomRows,
+                    RoomColumns = s.RoomColumns,
+                    RoomTypeName = s.RoomTypeName,
+                    RoomTypePrice = s.RoomTypePrice,
+                    RoomStatus = s.Status,
+                    TotalSeatCounts = s.SeatDataForShowtimes.Count(),
+                    StandardSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Standard"),
+                    VipSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "VIP"),
+                    CoupleSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Couple") / 2,
+                    RemainSeatsCount = s.SeatDataForShowtimes.Count(sta => sta.Status == "Active"),
+                }).FirstOrDefaultAsync();
         }
     }
 }

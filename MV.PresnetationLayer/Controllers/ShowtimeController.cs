@@ -71,10 +71,29 @@ namespace MV.PresnetationLayer.Controllers
 
         }
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<string>> GetShowtimeById(int id)
+        [HttpGet("GetShowtimeById")]
+        public async Task<ActionResult<ShowtimeGetByIdResponse>> GetShowtimeById([FromQuery] ShowtimeGetByIdRequest showtimeGetByIdRequest)
         {
-            return Ok("Test");
+            try
+            {
+                var result = await _showtimeService.GetShowtimeByIdWithAllRoomInstance(showtimeGetByIdRequest);
+
+                if (result == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return Problem(
+                    detail: "An unexpected error occurred while getting all the room. Please try again later.",
+                    title: "Internal Server Error",
+                    statusCode: StatusCodes.Status500InternalServerError,
+                    instance: HttpContext.Request.Path
+                );
+            }
         }
 
         [HttpGet("GetAllShowtimeWithDataOnly")]

@@ -1,7 +1,6 @@
 ﻿using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.GenericExceptionReport;
-using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.QuarztInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
@@ -421,6 +420,59 @@ namespace MV.ApplicationLayer.Services
             };
         }
 
+        public async Task<ShowtimeGetByIdResponse> GetShowtimeByIdWithAllRoomInstance(ShowtimeGetByIdRequest showtimeGetByIdRequest)
+        {
+            var showtimeByIdResult = await _unitOfWork.showtimeRepository.GetShowtimeByIdAsync(showtimeGetByIdRequest.ShowtimeId);
 
+            if(showtimeByIdResult == null)
+            {
+                return null!;
+            }
+
+            var roomInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetAllRoomInstanceAsync
+                ((showtimeGetByIdRequest.Page - 1) * showtimeGetByIdRequest.PageSize
+                , showtimeGetByIdRequest.PageSize, showtimeGetByIdRequest.ShowtimeId);
+
+            var totalItems = await _unitOfWork.showtimeRoomInstanceRepository.GetTotalAllRoomInstanceCountAsync(showtimeGetByIdRequest.ShowtimeId);
+
+            var roomInstanceResponse = roomInstances.Select(
+                ri => new ShowtimeRoomInstanceForShowtime
+                {
+                    RoomInstanceId = ri.RoomInstanceId,
+                    RoomName = ri.RoomName,
+                    RoomRows = ri.RoomRows,
+                    RoomColumns = ri.RoomColumns,
+                    RoomStatus = ri.RoomStatus,
+                    RoomTypeName = ri.RoomTypeName,
+                    RoomTypePrice = ri.RoomTypePrice,
+                    TotalSeatCounts = ri.TotalSeatCounts,
+                    StandardSeatCount = ri.StandardSeatCount,
+                    VipSeatCount = ri.VipSeatCount,
+                    CoupleSeatCount = ri.CoupleSeatCount,
+                    RemainSeatsCount = ri.RemainSeatsCount,
+                });
+
+            var finalResult = new ShowtimeGetByIdResponse
+            {
+                ShowtimeId = showtimeByIdResult.ShowtimeId,
+                StartTime = showtimeByIdResult.StartTime,
+                EndTime = showtimeByIdResult.EndTime,
+                MovieId = showtimeByIdResult.MovieId,
+                MovieDuration = showtimeByIdResult.MovieDuration,
+                MoviePrice = showtimeByIdResult.MoviePrice,
+                Status = showtimeByIdResult.Status,
+                RoomInstanceCount = showtimeByIdResult.RoomInstanceCount,
+                listRoomInstances = new PagedResult<ShowtimeRoomInstanceForShowtime>
+                {
+                    Items = roomInstanceResponse.ToList(),
+                    TotalItems = totalItems,
+                    Page = showtimeGetByIdRequest.Page,
+                    PageSize = showtimeGetByIdRequest.PageSize,
+                    TotalPages = (int)Math.Ceiling(totalItems / (double)showtimeGetByIdRequest.PageSize)
+                }
+            };
+
+            return finalResult;
+        }
     }
 }

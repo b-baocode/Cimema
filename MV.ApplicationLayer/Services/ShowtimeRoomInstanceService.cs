@@ -1,3 +1,4 @@
+using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
@@ -23,6 +24,50 @@ namespace MV.ApplicationLayer.Services
                 throw new Exception("ShowtimeRoomInstance không tồn tại cho suất chiếu này.");
             }
             return showtimeRoomInstance;
+        }
+
+        public async Task<ShowTimeRoomInstanceGetByIdResponse?> GetRoomInstanceWithSeatById(int roomInstanceId)
+        {
+            var roomInstanceResult = await _unitOfWork.showtimeRoomInstanceRepository.GetRoomInstanceByIdAsync(roomInstanceId);
+
+            if (roomInstanceResult == null)
+            {
+                return null;
+            }
+
+            var seatResult = await _unitOfWork.seatDataForShowtimeRepository.GetSeatsForRoomInstanceAsync(roomInstanceId);
+
+            var searchedResult = new ShowTimeRoomInstanceGetByIdResponse
+            {
+                RoomInstanceId = roomInstanceResult.RoomInstanceId,
+                RoomName = roomInstanceResult.RoomName,
+                RoomRows = roomInstanceResult.RoomRows,
+                RoomColumns = roomInstanceResult.RoomColumns,
+                RoomStatus = roomInstanceResult.RoomStatus,
+                RoomTypeName = roomInstanceResult.RoomTypeName,
+                RoomTypePrice = roomInstanceResult.RoomTypePrice,
+                TotalSeatCounts = roomInstanceResult.TotalSeatCounts,
+                StandardSeatCount = roomInstanceResult.StandardSeatCount,
+                VipSeatCount = roomInstanceResult.VipSeatCount,
+                CoupleSeatCount = roomInstanceResult.CoupleSeatCount,
+                RemainSeatsCount = roomInstanceResult.RemainSeatsCount,
+                SeatForRoomInstances = seatResult.Select(
+                    srDto => new SeatForRoomInstanceDTO
+                    {
+                        SeatDataId = srDto.SeatDataId,
+                        ShowtimeInstanceId = srDto.ShowtimeInstanceId,
+                        RowLabel = srDto.RowLabel,
+                        ColumnNumber = srDto.ColumnNumber,
+                        SeatTypeName = srDto.SeatTypeName,
+                        SeatTypePrice = srDto.SeatTypePrice,
+                        PairedWithSeatLocation = srDto.PairedWithSeatLocation,
+                        SeatStatus = srDto.Status,
+                    })
+                .OrderBy(srDto => srDto.SeatDataId)
+                .ToList()
+            };
+
+            return searchedResult;
         }
 
     }

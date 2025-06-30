@@ -3,11 +3,6 @@ using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -57,10 +52,10 @@ namespace MV.InfrastructureLayer.Repositories
                     Status = s.Status,
                 }).AsQueryable();
 
-                return await resultForPage
-                .Skip(skip)
-                .Take(take)
-                .ToListAsync();
+            return await resultForPage
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
         }
 
         public async Task<int> GetTotalNowShowingShowtimeCountAsync()
@@ -239,6 +234,23 @@ namespace MV.InfrastructureLayer.Repositories
             .Skip(skip)
             .Take(take)
             .ToListAsync();
+        }
+
+        public async Task<GetShowtimeByIdCustom?> GetShowtimeByIdAsync(int showtimeId)
+        {
+            return await _context.Set<Showtime>()
+                .Select(sh => new GetShowtimeByIdCustom
+                {
+                    ShowtimeId = sh.ShowtimeId,
+                    StartTime = sh.StartTime,
+                    EndTime = sh.EndTime,
+                    MovieId = sh.MovieId,
+                    MovieDuration = sh.MovieDuration,
+                    Status = sh.Status,
+                    MoviePrice = sh.Movie!.MoviePrice,
+                    RoomInstanceCount = sh.ShowtimeRoomInstances.Count(),
+                }).FirstOrDefaultAsync(sh => sh.ShowtimeId == showtimeId);
+
         }
     }
 }
