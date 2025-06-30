@@ -49,6 +49,38 @@ namespace MV.ApplicationLayer.Services
                 throw new CommentAlreadyExistsException("You have already commented on this movie.");
             }
 
+            // Bắt đầu kiểm tra user đã mua vé xem phim này chưa
+            // 1. Lấy tất cả hóa đơn thành công của user
+            var invoices = await _unitOfWork.ticketInvoiceRepository.GetByUserIdAsync(request.UserId);
+            var successfulInvoices = invoices.Where(inv => inv.Status == "Success").ToList();
+
+            bool hasWatchedMovie = false;
+            foreach (var invoice in successfulInvoices)
+            {
+                foreach (var ticketDetail in invoice.TicketDetails)
+                {
+                    // Load ShowtimeRoomInstance và Showtime nếu chưa có
+                    var showtimeRoomInstance = ticketDetail.ShowtimeInstance;
+                    if (showtimeRoomInstance == null)
+                        continue;
+                    var showtime = showtimeRoomInstance.Showtime;
+                    if (showtime == null)
+                        continue;
+                    if (showtime.MovieId == request.MovieId)
+                    {
+                        // Có vé xem phim này
+                        hasWatchedMovie = true;
+                        break;
+                    }
+                }
+                if (hasWatchedMovie) break;
+            }
+
+            if (!hasWatchedMovie)
+            {
+                throw new UniqueConstraintViolationException("You have not purchased tickets to see this movie so you cannot rate/comment.");
+            }
+
             var commentRating = new CommentRating
             {
                 Userid = request.UserId,
