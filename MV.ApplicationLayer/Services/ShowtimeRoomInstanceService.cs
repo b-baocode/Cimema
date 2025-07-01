@@ -63,7 +63,8 @@ namespace MV.ApplicationLayer.Services
                         PairedWithSeatLocation = srDto.PairedWithSeatLocation,
                         SeatStatus = srDto.Status,
                     })
-                .OrderBy(srDto => srDto.SeatDataId)
+                .OrderBy(srDto => srDto.RowLabel)
+                .ThenBy(srtDto => srtDto.ColumnNumber)
                 .ToList()
             };
 

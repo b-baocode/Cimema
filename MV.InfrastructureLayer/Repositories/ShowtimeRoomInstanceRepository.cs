@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
@@ -69,7 +70,7 @@ namespace MV.InfrastructureLayer.Repositories
                     TotalSeatCounts = s.SeatDataForShowtimes.Count(),
                     StandardSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Standard"),
                     VipSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "VIP"),
-                    CoupleSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Couple")/2,
+                    CoupleSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Couple") / 2,
                     RemainSeatsCount = s.SeatDataForShowtimes.Count(sta => sta.Status == "Active"),
                 }).AsQueryable();
 
@@ -108,5 +109,20 @@ namespace MV.InfrastructureLayer.Repositories
                 .Select(sri => sri.RoomName)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<(int movieId, int showtimeId)?> GetShowtimeMovieIdByInstanceId(int? roomInstanceId)
+        {
+            var result = await _context.Set<ShowtimeRoomInstance>()
+                    .Where(r => r.ShowtimeInstanceId == roomInstanceId)
+                    .Select(r => new ValueTuple<int, int>(
+                            r.Showtime.MovieId ?? -1,
+                            r.ShowtimeId
+                    ))
+                    .FirstOrDefaultAsync();
+
+            return result == default ? (-1, -1) : result;
+        }
+
+        
     }
 }

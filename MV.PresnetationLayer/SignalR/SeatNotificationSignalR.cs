@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.QuarztInterfaces;
 using MV.PresnetationLayer.Hubs;
 
 namespace MV.PresnetationLayer.SignalR
 {
-    public class SeatNotificationSignalR
+    public class SeatNotificationSignalR : ISeatNotificationService
     {
         private readonly IHubContext<SeatHub> _hubContext;
         private readonly ILogger<SeatNotificationSignalR> _logger;
