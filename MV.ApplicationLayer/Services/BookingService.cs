@@ -42,12 +42,15 @@ namespace MV.ApplicationLayer.Services
             var user = await _unitOfWork.userRepository.GetByIdAsync(request.UserId);
             if (user == null)
                 throw new Exception("User không tồn tại.");
-
+            //lỗi ở đây
+            
             // 2. Get ShowtimeRoomInstance
-            var showtimeRoomInstance = await _showtimeRoomInstanceService.GetByShowtimeIdAsync(request.ShowtimeId);
+            var showtimeRoomInstance = await _showtimeRoomInstanceService.GetRoomInstanceWithSeatById(request.ShowtimeInstanceId);
+            if (showtimeRoomInstance == null)
+                throw new Exception("ShowtimeRoomInstance không tồn tại cho RoomInstanceId này.");
 
             // 3. Get and validate seats
-            var seatDataDict = await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeRoomInstance.ShowtimeInstanceId);
+            var seatDataDict = await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeRoomInstance.RoomInstanceId);
             var requestedSeatIds = request.Seats.Select(s => s.SeatId).ToList();
             await _seatDataForShowtimeService.ValidateSeatsAsync(requestedSeatIds, seatDataDict);
 
@@ -80,10 +83,7 @@ namespace MV.ApplicationLayer.Services
             }
 
             // 6. Calculate total price
-            decimal totalTicketPrice = request.Seats.Sum(seatReq => 
-                seatDataDict[seatReq.SeatId].SeatTypePrice + 
-                showtimeRoomInstance.RoomTypePrice +
-                (showtimeRoomInstance.MoviePrice ?? 0));
+            decimal totalTicketPrice = 0;
             decimal totalFoodPrice = 0;
             if (request.Foods != null && request.Foods.Any())
             {
@@ -105,10 +105,17 @@ namespace MV.ApplicationLayer.Services
             }
 
             // 7. Create Invoice and associated details
-            var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstance, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
+            var showtimeRoomInstanceEntity = await _showtimeRoomInstanceService.GetByShowtimeInstanceIdAsync(request.ShowtimeInstanceId);
+            if (showtimeRoomInstanceEntity == null)
+                throw new Exception("Không tìm thấy ShowtimeRoomInstance entity cho RoomInstanceId này.");
+            totalTicketPrice = request.Seats.Sum(seatReq => 
+                seatDataDict[seatReq.SeatId].SeatTypePrice + 
+                showtimeRoomInstance.RoomTypePrice +
+                (showtimeRoomInstanceEntity.MoviePrice ?? 0));
+            var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstanceEntity, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
 
             // 8. Update seat status
-            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "InActive", showtimeRoomInstance.ShowtimeInstanceId);
+            await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "InActive", showtimeRoomInstance.RoomInstanceId);
 
             // 9. Update food quantity
             if (request.Foods != null && request.Foods.Any())
@@ -124,9 +131,9 @@ namespace MV.ApplicationLayer.Services
             await _unitOfWork.SaveChangesAsync();
 
             //11. SignalR
-            var showtimeMovieId = await _unitOfWork.showtimeRoomInstanceRepository.GetShowtimeMovieIdByInstanceId(showtimeRoomInstance.ShowtimeInstanceId);
+            var showtimeMovieId = await _unitOfWork.showtimeRoomInstanceRepository.GetShowtimeMovieIdByInstanceId(showtimeRoomInstanceEntity.ShowtimeInstanceId);
             var (movieId, showtimeId) = showtimeMovieId.Value;
-            var groupName = $"{movieId}-{showtimeId}-{showtimeRoomInstance.ShowtimeInstanceId}";
+            var groupName = $"{movieId}-{showtimeId}-{showtimeRoomInstanceEntity.ShowtimeInstanceId}";
 
             string seatIdString = string.Join(", ", requestedSeatIds);
 
@@ -329,7 +336,8 @@ namespace MV.ApplicationLayer.Services
 
             //SignalR
             var showtimeMovieId = await _unitOfWork.showtimeRoomInstanceRepository.GetShowtimeMovieIdByInstanceId(showtimeInstanceId);
-            var (movieId, showtimeId) = showtimeMovieId.Value;
+            int movieId = showtimeMovieId?.movieId ?? -1;
+            int showtimeId = showtimeMovieId?.showtimeId ?? -1;
             var groupName = $"{movieId}-{showtimeId}-{showtimeInstanceId}";
 
             string seatIdString = string.Join(", ", seatIdsToRelease);
