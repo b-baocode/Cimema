@@ -1,5 +1,6 @@
 ﻿using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
+using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -30,5 +31,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
             (RoomGetByTimeRangeForShowtimeAddRequest roomGetByTimeRangeForShowtimeAddRequest);
 
         Task<ShowtimeGetByIdResponse> GetShowtimeByIdWithAllRoomInstance(ShowtimeGetByIdRequest showtimeGetByIdRequest);
+        Task<DataForSeatHub?> GetDataForSeatHub(string movieShowtimeRoomId);
     }
 }

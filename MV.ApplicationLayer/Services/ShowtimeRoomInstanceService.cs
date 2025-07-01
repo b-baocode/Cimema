@@ -63,11 +63,17 @@ namespace MV.ApplicationLayer.Services
                         PairedWithSeatLocation = srDto.PairedWithSeatLocation,
                         SeatStatus = srDto.Status,
                     })
-                .OrderBy(srDto => srDto.SeatDataId)
+                .OrderBy(srDto => srDto.RowLabel)
+                .ThenBy(srtDto => srtDto.ColumnNumber)
                 .ToList()
             };
 
             return searchedResult;
+        }
+
+        public async Task<string?> GetRoomInstanceNameById(int roomInstanceId)
+        {
+            return await _unitOfWork.showtimeRoomInstanceRepository.GetRoomInstanceNameByIdAsync(roomInstanceId);
         }
 
     }

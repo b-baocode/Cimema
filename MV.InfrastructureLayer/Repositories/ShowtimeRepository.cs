@@ -3,6 +3,7 @@ using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
+using System.Text.RegularExpressions;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -251,6 +252,31 @@ namespace MV.InfrastructureLayer.Repositories
                     RoomInstanceCount = sh.ShowtimeRoomInstances.Count(),
                 }).FirstOrDefaultAsync(sh => sh.ShowtimeId == showtimeId);
 
+        }
+
+        public async Task<DataForSeatHub?> GetDataForSeatHubAsync(string movieShowtimeRoomId)
+        {
+            var numbers = Regex.Matches(movieShowtimeRoomId, @"\d+")
+                           .Select(m => m.Value).ToList();
+
+            int movieId = int.Parse(numbers[0]);
+            int showtimeId = int.Parse(numbers[1]);
+            int roomInstanceId = int.Parse(numbers[2]);
+
+            var result = await _context.Set<Showtime>()
+                .Where(sh => sh.ShowtimeId == showtimeId)
+                .Select(r => new DataForSeatHub
+                {
+                    MovieId = movieId,
+                    MovieName = r.Movie != null ? r.Movie.Title : string.Empty,
+                    ShowtimeId = showtimeId,
+                    RoomInstanceId = roomInstanceId,
+                    RoomInstanceName = r.ShowtimeRoomInstances
+                    .Where(sri => sri.ShowtimeInstanceId == roomInstanceId).Select(sri => sri.RoomName).FirstOrDefault()
+                })
+                .FirstOrDefaultAsync();
+
+            return result;
         }
     }
 }

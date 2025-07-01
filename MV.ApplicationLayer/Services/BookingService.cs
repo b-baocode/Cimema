@@ -7,6 +7,7 @@ using MV.ApplicationLayer.DTO.ResponseModel.BookingResponse;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
 using MV.ApplicationLayer.RepositoryInterfaces;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -17,19 +18,22 @@ namespace MV.ApplicationLayer.Services
         private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
         private readonly ITicketInvoiceService _ticketInvoiceService;
         private readonly IScoreService _scoreService;
+        private readonly ISeatNotificationService _seatNotificationService;
 
         public BookingService(
             IUnitOfWork unitOfWork,
             IShowtimeRoomInstanceService showtimeRoomInstanceService,
             ISeatDataForShowtimeService seatDataForShowtimeService,
             ITicketInvoiceService ticketInvoiceService,
-            IScoreService scoreService)
+            IScoreService scoreService,
+            ISeatNotificationService seatNotificationService)
         {
             _unitOfWork = unitOfWork;
             _showtimeRoomInstanceService = showtimeRoomInstanceService;
             _seatDataForShowtimeService = seatDataForShowtimeService;
             _ticketInvoiceService = ticketInvoiceService;
             _scoreService = scoreService;
+            _seatNotificationService = seatNotificationService;
         }
 
         public async Task<BookingResponse> CreateBookingAsync(CreateBookingRequest request)
@@ -119,7 +123,19 @@ namespace MV.ApplicationLayer.Services
             // 10. Save all changes
             await _unitOfWork.SaveChangesAsync();
 
-            // 11. Map to response
+            //11. SignalR
+            var showtimeMovieId = await _unitOfWork.showtimeRoomInstanceRepository.GetShowtimeMovieIdByInstanceId(showtimeRoomInstance.ShowtimeInstanceId);
+            var (movieId, showtimeId) = showtimeMovieId.Value;
+            var groupName = $"{movieId}-{showtimeId}-{showtimeRoomInstance.ShowtimeInstanceId}";
+
+            string seatIdString = string.Join(", ", requestedSeatIds);
+
+            string message = $"The following seat data IDs is booked: {seatIdString}; Status = InActive";
+
+            Console.WriteLine($"Atempting to send message to group: {groupName}");
+            await _seatNotificationService.SendMessageToGroupAsync(groupName, message);
+
+            // 12. Map to response
             return new BookingResponse
             {
                 InvoiceId = invoice.InvoiceId,
@@ -310,6 +326,19 @@ namespace MV.ApplicationLayer.Services
             var seatIdsToRelease = invoice.TicketDetails.Select(td => td.SeatDataId);
             var showtimeInstanceId = invoice.TicketDetails.First().ShowtimeInstanceId;
             await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIdsToRelease, "Active", showtimeInstanceId);
+
+            //SignalR
+            var showtimeMovieId = await _unitOfWork.showtimeRoomInstanceRepository.GetShowtimeMovieIdByInstanceId(showtimeInstanceId);
+            var (movieId, showtimeId) = showtimeMovieId.Value;
+            var groupName = $"{movieId}-{showtimeId}-{showtimeInstanceId}";
+
+            string seatIdString = string.Join(", ", seatIdsToRelease);
+
+            string message = $"The following seat data IDs is cancelled: {seatIdString}; Status = Active";
+
+            Console.WriteLine($"Atempting to send message to group: {groupName}");
+
+            await _seatNotificationService.SendMessageToGroupAsync(groupName, message);
 
             foreach (var ticketDetail in invoice.TicketDetails)
             {

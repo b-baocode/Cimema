@@ -9,6 +9,7 @@ using MV.InfrastructureLayer.Services;
 using MV.PresnetationLayer.Hubs;
 using MV.PresnetationLayer.SignalR;
 using MV.ApplicationLayer.Services.Vnpay;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -75,6 +76,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddSignalR();
 
 builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
+builder.Services.AddScoped<ISeatNotificationService, SeatNotificationSignalR>();
 
 // Configure JWT Authentication using the extension method
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -115,7 +117,7 @@ app.UseWebSockets();
 app.UseCors("AllowReactApp");
 
 app.MapHub<ShowtimeHub>("/showtimeHub");
-
+app.MapHub<SeatHub>("/seatHub");
 
 //app.UseHttpsRedirection();
 

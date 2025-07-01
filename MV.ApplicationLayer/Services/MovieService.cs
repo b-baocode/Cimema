@@ -482,5 +482,10 @@ namespace MV.ApplicationLayer.Services
                 return "Expired";
             }
         }
+
+        public async Task<string?> GetMovieNameById(int movieId)
+        {
+            return await _unitOfWork.movieRepository.GetMovieNameByIdAsync(movieId);
+        }
     }
 }
