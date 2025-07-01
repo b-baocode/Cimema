@@ -14,5 +14,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<GetAllRoomInstanceForShowtime?> GetRoomInstanceByIdAsync(int roomInstanceId);
         Task<string?> GetRoomInstanceNameByIdAsync(int roomInstanceId);
         Task<(int movieId, int showtimeId)?> GetShowtimeMovieIdByInstanceId(int? roomInstanceId);
+
+        Task<IEnumerable<GetAllRoomInstanceForShowtimeForSearch?>> GetAllRoomInstanceForSearchAsync(List<int> showtimeIds);
     }
 } 

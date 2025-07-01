@@ -80,6 +80,34 @@ namespace MV.InfrastructureLayer.Repositories
             .ToListAsync();
         }
 
+        public async Task<IEnumerable<GetAllRoomInstanceForShowtimeForSearch?>> GetAllRoomInstanceForSearchAsync(List<int> showtimeIds)
+        {
+            var resultForPage = _context.Set<ShowtimeRoomInstance>()
+                .AsNoTracking()
+                .Where(s => showtimeIds.Contains(s.ShowtimeId))
+                .OrderBy(s => s.RoomTypePrice)
+                .ThenBy(s => s.RoomName)
+                .Select(s => new GetAllRoomInstanceForShowtimeForSearch
+                {
+                    RoomInstanceId = s.ShowtimeInstanceId,
+                    ShowtimeId = s.ShowtimeId,
+                    RoomName = s.RoomName,
+                    RoomRows = s.RoomRows,
+                    RoomColumns = s.RoomColumns,
+                    RoomTypeName = s.RoomTypeName,
+                    RoomTypePrice = s.RoomTypePrice,
+                    RoomStatus = s.Status,
+                    TotalSeatCounts = s.SeatDataForShowtimes.Count(),
+                    StandardSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Standard"),
+                    VipSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "VIP"),
+                    CoupleSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Couple") / 2,
+                    RemainSeatsCount = s.SeatDataForShowtimes.Count(sta => sta.Status == "Active"),
+                }).AsQueryable();
+
+            return await resultForPage
+            .ToListAsync();
+        }
+
         public async Task<GetAllRoomInstanceForShowtime?> GetRoomInstanceByIdAsync(int roomInstanceId)
         {
             return await _context.Set<ShowtimeRoomInstance>()

@@ -166,6 +166,18 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.showtimeRepository.GetTotalShowtimeCountAsync();
 
+            List<int> showtimeIdsList = new List<int>();
+
+            if (showtimes != null)
+            {
+                foreach (var showtime in showtimes)
+                {
+                    showtimeIdsList.Add(showtime.ShowtimeId);
+                }
+            }
+
+            var listShowtimeInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetAllRoomInstanceForSearchAsync(showtimeIdsList);
+
             var showtimeResponse = showtimes.Select(
                 s => new GetAllShowtimeWithDataOnlyResponse
                 {
@@ -175,6 +187,24 @@ namespace MV.ApplicationLayer.Services
                     MovieId = s.MovieId,
                     MovieTitle = s.MovieTitle,
                     Status = s.Status,
+                    listRoomInstances = listShowtimeInstances
+                    .Where(str => str.ShowtimeId == s.ShowtimeId)
+                    .Select(s => new ShowtimeRoomInstanceForShowtime
+                    {
+                        RoomInstanceId = s.RoomInstanceId,
+                        RoomName = s.RoomName,
+                        RoomRows = s.RoomRows,
+                        RoomColumns = s.RoomColumns,
+                        RoomStatus = s.RoomStatus,
+                        RoomTypeName = s.RoomTypeName,
+                        RoomTypePrice = s.RoomTypePrice,
+                        TotalSeatCounts = s.TotalSeatCounts,
+                        StandardSeatCount = s.StandardSeatCount,
+                        VipSeatCount = s.VipSeatCount,
+                        CoupleSeatCount = s.CoupleSeatCount,
+                        RemainSeatsCount = s.RemainSeatsCount,
+                    })
+                    .ToList()
                 });
 
             return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
@@ -197,6 +227,18 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.showtimeRepository.GetTotalNowShowingShowtimeCountAsync();
 
+            List<int> showtimeIdsList = new List<int>();
+
+            if (showtimes != null)
+            {
+                foreach (var showtime in showtimes)
+                {
+                    showtimeIdsList.Add(showtime.ShowtimeId);
+                }
+            }
+
+            var listShowtimeInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetAllRoomInstanceForSearchAsync(showtimeIdsList);
+
             var showtimeResponse = showtimes.Select(
                 s => new GetAllShowtimeWithDataOnlyResponse
                 {
@@ -206,6 +248,24 @@ namespace MV.ApplicationLayer.Services
                     MovieId = s.MovieId,
                     MovieTitle = s.MovieTitle,
                     Status = s.Status,
+                    listRoomInstances = listShowtimeInstances
+                    .Where(str => str.ShowtimeId == s.ShowtimeId)
+                    .Select(s => new ShowtimeRoomInstanceForShowtime
+                    {
+                        RoomInstanceId = s.RoomInstanceId,
+                        RoomName = s.RoomName,
+                        RoomRows = s.RoomRows,
+                        RoomColumns = s.RoomColumns,
+                        RoomStatus = s.RoomStatus,
+                        RoomTypeName = s.RoomTypeName,
+                        RoomTypePrice = s.RoomTypePrice,
+                        TotalSeatCounts = s.TotalSeatCounts,
+                        StandardSeatCount = s.StandardSeatCount,
+                        VipSeatCount = s.VipSeatCount,
+                        CoupleSeatCount = s.CoupleSeatCount,
+                        RemainSeatsCount = s.RemainSeatsCount,
+                    })
+                    .ToList()
                 });
 
             return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
@@ -228,6 +288,18 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.showtimeRepository.GetTotalScheduledShowtimeCountAsync();
 
+            List<int> showtimeIdsList = new List<int>();
+
+            if (showtimes != null)
+            {
+                foreach (var showtime in showtimes)
+                {
+                    showtimeIdsList.Add(showtime.ShowtimeId);
+                }
+            }
+
+            var listShowtimeInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetAllRoomInstanceForSearchAsync(showtimeIdsList);
+
             var showtimeResponse = showtimes.Select(
                 s => new GetAllShowtimeWithDataOnlyResponse
                 {
@@ -237,6 +309,24 @@ namespace MV.ApplicationLayer.Services
                     MovieId = s.MovieId,
                     MovieTitle = s.MovieTitle,
                     Status = s.Status,
+                    listRoomInstances = listShowtimeInstances
+                    .Where(str => str.ShowtimeId == s.ShowtimeId)
+                    .Select(s => new ShowtimeRoomInstanceForShowtime
+                    {
+                        RoomInstanceId = s.RoomInstanceId,
+                        RoomName = s.RoomName,
+                        RoomRows = s.RoomRows,
+                        RoomColumns = s.RoomColumns,
+                        RoomStatus = s.RoomStatus,
+                        RoomTypeName = s.RoomTypeName,
+                        RoomTypePrice = s.RoomTypePrice,
+                        TotalSeatCounts = s.TotalSeatCounts,
+                        StandardSeatCount = s.StandardSeatCount,
+                        VipSeatCount = s.VipSeatCount,
+                        CoupleSeatCount = s.CoupleSeatCount,
+                        RemainSeatsCount = s.RemainSeatsCount,
+                    })
+                    .ToList()
                 });
 
             return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
@@ -258,6 +348,18 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.showtimeRepository.GetTotalFinishedShowtimeCountAsync();
 
+            List<int> showtimeIdsList = new List<int>();
+
+            if (showtimes != null)
+            {
+                foreach (var showtime in showtimes)
+                {
+                    showtimeIdsList.Add(showtime.ShowtimeId);
+                }
+            }
+
+            var listShowtimeInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetAllRoomInstanceForSearchAsync(showtimeIdsList);
+
             var showtimeResponse = showtimes.Select(
                 s => new GetAllShowtimeWithDataOnlyResponse
                 {
@@ -267,6 +369,24 @@ namespace MV.ApplicationLayer.Services
                     MovieId = s.MovieId,
                     MovieTitle = s.MovieTitle,
                     Status = s.Status,
+                    listRoomInstances = listShowtimeInstances
+                    .Where(str => str.ShowtimeId == s.ShowtimeId)
+                    .Select(s => new ShowtimeRoomInstanceForShowtime
+                    {
+                        RoomInstanceId = s.RoomInstanceId,
+                        RoomName = s.RoomName,
+                        RoomRows = s.RoomRows,
+                        RoomColumns = s.RoomColumns,
+                        RoomStatus = s.RoomStatus,
+                        RoomTypeName = s.RoomTypeName,
+                        RoomTypePrice = s.RoomTypePrice,
+                        TotalSeatCounts = s.TotalSeatCounts,
+                        StandardSeatCount = s.StandardSeatCount,
+                        VipSeatCount = s.VipSeatCount,
+                        CoupleSeatCount = s.CoupleSeatCount,
+                        RemainSeatsCount = s.RemainSeatsCount,
+                    })
+                    .ToList()
                 });
 
             return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
@@ -288,6 +408,18 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.showtimeRepository.GetTotalShowtimeByMovieCountAsync(getAllShowtimeWithDataOnlyByMovieRequest.MovieId);
 
+            List<int> showtimeIdsList = new List<int>();
+
+            if (showtimes != null)
+            {
+                foreach (var showtime in showtimes)
+                {
+                    showtimeIdsList.Add(showtime.ShowtimeId);
+                }
+            }
+
+            var listShowtimeInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetAllRoomInstanceForSearchAsync(showtimeIdsList);
+
             var showtimeResponse = showtimes.Select(
                 s => new GetAllShowtimeWithDataOnlyResponse
                 {
@@ -297,6 +429,24 @@ namespace MV.ApplicationLayer.Services
                     MovieId = s.MovieId,
                     MovieTitle = s.MovieTitle,
                     Status = s.Status,
+                    listRoomInstances = listShowtimeInstances
+                    .Where(str => str.ShowtimeId == s.ShowtimeId)
+                    .Select(s => new ShowtimeRoomInstanceForShowtime
+                    {
+                        RoomInstanceId = s.RoomInstanceId,
+                        RoomName = s.RoomName,
+                        RoomRows = s.RoomRows,
+                        RoomColumns = s.RoomColumns,
+                        RoomStatus = s.RoomStatus,
+                        RoomTypeName = s.RoomTypeName,
+                        RoomTypePrice = s.RoomTypePrice,
+                        TotalSeatCounts = s.TotalSeatCounts,
+                        StandardSeatCount = s.StandardSeatCount,
+                        VipSeatCount = s.VipSeatCount,
+                        CoupleSeatCount = s.CoupleSeatCount,
+                        RemainSeatsCount = s.RemainSeatsCount,
+                    })
+                    .ToList()
                 });
 
             return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
@@ -318,6 +468,18 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.showtimeRepository.GetTotalShowtimeByDateCountAsync(showtimeGetByDateRequest.SearchedDate);
 
+            List<int> showtimeIdsList = new List<int>();
+
+            if (showtimes != null)
+            {
+                foreach (var showtime in showtimes)
+                {
+                    showtimeIdsList.Add(showtime.ShowtimeId);
+                }
+            }
+
+            var listShowtimeInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetAllRoomInstanceForSearchAsync(showtimeIdsList);
+
             var showtimeResponse = showtimes.Select(
                 s => new GetAllShowtimeWithDataOnlyResponse
                 {
@@ -327,6 +489,24 @@ namespace MV.ApplicationLayer.Services
                     MovieId = s.MovieId,
                     MovieTitle = s.MovieTitle,
                     Status = s.Status,
+                    listRoomInstances = listShowtimeInstances
+                    .Where(str => str.ShowtimeId == s.ShowtimeId)
+                    .Select(s => new ShowtimeRoomInstanceForShowtime
+                    {
+                        RoomInstanceId = s.RoomInstanceId,
+                        RoomName = s.RoomName,
+                        RoomRows = s.RoomRows,
+                        RoomColumns = s.RoomColumns,
+                        RoomStatus = s.RoomStatus,
+                        RoomTypeName = s.RoomTypeName,
+                        RoomTypePrice = s.RoomTypePrice,
+                        TotalSeatCounts = s.TotalSeatCounts,
+                        StandardSeatCount = s.StandardSeatCount,
+                        VipSeatCount = s.VipSeatCount,
+                        CoupleSeatCount = s.CoupleSeatCount,
+                        RemainSeatsCount = s.RemainSeatsCount,
+                    })
+                    .ToList()
                 });
 
             return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
@@ -348,6 +528,18 @@ namespace MV.ApplicationLayer.Services
 
             var totalItems = await _unitOfWork.showtimeRepository.GetTotalShowtimeByDateRangeCountAsync(showtimeGetByDateRangeRequest.StartDate, showtimeGetByDateRangeRequest.EndDate);
 
+            List<int> showtimeIdsList = new List<int>();
+
+            if (showtimes != null)
+            {
+                foreach (var showtime in showtimes)
+                {
+                    showtimeIdsList.Add(showtime.ShowtimeId);
+                }
+            }
+
+            var listShowtimeInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetAllRoomInstanceForSearchAsync(showtimeIdsList);
+
             var showtimeResponse = showtimes.Select(
                 s => new GetAllShowtimeWithDataOnlyResponse
                 {
@@ -357,6 +549,24 @@ namespace MV.ApplicationLayer.Services
                     MovieId = s.MovieId,
                     MovieTitle = s.MovieTitle,
                     Status = s.Status,
+                    listRoomInstances = listShowtimeInstances
+                    .Where(str => str.ShowtimeId == s.ShowtimeId)
+                    .Select(s => new ShowtimeRoomInstanceForShowtime
+                    {
+                        RoomInstanceId = s.RoomInstanceId,
+                        RoomName = s.RoomName,
+                        RoomRows = s.RoomRows,
+                        RoomColumns = s.RoomColumns,
+                        RoomStatus = s.RoomStatus,
+                        RoomTypeName = s.RoomTypeName,
+                        RoomTypePrice = s.RoomTypePrice,
+                        TotalSeatCounts = s.TotalSeatCounts,
+                        StandardSeatCount = s.StandardSeatCount,
+                        VipSeatCount = s.VipSeatCount,
+                        CoupleSeatCount = s.CoupleSeatCount,
+                        RemainSeatsCount = s.RemainSeatsCount,
+                    })
+                    .ToList()
                 });
 
             return new PagedResult<GetAllShowtimeWithDataOnlyResponse>
