@@ -116,7 +116,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
                             _scoreService.UseScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, (int?)invoice.ScoresUsed ?? 0).GetAwaiter().GetResult();
                         }
                         // Cộng điểm thưởng cho user
-                        _scoreService.AddScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, (decimal)invoice.ScoreDiscountAmount).GetAwaiter().GetResult();
+                        _scoreService.AddScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, invoice.TotalPrice).GetAwaiter().GetResult();
                     }
                 }
                 else

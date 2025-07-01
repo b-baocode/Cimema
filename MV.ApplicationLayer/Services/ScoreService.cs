@@ -69,9 +69,6 @@ namespace MV.ApplicationLayer.Services
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
-            
-            // Lưu thay đổi vào database
-            await _unitOfWork.SaveChangesAsync();
         }
         /// <summary>
         /// Tính toán discount amount từ điểm (chỉ tính toán, không trừ điểm thực tế)
@@ -132,9 +129,6 @@ namespace MV.ApplicationLayer.Services
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
-            
-            // Lưu thay đổi vào database
-            await _unitOfWork.SaveChangesAsync();
         }
     }
 
