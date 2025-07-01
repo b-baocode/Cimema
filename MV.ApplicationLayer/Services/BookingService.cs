@@ -82,31 +82,32 @@ namespace MV.ApplicationLayer.Services
                     throw new Exception("Mã khuyến mãi đã hết hạn.");
             }
 
-            // 6. Calculate total price
-            decimal totalTicketPrice = 0;
+            // TÍNH TIỀN CHUẨN
+            var showtimeRoomInstanceEntity = await _showtimeRoomInstanceService.GetByShowtimeInstanceIdAsync(request.ShowtimeInstanceId);
+            if (showtimeRoomInstanceEntity == null)
+                throw new Exception("Không tìm thấy ShowtimeRoomInstance entity cho RoomInstanceId này.");
+
+            decimal totalTicketPrice = request.Seats.Sum(seatReq =>
+                seatDataDict[seatReq.SeatId].SeatTypePrice +
+                showtimeRoomInstance.RoomTypePrice +
+                (showtimeRoomInstanceEntity.MoviePrice ?? 0));
+
             decimal totalFoodPrice = 0;
             if (request.Foods != null && request.Foods.Any())
             {
-                totalFoodPrice = request.Foods.Sum(foodReq => 
+                totalFoodPrice = request.Foods.Sum(foodReq =>
                     foods.First(f => f.FoodId == foodReq.FoodId).FoodPrice * foodReq.Quantity);
             }
+
             decimal discountRate = promotion?.DiscountRate ?? 0;
-            decimal totalPrice = (totalTicketPrice + totalFoodPrice) * (1 - discountRate / 100); // Chia cho 100 để chuyển từ % sang decimal
+            decimal totalPrice = (totalTicketPrice + totalFoodPrice) * (1 - discountRate / 100);
             if (totalPrice < 0) totalPrice = 0;
 
-            // 6.1. Calculate final price after score discount
             int scoresUsed = request.ScoresToUse ?? 0;
             decimal finalPrice = totalPrice - scoresUsed;
             if (finalPrice < 0) finalPrice = 0;
 
             // 7. Create Invoice and associated details
-            var showtimeRoomInstanceEntity = await _showtimeRoomInstanceService.GetByShowtimeInstanceIdAsync(request.ShowtimeInstanceId);
-            if (showtimeRoomInstanceEntity == null)
-                throw new Exception("Không tìm thấy ShowtimeRoomInstance entity cho RoomInstanceId này.");
-            totalTicketPrice = request.Seats.Sum(seatReq => 
-                seatDataDict[seatReq.SeatId].SeatTypePrice + 
-                showtimeRoomInstance.RoomTypePrice +
-                (showtimeRoomInstanceEntity.MoviePrice ?? 0));
             var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstanceEntity, seatDataDict, foods, scoresUsed, finalPrice);
 
             // 8. Update seat status
