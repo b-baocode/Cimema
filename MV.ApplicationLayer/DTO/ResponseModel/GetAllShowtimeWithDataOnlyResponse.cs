@@ -19,5 +19,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public DateTime EndTime { get; set; }
 
         public string? Status { get; set; }
+
+        public List<ShowtimeRoomInstanceForShowtime>? listRoomInstances { get; set; }
     }
 }
