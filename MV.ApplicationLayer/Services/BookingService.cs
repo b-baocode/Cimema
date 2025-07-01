@@ -94,15 +94,10 @@ namespace MV.ApplicationLayer.Services
             decimal totalPrice = (totalTicketPrice + totalFoodPrice) * (1 - discountRate / 100); // Chia cho 100 để chuyển từ % sang decimal
             if (totalPrice < 0) totalPrice = 0;
 
-            // 6.1. Calculate score discount
-            decimal scoreDiscountAmount = totalPrice; // Giá sau khi tính điểm = giá trước khi tính điểm
-            int scoresUsed = 0;
-            if (request.ScoresToUse.HasValue && request.ScoresToUse.Value > 0)
-            {
-                scoresUsed = request.ScoresToUse.Value;
-                scoreDiscountAmount = totalPrice - scoresUsed;
-                if (scoreDiscountAmount < 0) scoreDiscountAmount = 0;
-            }
+            // 6.1. Calculate final price after score discount
+            int scoresUsed = request.ScoresToUse ?? 0;
+            decimal finalPrice = totalPrice - scoresUsed;
+            if (finalPrice < 0) finalPrice = 0;
 
             // 7. Create Invoice and associated details
             var showtimeRoomInstanceEntity = await _showtimeRoomInstanceService.GetByShowtimeInstanceIdAsync(request.ShowtimeInstanceId);
@@ -112,7 +107,7 @@ namespace MV.ApplicationLayer.Services
                 seatDataDict[seatReq.SeatId].SeatTypePrice + 
                 showtimeRoomInstance.RoomTypePrice +
                 (showtimeRoomInstanceEntity.MoviePrice ?? 0));
-            var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstanceEntity, seatDataDict, foods, scoresUsed, scoreDiscountAmount);
+            var invoice = await _ticketInvoiceService.CreateInvoiceAsync(request, user, promotion, totalPrice, showtimeRoomInstanceEntity, seatDataDict, foods, scoresUsed, finalPrice);
 
             // 8. Update seat status
             await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "InActive", showtimeRoomInstance.RoomInstanceId);
