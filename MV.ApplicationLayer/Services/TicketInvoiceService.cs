@@ -91,6 +91,7 @@ namespace MV.ApplicationLayer.Services
         public async Task UpdateAsync(TicketInvoice invoice)
         {
             await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int invoiceId)
