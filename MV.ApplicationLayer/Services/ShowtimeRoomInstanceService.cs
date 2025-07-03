@@ -76,5 +76,10 @@ namespace MV.ApplicationLayer.Services
             return await _unitOfWork.showtimeRoomInstanceRepository.GetRoomInstanceNameByIdAsync(roomInstanceId);
         }
 
+        public async Task<ShowtimeRoomInstance?> GetByShowtimeInstanceIdAsync(int showtimeInstanceId)
+        {
+            return await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdAsync(showtimeInstanceId);
+        }
+
     }
 } 
