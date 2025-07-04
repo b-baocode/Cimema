@@ -7,5 +7,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<int> GetStandardSeatTypeIdAsync();
 
         Task<SeatType?> GetSeatTypeByIdAsync(int seatTypeId);
+
+        Task<SeatType?> GetByIdAsync(int id);
     }
 }

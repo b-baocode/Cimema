@@ -157,5 +157,10 @@ namespace MV.InfrastructureLayer.Repositories
                 .Include(sri => sri.SeatDataForShowtimes)
                 .FirstOrDefaultAsync(sri => sri.ShowtimeInstanceId == showtimeInstanceId);
         }
+
+        public async Task<ShowtimeRoomInstance?> GetByIdAsync(int id)
+        {
+            return await _context.ShowtimeRoomInstances.FindAsync(id);
+        }
     }
 }

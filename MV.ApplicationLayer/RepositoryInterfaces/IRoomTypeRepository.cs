@@ -21,5 +21,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
 
         Task<RoomType?> GetRoomTypeByIdWithoutRoomAsync(int roomTypeId);
 
+        Task<RoomType?> GetByIdAsync(int id);
     }
 }

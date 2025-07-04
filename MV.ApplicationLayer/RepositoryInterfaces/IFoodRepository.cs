@@ -12,5 +12,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<Food> CreateFoodAsync(Food food);
         Task<Food> UpdateFoodAsync(Food food);
         Task DeleteFoodAsync(int id);
+        Task<Food?> GetByIdAsync(int id);
     }
 }

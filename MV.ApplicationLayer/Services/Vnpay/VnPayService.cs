@@ -25,6 +25,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
         private readonly IUserRepository _userRepository;
         private readonly IScoreService _scoreService;
         private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
+        private readonly IQrCodeService _qrCodeService;
 
         public VnpayService(
             IConfiguration configuration,
@@ -33,7 +34,8 @@ namespace MV.ApplicationLayer.Services.Vnpay
             IScoreService scoreService,
             ISeatDataForShowtimeService seatDataForShowtimeService,
             IEmailService emailService,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IQrCodeService qrCodeService
         )
         {
             _configuration = configuration;
@@ -43,6 +45,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
             _seatDataForShowtimeService = seatDataForShowtimeService;
             _emailService = emailService;
             _userRepository = userRepository;
+            _qrCodeService = qrCodeService;
         }
 
         public string CreatePaymentUrl(PaymentInformationRequest model, double amount, HttpContext context)
@@ -140,7 +143,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
                     return;
 
                 var emailSubject = "🎬 Thanh toán thành công - Premium Cinema";
-                var emailBody = GeneratePaymentSuccessEmailBody(user, invoice, payment);
+                var emailBody = await GeneratePaymentSuccessEmailBodyAsync(user, invoice, payment);
                 
                 await _emailService.SendEmailAsync(user.Email, emailSubject, emailBody);
             }
@@ -151,10 +154,13 @@ namespace MV.ApplicationLayer.Services.Vnpay
             }
         }
 
-        private string GeneratePaymentSuccessEmailBody(User user, TicketInvoice invoice, PaymentOnline payment)
+        private async Task<string> GeneratePaymentSuccessEmailBodyAsync(User user, TicketInvoice invoice, PaymentOnline payment)
         {
             var paymentDate = payment.CreatedAt.ToString("dd/MM/yyyy HH:mm");
             var amount = payment.Amount.ToString("N0") + " VNĐ";
+            
+            // Tạo QR code cho booking
+            var qrCodeBase64 = await _qrCodeService.GenerateQrCodeAsync(invoice.InvoiceId);
             
             return $@"
             <!DOCTYPE html>
@@ -340,6 +346,15 @@ namespace MV.ApplicationLayer.Services.Vnpay
                     </div>
                     <p style=""color: #4CAF50; font-weight: bold;"">🎉 Giao dịch của bạn đã được xử lý thành công!</p>
                     <p style=""color: #ccc; font-size: 14px;"">Vui lòng kiểm tra email để xem thông tin chi tiết về vé và suất chiếu.</p>
+                    
+                    <div class=""qr-section"">
+                        <h3>🎫 Mã QR Check-in</h3>
+                        <p style=""color: #ccc; font-size: 14px;"">Vui lòng xuất trình mã QR này khi đến rạp để check-in và nhận vé.</p>
+                        <div class=""qr-container"">
+                            <img src=""data:image/png;base64,{qrCodeBase64}"" alt=""QR Code"" style=""width: 200px; height: 200px; border: 2px solid #4CAF50; border-radius: 10px;"" />
+                        </div>
+                        <p style=""color: #FFD700; font-size: 12px; margin-top: 10px;"">📱 Bạn có thể lưu ảnh này vào điện thoại hoặc in ra để sử dụng</p>
+                    </div>
                   </div>
                   <div class=""support"">
                     <h3>Hỗ trợ khách hàng</h3>

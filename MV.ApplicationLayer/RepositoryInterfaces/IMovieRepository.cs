@@ -26,5 +26,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<int> GetTotalMoviesByPriceRangeAsync(decimal minPrice, decimal maxPrice, string? keyword);
 
         Task<string?> GetMovieNameByIdAsync(int movieId);
+
+        Task<Movie?> GetByIdAsync(int id);
     }
 }

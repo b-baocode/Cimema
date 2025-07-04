@@ -23,6 +23,10 @@ public partial class TicketInvoice
 
     public string PaymentType { get; set; } = null!;
 
+    public bool? IsCheckedIn { get; set; }
+
+    public DateTime? CheckInTime { get; set; }
+
     public virtual ICollection<PaymentOnline> PaymentOnlines { get; set; } = new List<PaymentOnline>();
 
     public virtual ICollection<PaymentUpFront> PaymentUpFronts { get; set; } = new List<PaymentUpFront>();

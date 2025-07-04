@@ -76,5 +76,10 @@ namespace MV.InfrastructureLayer.Repositories
                 await _context.SaveChangesAsync();
             }
         }
+
+        public async Task<Food?> GetByIdAsync(int id)
+        {
+            return await _context.Foods.FindAsync(id);
+        }
     }
 }

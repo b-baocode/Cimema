@@ -94,5 +94,10 @@ namespace MV.InfrastructureLayer.Repositories
             return await _context.Set<RoomType>()
                 .FirstOrDefaultAsync(r => r.RoomTypeId == roomTypeId);
         }
+
+        public async Task<RoomType?> GetByIdAsync(int id)
+        {
+            return await _context.RoomTypes.FindAsync(id);
+        }
     }
 }

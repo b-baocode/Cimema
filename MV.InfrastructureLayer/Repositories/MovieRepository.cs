@@ -366,5 +366,10 @@ namespace MV.InfrastructureLayer.Repositories
                 .Select(m => m.Title)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<Movie?> GetByIdAsync(int id)
+        {
+            return await _context.Movies.FindAsync(id);
+        }
     }
 }

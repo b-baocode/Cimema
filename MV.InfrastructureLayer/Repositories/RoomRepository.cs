@@ -113,5 +113,10 @@ namespace MV.InfrastructureLayer.Repositories
                 })
                 .ToListAsync();
         }
+
+        public async Task<CinemaRoom?> GetByIdAsync(int id)
+        {
+            return await _context.CinemaRooms.FindAsync(id);
+        }
     }
 }

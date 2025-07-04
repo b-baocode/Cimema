@@ -88,6 +88,10 @@ namespace MV.InfrastructureLayer.Configuration
             // Add VnPay services
             services.AddScoped<IVnPayService, MV.ApplicationLayer.Services.Vnpay.VnpayService>();
 
+            // Add QR Code and Check-in services
+            services.AddScoped<IQrCodeService, MV.ApplicationLayer.Services.QrCodeService>();
+            services.AddScoped<ICheckInService, MV.ApplicationLayer.Services.CheckInService>();
+
             return services;
         }
     }

@@ -21,5 +21,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<int> GetTotalRoomForInstanceCountAsync(IEnumerable<int> listUnAvailableRoomId);
 
         Task<IEnumerable<RoomForShowtimeRoomInstanceAdd>> GetListRoomDataForShowtimeAddAsync(List<int> orginalRoomIdsList);
+
+        Task<CinemaRoom?> GetByIdAsync(int id);
     }
 }
