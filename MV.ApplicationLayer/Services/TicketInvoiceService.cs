@@ -1,4 +1,5 @@
 using MV.ApplicationLayer.DTO.RequestModel.BookingRequest;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
@@ -13,11 +14,13 @@ namespace MV.ApplicationLayer.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
+        private readonly ISeatNotificationService _seatNotificationService;
 
-        public TicketInvoiceService(IUnitOfWork unitOfWork, ISeatDataForShowtimeService seatDataForShowtimeService)
+        public TicketInvoiceService(IUnitOfWork unitOfWork, ISeatDataForShowtimeService seatDataForShowtimeService, ISeatNotificationService seatNotificationService)
         {
             _unitOfWork = unitOfWork;
             _seatDataForShowtimeService = seatDataForShowtimeService;
+            _seatNotificationService = seatNotificationService;
         }
 
         public async Task<TicketInvoice> CreateInvoiceAsync(
@@ -98,13 +101,26 @@ namespace MV.ApplicationLayer.Services
                 // Lấy danh sách seatId và showtimeInstanceId từ TicketDetails
                 var seatIds = invoice.TicketDetails.Select(td => td.SeatDataId).ToList();
                 var showtimeInstanceId = invoice.TicketDetails.FirstOrDefault()?.ShowtimeInstanceId;
-                
+
                 if (seatIds.Any() && showtimeInstanceId.HasValue)
                 {
+                    
                     // Cập nhật trạng thái ghế về "Active" khi payment thất bại hoặc xóa invoice
                     await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
                     // Đảm bảo lưu thay đổi trạng thái ghế vào database
                     await _unitOfWork.SaveChangesAsync();
+
+                    //SignalR
+                    var showtimeMovieId = await _unitOfWork.showtimeRoomInstanceRepository.GetShowtimeMovieIdByInstanceId(showtimeInstanceId);
+                    var (movieId, showtimeId) = showtimeMovieId.Value;
+                    var groupName = $"{movieId}-{showtimeId}-{showtimeInstanceId}";
+
+                    string seatIdString = string.Join(", ", seatIds);
+
+                    string message = $"The following seat data IDs is cancelled: {seatIdString}; Status = Active";
+
+                    Console.WriteLine($"Atempting to send message to group: {groupName}");
+                    await _seatNotificationService.SendMessageToGroupAsync(groupName, message);
                 }
                 
                 // Xóa invoice và tất cả dữ liệu liên quan

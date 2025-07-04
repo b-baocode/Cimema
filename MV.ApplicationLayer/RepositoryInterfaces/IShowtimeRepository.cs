@@ -23,5 +23,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<int> GetTotalShowtimeByDateRangeCountAsync(DateOnly fromDate, DateOnly toDate);
         Task<IEnumerable<GetAllShowtimeDataOnlyCustom?>> GetShowtimeWithDataOnlyByDateRangeAsync(int skip, int take, DateOnly fromDate, DateOnly toDate);
         Task<GetShowtimeByIdCustom?> GetShowtimeByIdAsync(int showtimeId);
+        Task<DataForSeatHub?> GetDataForSeatHubAsync(string movieShowtimeRoomId);
     }
 }

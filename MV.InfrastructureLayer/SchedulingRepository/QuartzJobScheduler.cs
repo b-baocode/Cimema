@@ -29,6 +29,7 @@ namespace MV.InfrastructureLayer.SchedulingRepository
             var startTrigger = TriggerBuilder.Create()
                 .WithIdentity($"showtime-trigger-start-{showtime.ShowtimeId}")
                 .StartAt(startTimeOffset)
+                .WithPriority(10)
                 .WithSimpleSchedule(x => x
                     .WithMisfireHandlingInstructionFireNow()
                     .WithRepeatCount(0))
@@ -43,6 +44,7 @@ namespace MV.InfrastructureLayer.SchedulingRepository
             var endTrigger = TriggerBuilder.Create()
                 .WithIdentity($"showtime-trigger-end-{showtime.ShowtimeId}")
                 .StartAt(endTimeOffset)
+                .WithPriority(5)
                 .WithSimpleSchedule(x => x
                     .WithMisfireHandlingInstructionFireNow()
                     .WithRepeatCount(0))

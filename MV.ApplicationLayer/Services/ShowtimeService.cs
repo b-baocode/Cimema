@@ -474,5 +474,10 @@ namespace MV.ApplicationLayer.Services
 
             return finalResult;
         }
+
+        public async Task<DataForSeatHub?> GetDataForSeatHub(string movieShowtimeRoomId)
+        {
+            return await _unitOfWork.showtimeRepository.GetDataForSeatHubAsync(movieShowtimeRoomId);
+        }
     }
 }
