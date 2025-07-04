@@ -9,7 +9,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    // [Authorize(Roles = "Admin,Manager")]
+     [Authorize(Roles = "Admin,Manager")]
     public class MovieController : ControllerBase
     {
         private readonly IMovieService _movieService;
@@ -85,6 +85,7 @@ namespace MV.PresnetationLayer.Controllers
 
         [HttpGet("{id}")]
         [AllowAnonymous]
+        //[Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<MovieResponse>> GetMovie(int id)
         {
             var movie = await _movieService.GetMovieByIdAsync(id);

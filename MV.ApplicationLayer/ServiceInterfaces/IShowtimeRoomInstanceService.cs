@@ -11,5 +11,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<ShowTimeRoomInstanceGetByIdResponse?> GetRoomInstanceWithSeatById(int roomInstanceId);
 
         Task<string?> GetRoomInstanceNameById(int roomInstanceId);
+
+        Task<ShowtimeRoomInstance?> GetByShowtimeInstanceIdAsync(int showtimeInstanceId);
     }
 } 
