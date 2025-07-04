@@ -84,7 +84,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [AllowAnonymous]
         public async Task<ActionResult<MovieResponse>> GetMovie(int id)
         {
             var movie = await _movieService.GetMovieByIdAsync(id);
