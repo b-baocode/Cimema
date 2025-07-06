@@ -733,6 +733,39 @@ namespace MV.PresnetationLayer.Controllers
                 });
             }
         }
+
+        /// <summary>
+        /// Test API để kiểm tra QR code generation
+        /// </summary>
+        /// <returns>QR code base64 string</returns>
+        [HttpGet("test-qr")]
+        public async Task<IActionResult> TestQrCode()
+        {
+            try
+            {
+                var testText = "🎬 COSMOCINÉ\n═══════════════════════════════════════\n📽️ PHIM: Avengers: Endgame\n📅 NGÀY CHIẾU: 15/12/2024\n🕐 GIỜ CHIẾU: 19:30\n🎭 PHÒNG: Phòng 1\n💺 GHẾ: A1, A2\n🆔 MÃ ĐƠN HÀNG: #12345\n👤 NGƯỜI MUA: Nguyễn Văn A\n💰 TỔNG TIỀN: 200,000 VNĐ\n📊 ĐIỂM SỬ DỤNG: 0\n🎫 GIẢM GIÁ: 0 VNĐ\n═══════════════════════════════════════\n🎉 Cảm ơn bạn đã sử dụng dịch vụ!\n📞 Hotline: 0776743504";
+                
+                var qrCodeBase64 = await _qrCodeService.GenerateSimpleQrCodeAsync(testText);
+                
+                if (string.IsNullOrEmpty(qrCodeBase64))
+                {
+                    return BadRequest("Không thể tạo QR code");
+                }
+                
+                return Ok(new { 
+                    success = true, 
+                    qrCode = qrCodeBase64,
+                    message = "QR code được tạo thành công"
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { 
+                    success = false, 
+                    message = $"Lỗi tạo QR code: {ex.Message}" 
+                });
+            }
+        }
     }
 
     public class TestPaymentEmailRequest
