@@ -1,4 +1,5 @@
 using MV.ApplicationLayer.DTO.RequestModel.BookingRequest;
+using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
@@ -15,12 +16,18 @@ namespace MV.ApplicationLayer.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
         private readonly ISeatNotificationService _seatNotificationService;
+        private readonly IQrCodeService _qrCodeService;
 
-        public TicketInvoiceService(IUnitOfWork unitOfWork, ISeatDataForShowtimeService seatDataForShowtimeService, ISeatNotificationService seatNotificationService)
+        public TicketInvoiceService(
+            IUnitOfWork unitOfWork, 
+            ISeatDataForShowtimeService seatDataForShowtimeService, 
+            ISeatNotificationService seatNotificationService,
+            IQrCodeService qrCodeService)
         {
             _unitOfWork = unitOfWork;
             _seatDataForShowtimeService = seatDataForShowtimeService;
             _seatNotificationService = seatNotificationService;
+            _qrCodeService = qrCodeService;
         }
 
         public async Task<TicketInvoice> CreateInvoiceAsync(
@@ -127,6 +134,121 @@ namespace MV.ApplicationLayer.Services
                 // Xóa invoice và tất cả dữ liệu liên quan
                 await _unitOfWork.ticketInvoiceRepository.DeleteAsync(invoiceId);
             }
+        }
+
+        public async Task<List<TicketResponse>> GetTicketsByUserIdAsync(string userId)
+        {
+            var invoices = await _unitOfWork.ticketInvoiceRepository.GetByUserIdAsync(userId);
+            var ticketResponses = new List<TicketResponse>();
+
+            foreach (var invoice in invoices)
+            {
+                var ticketResponse = new TicketResponse
+                {
+                    InvoiceId = invoice.InvoiceId,
+                    CreatedAt = invoice.CreatedAt,
+                    TotalPrice = invoice.TotalPrice,
+                    Status = invoice.Status ?? "Unknown",
+                    PaymentType = invoice.PaymentType,
+                    TicketDetails = new List<TicketDetailResponse>(),
+                    FoodItems = new List<TicketFoodItemResponse>()
+                };
+
+                // Convert TicketDetails
+                foreach (var detail in invoice.TicketDetails)
+                {
+                    var ticketDetailResponse = new TicketDetailResponse
+                    {
+                        TicketDetailId = detail.SeatDataId, // Use SeatDataId as unique identifier
+                        TicketPrice = detail.TicketPrice,
+                        Status = detail.Status ?? "Unknown",
+                        ShowtimeInstanceId = detail.ShowtimeInstanceId,
+                        SeatDataId = detail.SeatDataId
+                    };
+
+                    // Get additional information for each ticket detail
+                    var showtimeInstance = await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdAsync(detail.ShowtimeInstanceId);
+                    if (showtimeInstance != null)
+                    {
+                        var movie = showtimeInstance.Showtime.MovieId.HasValue 
+                            ? await _unitOfWork.movieRepository.GetMovieByIdAsync(showtimeInstance.Showtime.MovieId.Value)
+                            : null;
+                        var room = await _unitOfWork.roomRepository.GetRoomByIdAsync(showtimeInstance.OriginalRoomId);
+                        var seatData = await _unitOfWork.seatDataForShowtimeRepository.GetSeatDataAsync(detail.SeatDataId);
+                        
+                        // Get seat name from seat data
+                        string? seatName = null;
+                        if (seatData != null)
+                        {
+                            // Use row and column information to create seat name
+                            seatName = $"{seatData.RowLabel}{seatData.ColumnNumber}";
+                        }
+
+                        ticketDetailResponse.MovieName = movie?.Title;
+                        ticketDetailResponse.RoomName = room?.Name;
+                        ticketDetailResponse.ShowtimeDate = showtimeInstance.ActualStartTime;
+                        ticketDetailResponse.SeatName = seatName;
+                    }
+
+                    ticketResponse.TicketDetails.Add(ticketDetailResponse);
+                }
+
+                // Convert FoodItems
+                foreach (var foodItem in invoice.TicketInvoiceFoodItems)
+                {
+                    var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(foodItem.FoodId);
+                    var foodItemResponse = new TicketFoodItemResponse
+                    {
+                        FoodId = foodItem.FoodId,
+                        FoodName = food?.FoodName ?? "Unknown Food",
+                        BoughtQuantity = foodItem.BoughtQuantity,
+                        TotalFoodPrice = foodItem.TotalFoodPrice
+                    };
+                    ticketResponse.FoodItems.Add(foodItemResponse);
+                }
+
+                // Generate QR code for the ticket
+                ticketResponse.QrCode = await GenerateTicketQrCodeAsync(invoice.InvoiceId);
+
+                ticketResponses.Add(ticketResponse);
+            }
+
+            return ticketResponses;
+        }
+
+        public async Task<bool> CheckTicketAsync(int ticketId)
+        {
+            var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(ticketId);
+            if (invoice == null)
+            {
+                return false;
+            }
+
+            // Update ticket status to "Checked"
+            invoice.Status = "Checked";
+            await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
+            await _unitOfWork.SaveChangesAsync();
+
+            // Update all ticket details status to "Checked"
+            foreach (var detail in invoice.TicketDetails)
+            {
+                detail.Status = "Checked";
+            }
+            await _unitOfWork.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<string> GenerateTicketQrCodeAsync(int ticketId)
+        {
+            var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(ticketId);
+            if (invoice == null)
+            {
+                throw new ArgumentException($"Ticket with ID {ticketId} not found");
+            }
+
+            // Generate QR code containing only the ticket ID for scanning
+            return await _qrCodeService.GenerateSimpleQrCodeAsync(ticketId.ToString());
         }
     }
 } 
