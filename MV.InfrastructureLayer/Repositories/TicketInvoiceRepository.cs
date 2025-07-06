@@ -40,6 +40,16 @@ namespace MV.InfrastructureLayer.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<TicketInvoice>> GetByUserIdAndStatusAsync(string userId, string status)
+        {
+            return await _context.TicketInvoices
+                .Include(ti => ti.TicketDetails)
+                .Include(ti => ti.TicketInvoiceFoodItems)
+                .Include(ti => ti.Promotion)
+                .Where(ti => ti.Userid == userId && ti.Status == status)
+                .ToListAsync();
+        }
+
         public async Task<List<TicketInvoice>> GetAllAsync()
         {
             return await _context.TicketInvoices

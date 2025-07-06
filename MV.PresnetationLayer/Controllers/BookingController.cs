@@ -40,7 +40,7 @@ namespace MV.PresnetationLayer.Controllers
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetBookingsByUserId(string userId)
         {
-            var result = await _bookingService.GetBookingsByUserAsync(userId);
+            var result = await _bookingService.GetBookingsByUserAndStatusAsync(userId, "Success");
             return Ok(result);
         }
 
