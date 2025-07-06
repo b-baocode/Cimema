@@ -95,7 +95,7 @@ namespace MV.ApplicationLayer.Services
                 // Footer
                 sb.AppendLine("═══════════════════════════════════════");
                 sb.AppendLine("🎉 Cảm ơn bạn đã sử dụng dịch vụ!");
-                sb.AppendLine("📞 Hotline: 0776743504");
+                sb.AppendLine("📞 Hotline: 0775743304");
                 
                 return sb.ToString();
             }

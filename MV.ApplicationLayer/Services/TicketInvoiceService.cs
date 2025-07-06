@@ -250,5 +250,51 @@ namespace MV.ApplicationLayer.Services
             // Generate QR code containing only the ticket ID for scanning
             return await _qrCodeService.GenerateSimpleQrCodeAsync(ticketId.ToString());
         }
+
+        public async Task<TicketDetailFullResponse> GetTicketDetailByInvoiceIdAsync(int invoiceId)
+        {
+            var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
+            if (invoice == null)
+                return null;
+
+            // Lấy thông tin showtime, movie, room, seat, user, ...
+            var ticketDetail = invoice.TicketDetails.FirstOrDefault();
+            if (ticketDetail == null)
+                return null;
+
+            var showtimeInstance = await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdWithDetailsAsync(ticketDetail.ShowtimeInstanceId);
+            var movie = showtimeInstance?.Showtime?.Movie;
+            var room = await _unitOfWork.roomRepository.GetRoomByIdAsync(showtimeInstance.OriginalRoomId);
+            var seatData = await _unitOfWork.seatDataForShowtimeRepository.GetSeatDataAsync(ticketDetail.SeatDataId);
+            var seat = seatData != null ? await _unitOfWork.seatRepository.GetSeatByIdAsync(seatData.SeatDataId) : null;
+            var user = await _unitOfWork.userRepository.GetByIdAsync(invoice.Userid);
+
+            // Tạo QR code
+            var seatNames = new List<string> { seatData != null ? $"{seatData.RowLabel}{seatData.ColumnNumber}" : "N/A" };
+            var qrCode = await _qrCodeService.GenerateBookingQrCodeAsync(invoice, user, showtimeInstance, seatNames);
+
+            return new TicketDetailFullResponse
+            {
+                Id = ticketDetail.SeatDataId.ToString(),
+                ShowTimeSeatId = ticketDetail.ShowtimeInstanceId.ToString(),
+                SeatName = seatData != null ? $"{seatData.RowLabel}{seatData.ColumnNumber}" : "N/A",
+                CoupleShowTimeSeatId = null,
+                SeatCoupleName = null,
+                ScheduleId = showtimeInstance?.ShowtimeId.ToString(),
+                ShowTimeId = showtimeInstance?.ShowtimeId.ToString(),
+                MovieId = movie?.MovieId.ToString(),
+                MovieName = movie?.Title,
+                MoviePoster = movie?.Poster,
+                MovieNews = "",
+                RoomId = room?.RoomId.ToString(),
+                RoomName = room?.Name,
+                Status = ticketDetail.Status,
+                TicketType = "Normal",
+                MovieType = "",
+                Price = (int)ticketDetail.TicketPrice,
+                QrCodeBase64 = qrCode,
+                UserId = invoice.Userid
+            };
+        }
     }
 } 

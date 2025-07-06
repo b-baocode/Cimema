@@ -99,5 +99,19 @@ namespace MV.PresnetationLayer.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Lấy chi tiết vé theo InvoiceId
+        /// </summary>
+        [HttpGet("{invoiceId}")]
+        public async Task<ActionResult<TicketDetailFullResponse>> GetTicketDetailByInvoiceId(int invoiceId)
+        {
+            if (invoiceId <= 0)
+                return BadRequest("Invalid invoiceId");
+            var result = await _ticketInvoiceService.GetTicketDetailByInvoiceIdAsync(invoiceId);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
     }
 } 

@@ -103,6 +103,14 @@ namespace MV.PresnetationLayer.Controllers
                 if (invoice == null)
                     return NotFound("Không tìm thấy invoice");
 
+                // Kiểm tra invoice có thuộc về user này không
+                if (invoice.Userid != request.UserId)
+                    return BadRequest("Invoice không thuộc về user này");
+
+                // Kiểm tra invoice có ticket details không
+                if (invoice.TicketDetails == null || !invoice.TicketDetails.Any())
+                    return BadRequest("Invoice không có thông tin vé");
+
                 // Tạo mock payment data
                 var mockPayment = new PaymentOnline
                 {
@@ -692,6 +700,10 @@ namespace MV.PresnetationLayer.Controllers
                 var invoice = await _ticketInvoiceService.GetByIdAsync(request.InvoiceId);
                 if (invoice == null)
                     return NotFound("Không tìm thấy invoice");
+
+                // Kiểm tra invoice có thuộc về user này không
+                if (invoice.Userid != request.UserId)
+                    return BadRequest("Invoice không thuộc về user này");
 
                 // Kiểm tra invoice có ticket details không
                 if (invoice.TicketDetails == null || !invoice.TicketDetails.Any())

@@ -28,5 +28,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<List<TicketResponse>> GetTicketsByUserIdAsync(string userId);
         Task<bool> CheckTicketAsync(int ticketId);
         Task<string> GenerateTicketQrCodeAsync(int ticketId);
+
+        Task<TicketDetailFullResponse> GetTicketDetailByInvoiceIdAsync(int invoiceId);
     }
 } 

@@ -35,4 +35,27 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public int BoughtQuantity { get; set; }
         public decimal TotalFoodPrice { get; set; }
     }
+
+    public class TicketDetailFullResponse
+    {
+        public string Id { get; set; }
+        public string ShowTimeSeatId { get; set; }
+        public string SeatName { get; set; }
+        public string? CoupleShowTimeSeatId { get; set; }
+        public string? SeatCoupleName { get; set; }
+        public string ScheduleId { get; set; }
+        public string ShowTimeId { get; set; }
+        public string MovieId { get; set; }
+        public string MovieName { get; set; }
+        public string MoviePoster { get; set; }
+        public string MovieNews { get; set; }
+        public string RoomId { get; set; }
+        public string RoomName { get; set; }
+        public string Status { get; set; }
+        public string TicketType { get; set; }
+        public string MovieType { get; set; }
+        public int Price { get; set; }
+        public string QrCodeBase64 { get; set; }
+        public string UserId { get; set; }
+    }
 } 
