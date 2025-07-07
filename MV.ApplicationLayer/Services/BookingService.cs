@@ -319,11 +319,11 @@ namespace MV.ApplicationLayer.Services
             var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
             if (invoice == null)
                 throw new Exception($"Không tìm thấy hóa đơn với id {invoiceId}");
-            if (invoice.Status == "Canceled")
+            if (invoice.Status == "Cancelled")
                 return false;
 
             // Cập nhật trạng thái hóa đơn
-            invoice.Status = "Canceled";
+            invoice.Status = "Cancelled";
 
             // Cập nhật trạng thái ghế về "Active" (có thể đặt lại)
             var seatIdsToRelease = invoice.TicketDetails.Select(td => td.SeatDataId);
@@ -338,7 +338,7 @@ namespace MV.ApplicationLayer.Services
 
             string seatIdString = string.Join(", ", seatIdsToRelease);
 
-            string message = $"The following seat data IDs is cancelled: {seatIdString}; Status = Active";
+            string message = $"The following seat data IDs is Cancelled: {seatIdString}; Status = Active";
 
             Console.WriteLine($"Atempting to send message to group: {groupName}");
 
@@ -346,7 +346,7 @@ namespace MV.ApplicationLayer.Services
 
             foreach (var ticketDetail in invoice.TicketDetails)
             {
-                ticketDetail.Status = "Canceled";
+                ticketDetail.Status = "Cancelled";
             }
             
             await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);

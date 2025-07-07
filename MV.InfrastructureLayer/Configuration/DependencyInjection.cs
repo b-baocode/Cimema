@@ -57,6 +57,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
             services.AddScoped<IPaymentOnlineRepository, PaymentOnlineRepository>();
+            services.AddScoped<IShowtimeRoomInstanceRepository, ShowtimeRoomInstanceRepository>();
 
 
             //Service injection
@@ -87,6 +88,9 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IJobScheduler, QuartzJobScheduler>();
             // Add VnPay services
             services.AddScoped<IVnPayService, MV.ApplicationLayer.Services.Vnpay.VnpayService>();
+            
+            // Add QR Code services
+            services.AddScoped<IQrCodeService, QrCodeService>();
 
             return services;
         }
