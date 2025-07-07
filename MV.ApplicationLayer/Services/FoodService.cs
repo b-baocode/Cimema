@@ -44,7 +44,7 @@ namespace MV.ApplicationLayer.Services
             // Check if food name already exists
             var existingFood = await _unitOfWork.foodRepository.GetFoodByNameAsync(request.FoodName);
             if (existingFood != null)
-                throw new ValidationException("Food with this name already exists");
+                throw new ValidationException("Food with this name already exists.");
 
             // --- BẮT ĐẦU THAY ĐỔI ---
             string posterUrl;
@@ -61,7 +61,7 @@ namespace MV.ApplicationLayer.Services
             // Get food categories
             var foodCategories = await _unitOfWork.foodCategoryRepository.GetFoodCategoriesByIdsAsync(request.FoodCateIds);
             if (!foodCategories.Any())
-                throw new ValidationException("No valid food categories found for the provided category IDs");
+                throw new ValidationException("No valid food categories found for the provided category IDs.");
 
             var food = new Food
             {
@@ -88,15 +88,15 @@ namespace MV.ApplicationLayer.Services
         {
             var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(id);
             if (food == null)
-                throw new ValidationException("Food not found");
+                throw new ValidationException("Food not found.");
 
             var existingFood = await _unitOfWork.foodRepository.GetFoodByNameAsync(request.FoodName);
             if (existingFood != null && existingFood.FoodId != id)
-                throw new ValidationException("Food with this name already exists");
+                throw new ValidationException("Food with this name already exists.");
 
             var foodCategories = await _unitOfWork.foodCategoryRepository.GetFoodCategoriesByIdsAsync(request.FoodCateIds);
             if (!foodCategories.Any())
-                throw new ValidationException("No valid food categories found for the provided category IDs");
+                throw new ValidationException("No valid food categories found for the provided category IDs.");
 
             try
             {
@@ -154,7 +154,7 @@ namespace MV.ApplicationLayer.Services
         {
             var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(id);
             if (food == null)
-                throw new ValidationException("Food not found");
+                throw new ValidationException("Food not found.");
 
             food.Quantity = request.Quantity;
             var updatedFood = await _unitOfWork.foodRepository.UpdateFoodAsync(food);
@@ -165,10 +165,10 @@ namespace MV.ApplicationLayer.Services
         {
             var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(id);
             if (food == null)
-                throw new ValidationException("Food not found");
+                throw new ValidationException("Food not found.");
 
             if (food.Status == "UnActive")
-                throw new ValidationException("Food is already deleted");
+                throw new ValidationException("Food is already deleted.");
 
             await _unitOfWork.foodRepository.DeleteFoodAsync(id);
         }

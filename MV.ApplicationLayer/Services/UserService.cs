@@ -311,7 +311,7 @@ namespace MV.ApplicationLayer.Services
         {
             var user = await _unitOfWork.userRepository.GetByIdAsync(id);
             if (user == null)
-                throw new ValidationException("User not found");
+                throw new ValidationException("User not found.");
 
             try
             {

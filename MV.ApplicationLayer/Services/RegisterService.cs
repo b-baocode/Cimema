@@ -19,24 +19,24 @@ namespace MV.ApplicationLayer.Services
         public async Task<string> ValidateRegistrationAsync(RegisterRequest registerRequest)
         {
             // Validate password
-            if (string.IsNullOrEmpty(registerRequest.Password)) return "Password is required";
+            if (string.IsNullOrEmpty(registerRequest.Password)) return "Password is required.";
             if (registerRequest.Password.Length < 6 || registerRequest.Password.Length > 100) return "Password must be between 6-100 characters";
             if (!Regex.IsMatch(registerRequest.Password, @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$")) return "Password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number and 1 special character";
 
             // Validate identity number
-            if (string.IsNullOrEmpty(registerRequest.Identitynumber)) return "Identity number is required";
+            if (string.IsNullOrEmpty(registerRequest.Identitynumber)) return "Identity number is required.";
             if (!Regex.IsMatch(registerRequest.Identitynumber, @"^\d{12}$")) return "Identity number must contain exactly 12 digits";
 
             // Validate email
-            if (string.IsNullOrEmpty(registerRequest.Email)) return "Email is required";
+            if (string.IsNullOrEmpty(registerRequest.Email)) return "Email is required.";
             if (!Regex.IsMatch(registerRequest.Email, @"^[a-zA-Z0-9._%+-]+@gmail\.com$")) return "Email must end with @gmail.com";
 
             // Validate phone number
-            if (string.IsNullOrEmpty(registerRequest.Phone)) return "Phone number is required";
+            if (string.IsNullOrEmpty(registerRequest.Phone)) return "Phone number is required.";
             if (!Regex.IsMatch(registerRequest.Phone, @"^0\d{9}$")) return "Phone number must start with 0 and contain exactly 10 digits";
 
             // Validate birthdate
-            if (registerRequest.Birthdate == null) return "Date Of Birth is required";
+            if (registerRequest.Birthdate == null) return "Date Of Birth is required.";
             if (registerRequest.Birthdate > DateOnly.FromDateTime(DateTime.Now)) return "Date Of Birth cannot be in the future";
 
             // Check for duplicates
