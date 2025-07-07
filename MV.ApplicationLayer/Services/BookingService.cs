@@ -113,8 +113,7 @@ namespace MV.ApplicationLayer.Services
             // 8. Update seat status
             await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "InActive", showtimeRoomInstance.RoomInstanceId);
 
-            // 9. Update food quantity
-            if (request.Foods != null && request.Foods.Any())
+            // 9. Update food quantityf
             {
                 foreach (var foodReq in request.Foods)
                 {

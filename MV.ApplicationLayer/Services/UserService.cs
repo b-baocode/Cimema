@@ -383,5 +383,10 @@ namespace MV.ApplicationLayer.Services
                 TotalPages = (int)Math.Ceiling(totalItems / (double)request.PageSize)
             };
         }
+
+        public async Task<int> CountActiveUsersAsync()
+        {
+            return await _unitOfWork.userRepository.CountActiveUsersAsync();
+        }
     }
 }
