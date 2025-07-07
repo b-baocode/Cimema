@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
-using MV.ApplicationLayer.DTO.ResponseModel;
-using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
+using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
 
 namespace MV.PresnetationLayer.Controllers
@@ -43,7 +42,7 @@ namespace MV.PresnetationLayer.Controllers
             var url = _vnPayService.CreatePaymentUrl(request, (double)invoice.ScoreDiscountAmount/**.value*/, HttpContext);
             return Ok(new { paymentUrl = url });
         }
-        
+
 
         /// <summary>
         /// Nhận callback từ VnPay
@@ -52,10 +51,10 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<IActionResult> VnPayCallback([FromQuery] int? invoiceId = null)
         {
             var response = _vnPayService.PaymentExecute(Request.Query);
-            
+
             // Lưu tất cả các trường hợp thanh toán để tracking
             await _vnPayService.SavePaymentOnline(response, invoiceId);
-            
+
             // Trả về thông tin chi tiết về kết quả thanh toán
             var result = new
             {
@@ -66,7 +65,7 @@ namespace MV.PresnetationLayer.Controllers
                 transactionId = response.TransactionId,
                 amount = response.OrderDescription
             };
-            
+
             return Ok(result);
         }
 
@@ -90,26 +89,26 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 if (string.IsNullOrEmpty(request.UserId) || request.InvoiceId <= 0)
-                    return BadRequest("UserId và InvoiceId là bắt buộc");
+                    return BadRequest("UserId and InvoiceId are Required.");
 
                 var user = await _userRepository.GetByIdAsync(request.UserId);
                 if (user == null)
-                    return NotFound("Không tìm thấy user");
+                    return NotFound("User not Found.");
 
                 if (string.IsNullOrEmpty(user.Email))
-                    return BadRequest("User không có email");
+                    return BadRequest("User has no Email.");
 
                 var invoice = await _ticketInvoiceService.GetByIdAsync(request.InvoiceId);
                 if (invoice == null)
-                    return NotFound("Không tìm thấy invoice");
+                    return NotFound("Invoice not Found.");
 
                 // Kiểm tra invoice có thuộc về user này không
                 if (invoice.Userid != request.UserId)
-                    return BadRequest("Invoice không thuộc về user này");
+                    return BadRequest("Invoice does not belong to this user.");
 
                 // Kiểm tra invoice có ticket details không
                 if (invoice.TicketDetails == null || !invoice.TicketDetails.Any())
-                    return BadRequest("Invoice không có thông tin vé");
+                    return BadRequest("Invoice has no ticket information.");
 
                 // Tạo mock payment data
                 var mockPayment = new PaymentOnline
@@ -127,16 +126,17 @@ namespace MV.PresnetationLayer.Controllers
                 // Lấy thông tin ShowtimeRoomInstance và tên ghế
                 var showtimeRoomInstance = await GetShowtimeRoomInstanceWithSeatNamesAsync(invoice);
                 if (showtimeRoomInstance == null)
-                    return NotFound("Không tìm thấy thông tin suất chiếu");
+                    return NotFound("Showtime information not Found.");
 
                 // Gửi email test với QR code
-                var emailSubject = "🎬 Test - Thanh toán thành công - CosmoCiné";
+                var emailSubject = "🎬 Test - Payment successful - CosmoCiné";
                 var emailBody = await GenerateTestPaymentSuccessEmailBodyWithQrAsync(user, invoice, mockPayment, showtimeRoomInstance);
-                
+
                 await _emailService.SendEmailAsync(user.Email, emailSubject, emailBody);
 
-                return Ok(new { 
-                    message = "Email test đã được gửi thành công",
+                return Ok(new
+                {
+                    message = "Test email sent successfully.",
                     userEmail = user.Email,
                     userName = user.Fullname
                 });
@@ -171,18 +171,18 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 var seatNames = new List<string>();
-                
+
                 foreach (var ticketDetail in invoice.TicketDetails)
                 {
                     var seatData = showtimeRoomInstance.SeatDataForShowtimes
                         .FirstOrDefault(s => s.SeatDataId == ticketDetail.SeatDataId);
-                    
+
                     if (seatData != null)
                     {
                         seatNames.Add($"{seatData.RowLabel}{seatData.ColumnNumber}");
                     }
                 }
-                
+
                 return seatNames;
             }
             catch (Exception ex)
@@ -196,20 +196,20 @@ namespace MV.PresnetationLayer.Controllers
         {
             var paymentDate = payment.CreatedAt.ToString("dd/MM/yyyy HH:mm");
             var amount = payment.Amount.ToString("N0") + " VNĐ";
-            
+
             // Lấy tên ghế
             var seatNames = await GetSeatNamesAsync(invoice, showtimeRoomInstance);
-            
+
             // Tạo QR code
             var qrCodeBase64 = await _qrCodeService.GenerateBookingQrCodeAsync(invoice, user, showtimeRoomInstance, seatNames);
-            
+
             return $@"
             <!DOCTYPE html>
             <html lang=""vi"">
               <head>
                 <meta charset=""UTF-8"" />
                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0""/>
-                <title>Test - Thanh toán thành công - CosmoCiné</title>
+                <title>Test - Payment successful- CosmoCiné</title>
                 <link href=""https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;600&display=swap"" rel=""stylesheet"">
                 <style>
                   body {{
@@ -395,55 +395,55 @@ namespace MV.PresnetationLayer.Controllers
                   <div class=""premium-badge"">TEST</div>
                   <div class=""header"">
                     <img src=""https://img.icons8.com/ios-filled/100/ffffff/movie-projector.png"" alt=""Cinema Icon"" />
-                    <h1>TEST - THANH TOÁN THÀNH CÔNG</h1>
+                    <h1>TEST - SUCCESSFUL PAYMENT</h1>
                   </div>
                   <div class=""content"">
-                    <div class=""test-notice"">🧪 Đây là email test - Không phải giao dịch thật</div>
+                    <div class=""test-notice"">🧪 This is a test email - Not a real transaction</div>
                     <div class=""success-icon"">✅</div>
                     <div class=""greeting"">
-                      Xin chào <strong>{user.Fullname}</strong>!<br>
-                      Cảm ơn bạn đã sử dụng dịch vụ của CosmoCiné.
+                      Hi <strong>{user.Fullname}</strong>!<br>
+                      Thank you for using Premium Cinema's service.
                     </div>
                     <div class=""payment-details"">
-                      <h3>📋 Chi tiết giao dịch (TEST)</h3>
+                      <h3>📋 Transaction details (TEST)</h3>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Mã hóa đơn:</span>
+                        <span class=""detail-label"">Invoice code:</span>
                         <span class=""detail-value"">#{invoice.InvoiceId}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Phương thức thanh toán:</span>
+                        <span class=""detail-label"">Payment method:</span>
                         <span class=""detail-value"">{payment.PaymentMethod}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Thời gian thanh toán:</span>
+                        <span class=""detail-label"">Payment time:</span>
                         <span class=""detail-value"">{paymentDate}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Số tiền:</span>
+                        <span class=""detail-label"">Number amount:</span>
                         <span class=""detail-value amount"">{amount}</span>
                       </div>
                     </div>
                     
                     <div class=""qr-section"">
-                      <h3>🎫 Mã QR Vé Xem Phim (TEST)</h3>
+                      <h3>🎫 Movie Ticket QR Code(TEST)</h3>
                       <div class=""qr-code"">
                         <img src=""data:image/png;base64,{qrCodeBase64}"" alt=""QR Code"" />
                       </div>
                       <div class=""qr-note"">
-                        📱 Quét mã QR này tại rạp để vào xem phim<br>
-                        💡 Lưu ý: Mã QR này chứa toàn bộ thông tin vé của bạn<br>
-                        🧪 Đây là mã QR test - Không phải giao dịch thật
+                        📱 Scan this QR code at the cinema to enter the movie.<br>
+                        💡 Note: This QR code contains all your ticket information.<br>
+                        🧪 This is a test QR code - Not a real transaction.
                       </div>
                     </div>
                     
-                    <p style=""color: #4CAF50; font-weight: bold;"">🎉 Giao dịch của bạn đã được xử lý thành công!</p>
-                    <p style=""color: #ccc; font-size: 14px;"">Vui lòng đến rạp trước giờ chiếu 15 phút để quét mã QR.</p>
+                    <p style=""color: #4CAF50; font-weight: bold;"">🎉 Your transaction has been successfully processed!</p>
+                    <p style=""color: #ccc; font-size: 14px;"">Please arrive at the theater 15 minutes before showtime to scan the QR code.</p>
                   </div>
                   <div class=""support"">
-                    <h3>Hỗ trợ khách hàng</h3>
-                    <p>📞 Hotline: <strong>0776743504</strong></p>
+                    <h3>Customer Support</h3>
+                    <p>📞 Hotline: <strong>0775743304</strong></p>
                     <p>📧 Email: <a href=""mailto:hoangnvse183852@fpt.edu.vn"">hoangnvse183852@fpt.edu.vn</a></p>
-                    <p>🕒 Giờ làm việc: 8:00 - 22:00 (Thứ 2 - Chủ nhật)</p>
+                    <p>🕒 Working hours: 8:00 - 22:00 (Monday - Sunday)</p>
                   </div>
                   <div class=""footer"">
                     <div>
@@ -452,7 +452,7 @@ namespace MV.PresnetationLayer.Controllers
                       <a href=""https://www.facebook.com/viethoang.ng1005/"">Instagram</a>
                     </div>
                     <p>&copy; 2024 CosmoCiné Management System. All rights reserved.</p>
-                    <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+                    <p>This email was sent automatically, please do not reply.</p>
                   </div>
                 </div>
               </body>
@@ -463,14 +463,14 @@ namespace MV.PresnetationLayer.Controllers
         {
             var paymentDate = payment.CreatedAt.ToString("dd/MM/yyyy HH:mm");
             var amount = payment.Amount.ToString("N0") + " VNĐ";
-            
+
             return $@"
             <!DOCTYPE html>
             <html lang=""vi"">
               <head>
                 <meta charset=""UTF-8"" />
                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0""/>
-                <title>Test - Thanh toán thành công</title>
+                <title>Test - Payment successful</title>
                 <link href=""https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;600&display=swap"" rel=""stylesheet"">
                 <style>
                   body {{
@@ -622,47 +622,47 @@ namespace MV.PresnetationLayer.Controllers
                   }}
                 </style>
               </head>
-              <body>
-                <div class=""container"">
-                  <div class=""premium-badge"">TEST</div>
-                  <div class=""header"">
+                    <body>
+                    <div class=""container"">
+                    <div class=""premium-badge"">TEST</div>
+                    <div class=""header"">
                     <img src=""https://img.icons8.com/ios-filled/100/ffffff/movie-projector.png"" alt=""Cinema Icon"" />
-                    <h1>TEST - THANH TOÁN THÀNH CÔNG</h1>
-                  </div>
-                  <div class=""content"">
-                    <div class=""test-notice"">🧪 Đây là email test - Không phải giao dịch thật</div>
+                    <h1>TEST - SUCCESSFUL PAYMENT</h1>
+                    </div>
+                    <div class=""content"">
+                    <div class=""test-notice"">🧪 This is a test email - Not a real transaction</div>
                     <div class=""success-icon"">✅</div>
                     <div class=""greeting"">
-                      Xin chào <strong>{user.Fullname}</strong>!<br>
-                      Cảm ơn bạn đã sử dụng dịch vụ của Premium Cinema.
+                    Hello <strong>{user.Fullname}</strong>!<br>
+                    Thank you for using Premium Cinema's service.
+                    </div> 
+                    <div class=""payment-details""> 
+                    <h3>📋 Transaction details (TEST)</h3> 
+                    <div class=""detail-row""> 
+                    <span class=""detail-label"">Invoice code:</span> 
+                    <span class=""detail-value"">#{invoice.InvoiceId}</span> 
+                    </div> 
+                    <div class=""detail-row""> 
+                    <span class=""detail-label"">Payment method:</span> 
+                    <span class=""detail-value"">{payment.PaymentMethod}</span> 
+                    </div> 
+                    <div class=""detail-row""> 
+                    <span class=""detail-label"">Payment time:</span> 
+                    <span class=""detail-value"">{paymentDate}</span> 
+                    </div> 
+                    <div class=""detail-row""> 
+                    <span class=""detail-label"">Number amount:</span>
+                    <span class=""detail-value amount"">{amount}</span>
                     </div>
-                    <div class=""payment-details"">
-                      <h3>📋 Chi tiết giao dịch (TEST)</h3>
-                      <div class=""detail-row"">
-                        <span class=""detail-label"">Mã hóa đơn:</span>
-                        <span class=""detail-value"">#{invoice.InvoiceId}</span>
-                      </div>
-                      <div class=""detail-row"">
-                        <span class=""detail-label"">Phương thức thanh toán:</span>
-                        <span class=""detail-value"">{payment.PaymentMethod}</span>
-                      </div>
-                      <div class=""detail-row"">
-                        <span class=""detail-label"">Thời gian thanh toán:</span>
-                        <span class=""detail-value"">{paymentDate}</span>
-                      </div>
-                      <div class=""detail-row"">
-                        <span class=""detail-label"">Số tiền:</span>
-                        <span class=""detail-value amount"">{amount}</span>
-                      </div>
                     </div>
-                    <p style=""color: #4CAF50; font-weight: bold;"">🎉 Giao dịch của bạn đã được xử lý thành công!</p>
-                    <p style=""color: #ccc; font-size: 14px;"">Vui lòng kiểm tra email để xem thông tin chi tiết về vé và suất chiếu.</p>
-                  </div>
+                    <p style=""color: #4CAF50; font-weight: bold;"">🎉 Your transaction has been processed successfully!</p>
+                    <p style=""color: #ccc; font-size: 14px;"">Please check your email for ticket and showtime details.</p>
+                    </div>
                   <div class=""support"">
-                    <h3>Hỗ trợ khách hàng</h3>
-                    <p>📞 Hotline: <strong>0776743504</strong></p>
+                    <h3>Customer Support</h3>
+                    <p>📞 Hotline: <strong>0775743304</strong></p>
                     <p>📧 Email: <a href=""mailto:hoangnvse183852@fpt.edu.vn"">hoangnvse183852@fpt.edu.vn</a></p>
-                    <p>🕒 Giờ làm việc: 8:00 - 22:00 (Thứ 2 - Chủ nhật)</p>
+                    <p>🕒 Working hours: 8:00 - 22:00 (Monday - Sunday)</p>
                   </div>
                   <div class=""footer"">
                     <div>
@@ -671,7 +671,7 @@ namespace MV.PresnetationLayer.Controllers
                       <a href=""https://www.facebook.com/viethoang.ng1005/"">Instagram</a>
                     </div>
                     <p>&copy; 2024 Premium Cinema Management System. All rights reserved.</p>
-                    <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+                    <p>This email was sent automatically, please do not reply.</p>
                   </div>
                 </div>
               </body>
@@ -688,43 +688,46 @@ namespace MV.PresnetationLayer.Controllers
             {
                 // Validation
                 if (request == null)
-                    return BadRequest("Request body không được null");
-                    
+                    return BadRequest("Request body cannot be null.");
+
                 if (string.IsNullOrEmpty(request.UserId) || request.InvoiceId <= 0)
-                    return BadRequest("UserId và InvoiceId là bắt buộc");
+                    return BadRequest("UserId and InvoiceId are required.");
 
                 var user = await _userRepository.GetByIdAsync(request.UserId);
                 if (user == null)
-                    return NotFound("Không tìm thấy user");
+                    return NotFound("User not Found.");
 
                 var invoice = await _ticketInvoiceService.GetByIdAsync(request.InvoiceId);
                 if (invoice == null)
-                    return NotFound("Không tìm thấy invoice");
+                    return NotFound("Invoice not Found.");
 
                 // Kiểm tra invoice có thuộc về user này không
                 if (invoice.Userid != request.UserId)
-                    return BadRequest("Invoice không thuộc về user này");
+                    return BadRequest("Invoice does not belong to this user.");
 
                 // Kiểm tra invoice có ticket details không
                 if (invoice.TicketDetails == null || !invoice.TicketDetails.Any())
-                    return BadRequest("Invoice không có thông tin vé");
+                    return BadRequest("Invoice has no ticket information.");
 
                 // Lấy thông tin ShowtimeRoomInstance và tên ghế
                 var showtimeRoomInstance = await GetShowtimeRoomInstanceWithSeatNamesAsync(invoice);
                 if (showtimeRoomInstance == null)
-                    return NotFound("Không tìm thấy thông tin suất chiếu");
+                    return NotFound("Showtime information not found.");
 
                 // Lấy tên ghế
                 var seatNames = await GetSeatNamesAsync(invoice, showtimeRoomInstance);
-                
-                // Tạo QR code
-                var qrCodeBase64 = await _qrCodeService.GenerateBookingQrCodeAsync(invoice, user, showtimeRoomInstance, seatNames);
 
-                return Ok(new { 
+                // Tạo QR code
+                // var qrCodeBase64 = await _qrCodeService.GenerateBookingQrCodeAsync(invoice, user, showtimeRoomInstance, seatNames);
+                var qrCodeBase64 = await _qrCodeService.GenerateSimpleQrCodeAsync(invoice.InvoiceId.ToString());
+
+                return Ok(new
+                {
                     success = true,
                     qrCodeBase64 = qrCodeBase64,
                     qrCodeDataUrl = !string.IsNullOrEmpty(qrCodeBase64) ? $"data:image/png;base64,{qrCodeBase64}" : null,
-                    bookingInfo = new {
+                    bookingInfo = new
+                    {
                         invoiceId = invoice.InvoiceId,
                         userName = user.Fullname,
                         movieTitle = showtimeRoomInstance.Showtime?.Movie?.Title ?? "N/A",
@@ -738,7 +741,8 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { 
+                return StatusCode(500, new
+                {
                     error = ex.Message,
                     stackTrace = ex.StackTrace,
                     success = false
@@ -755,26 +759,28 @@ namespace MV.PresnetationLayer.Controllers
         {
             try
             {
-                var testText = "🎬 COSMOCINÉ\n═══════════════════════════════════════\n📽️ PHIM: Avengers: Endgame\n📅 NGÀY CHIẾU: 15/12/2024\n🕐 GIỜ CHIẾU: 19:30\n🎭 PHÒNG: Phòng 1\n💺 GHẾ: A1, A2\n🆔 MÃ ĐƠN HÀNG: #12345\n👤 NGƯỜI MUA: Nguyễn Văn A\n💰 TỔNG TIỀN: 200,000 VNĐ\n📊 ĐIỂM SỬ DỤNG: 0\n🎫 GIẢM GIÁ: 0 VNĐ\n═══════════════════════════════════════\n🎉 Cảm ơn bạn đã sử dụng dịch vụ!\n📞 Hotline: 0776743504";
-                
+                var testText = "🎬 COSMOCINÉ\n═══════════════════════════════════════════\n📽️ MOVIE: Avengers: Endgame\n📅 SHOW DATE: 12/15/2024\n🕐 SHOW TIME: 19:30\n🎭 ROOM: Room 1\n💺 CHAIRS: A1, A2\n🆔 ORDER CODE: #12345\n👤 BUYER: Nguyen Van A\n💰 TOTAL: 200,000 VND\n📊 POINTS USED: 0\n🎫 DISCOUNT: 0 VND\n═══════════════════════════════════════\n🎉 Cảm ơn bạn đã sử dụng dịch vụ!\n📞 Hotline: 0775743304";
+
                 var qrCodeBase64 = await _qrCodeService.GenerateSimpleQrCodeAsync(testText);
-                
+
                 if (string.IsNullOrEmpty(qrCodeBase64))
                 {
-                    return BadRequest("Không thể tạo QR code");
+                    return BadRequest("Can not generate QR code");
                 }
-                
-                return Ok(new { 
-                    success = true, 
+
+                return Ok(new
+                {
+                    success = true,
                     qrCode = qrCodeBase64,
-                    message = "QR code được tạo thành công"
+                    message = "QR code created Successfully"
                 });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { 
-                    success = false, 
-                    message = $"Lỗi tạo QR code: {ex.Message}" 
+                return BadRequest(new
+                {
+                    success = false,
+                    message = $"Error Creating QR code: {ex.Message}"
                 });
             }
         }
@@ -792,4 +798,4 @@ namespace MV.PresnetationLayer.Controllers
         public string UserId { get; set; }
         public int InvoiceId { get; set; }
     }
-} 
+}

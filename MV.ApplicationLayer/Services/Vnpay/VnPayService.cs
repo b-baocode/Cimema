@@ -12,6 +12,7 @@ using MV.ApplicationLayer.Library;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
 using MV.ApplicationLayer.RepositoryInterfaces;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
 
 namespace MV.ApplicationLayer.Services.Vnpay
 {
@@ -27,6 +28,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
         private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
         private readonly IQrCodeService _qrCodeService;
         private readonly IShowtimeRoomInstanceRepository _showtimeRoomInstanceRepository;
+        private readonly ISeatNotificationService _seatNotificationService;
 
         public VnpayService(
             IConfiguration configuration,
@@ -37,7 +39,8 @@ namespace MV.ApplicationLayer.Services.Vnpay
             IEmailService emailService,
             IUserRepository userRepository,
             IQrCodeService qrCodeService,
-            IShowtimeRoomInstanceRepository showtimeRoomInstanceRepository
+            IShowtimeRoomInstanceRepository showtimeRoomInstanceRepository,
+            ISeatNotificationService seatNotificationService
         )
         {
             _configuration = configuration;
@@ -49,6 +52,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
             _userRepository = userRepository;
             _qrCodeService = qrCodeService;
             _showtimeRoomInstanceRepository = showtimeRoomInstanceRepository;
+            _seatNotificationService = seatNotificationService;
         }
 
         public string CreatePaymentUrl(PaymentInformationRequest model, double amount, HttpContext context)
@@ -127,8 +131,24 @@ namespace MV.ApplicationLayer.Services.Vnpay
                 }
                 else
                 {
-                    // Payment thất bại - xóa invoice và cập nhật trạng thái ghế về Active
-                    _ticketInvoiceService.DeleteAsync(invoiceId.Value).GetAwaiter().GetResult();
+                    // Payment thất bại - cập nhật status invoice thành Cancelled và xóa PaymentOnline record
+                    var invoice = _ticketInvoiceService.GetByIdAsync(invoiceId.Value).GetAwaiter().GetResult();
+                    if (invoice != null)
+                    {
+                        // Cập nhật status invoice thành Cancelled
+                        invoice.Status = "Cancelled";
+                        _ticketInvoiceService.UpdateAsync(invoice).GetAwaiter().GetResult();
+                        
+                        // Xóa PaymentOnline record
+                        var paymentToDelete = await _paymentOnlineRepository.GetByInvoiceIdAsync(invoiceId.Value);
+                        if (paymentToDelete != null)
+                        {
+                            _paymentOnlineRepository.Delete(paymentToDelete);
+                        }
+                        
+                        // Cập nhật trạng thái ghế về "Active" và gửi SignalR notification
+                        await HandlePaymentFailureAsync(invoice);
+                    }
                 }
                 
             }
@@ -707,6 +727,40 @@ namespace MV.ApplicationLayer.Services.Vnpay
                 _ => $" - Giao dịch thất bại (Mã lỗi: {vnPayResponseCode})"
             };
             return baseNote + statusNote;
+        }
+
+        private async Task HandlePaymentFailureAsync(TicketInvoice invoice)
+        {
+            try
+            {
+                // Lấy danh sách seatId và showtimeInstanceId từ TicketDetails
+                var seatIds = invoice.TicketDetails.Select(td => td.SeatDataId).ToList();
+                var showtimeInstanceId = invoice.TicketDetails.FirstOrDefault()?.ShowtimeInstanceId;
+
+                if (seatIds.Any() && showtimeInstanceId.HasValue)
+                {
+                    // Cập nhật trạng thái ghế về "Active" khi payment thất bại
+                    await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
+
+                    //SignalR notification
+                    var showtimeMovieId = await _showtimeRoomInstanceRepository.GetShowtimeMovieIdByInstanceId(showtimeInstanceId);
+                    if (showtimeMovieId.HasValue)
+                    {
+                        var (movieId, showtimeId) = showtimeMovieId.Value;
+                        var groupName = $"{movieId}-{showtimeId}-{showtimeInstanceId}";
+
+                        string seatIdString = string.Join(", ", seatIds);
+                        string message = $"The following seat data IDs is cancelled: {seatIdString}; Status = Active";
+
+                        Console.WriteLine($"Attempting to send message to group: {groupName}");
+                        await _seatNotificationService.SendMessageToGroupAsync(groupName, message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling payment failure: {ex.Message}");
+            }
         }
     }
 }
