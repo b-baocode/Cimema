@@ -39,7 +39,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
     public class TicketDetailFullResponse
     {
         public string UserId { get; set; }
-        public string Id { get; set; }
+        public string InvoiceId { get; set; }
         public string ShowTimeSeatId { get; set; }
         public string SeatName { get; set; }
         public string showtimeInstanceId { get; set; }

@@ -170,9 +170,11 @@ namespace MV.ApplicationLayer.Services
                     var showtimeInstance = await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdAsync(detail.ShowtimeInstanceId);
                     if (showtimeInstance != null)
                     {
-                        var movie = showtimeInstance.Showtime.MovieId.HasValue
-                            ? await _unitOfWork.movieRepository.GetMovieByIdAsync(showtimeInstance.Showtime.MovieId.Value)
-                            : null;
+                        Movie? movie = null;
+                        if (showtimeInstance.Showtime != null && showtimeInstance.Showtime.MovieId.HasValue)
+                        {
+                            movie = await _unitOfWork.movieRepository.GetMovieByIdAsync(showtimeInstance.Showtime.MovieId.Value);
+                        }
                         var room = await _unitOfWork.roomRepository.GetRoomByIdAsync(showtimeInstance.OriginalRoomId);
                         var seatData = await _unitOfWork.seatDataForShowtimeRepository.GetSeatDataAsync(detail.SeatDataId);
 
@@ -288,7 +290,7 @@ namespace MV.ApplicationLayer.Services
             return new TicketDetailFullResponse
             {
                 UserId = invoice.Userid,
-                Id = invoice.InvoiceId.ToString(),
+                InvoiceId = invoice.InvoiceId.ToString(),
                 ShowTimeSeatId = firstTicketDetail.ShowtimeInstanceId.ToString(),
                 SeatName = seatNameDisplay,
                 showtimeInstanceId = showtimeInstance?.ShowtimeId.ToString(),

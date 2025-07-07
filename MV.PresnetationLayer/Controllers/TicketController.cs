@@ -21,24 +21,24 @@ namespace MV.PresnetationLayer.Controllers
         /// </summary>
         /// <param name="userId">ID của user</param>
         /// <returns>Danh sách vé với QR code</returns>
-        //[HttpGet("user/{userId}")]
-        //public async Task<ActionResult<List<TicketResponse>>> GetTicketsByUserId(string userId)
-        //{
-        //    try
-        //    {
-        //        if (string.IsNullOrEmpty(userId))
-        //        {
-        //            return BadRequest("UserId is required");
-        //        }
+        [HttpGet("user/{userId}")]
+        public async Task<ActionResult<List<TicketResponse>>> GetTicketsByUserId(string userId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return BadRequest("UserId is required");
+                }
 
-        //        var tickets = await _ticketInvoiceService.GetTicketsByUserIdAsync(userId);
-        //        return Ok(tickets);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, $"Internal server error: {ex.Message}");
-        //    }
-        //}
+                var tickets = await _ticketInvoiceService.GetTicketsByUserIdAsync(userId);
+                return Ok(tickets);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
 
         /// <summary>
         /// Check vé (cập nhật status thành "Checked")
