@@ -14,5 +14,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<IEnumerable<Seat>> GetSeatsOfRoomForSetTypeAsync(int roomId);
 
         Task<IEnumerable<SeatOfRoomForAddShowtimeInstance>> GetSeatsForRoomInstanceAsync(List<int> roomIds);
+
+        Task<Seat?> GetSeatByIdAsync(int seatId);
     }
 }
