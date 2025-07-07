@@ -14,5 +14,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<PaymentUpFront> DeletePaymentUpFrontAsync(int id);
         Task<PaymentUpFront> GetPaymentUpFrontByIdAsync(int id);
         Task<IEnumerable<PaymentUpFront>> GetAllPaymentUpFrontsAsync();
+        Task<PaymentUpFront> UndoPaymentUpFrontAsync(int id);
     }
 }

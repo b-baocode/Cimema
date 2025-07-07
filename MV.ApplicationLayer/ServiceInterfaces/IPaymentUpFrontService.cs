@@ -16,5 +16,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<bool> DeletePaymentUpFrontAsync(int id);
         Task<PaymentUpFrontResponse> GetPaymentUpFrontByIdAsync(int id);
         Task<IEnumerable<PaymentUpFrontResponse>> GetAllPaymentUpFrontsAsync();
+        Task<PaymentUpFrontResponse> UndoPaymentUpFrontAsync(int id);
     }
 }

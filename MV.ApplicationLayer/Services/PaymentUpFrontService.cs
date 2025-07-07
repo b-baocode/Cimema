@@ -175,5 +175,26 @@ namespace MV.ApplicationLayer.Services
                 InvoiceId = payment.InvoiceId
             };
         }
+
+        public async Task<PaymentUpFrontResponse> UndoPaymentUpFrontAsync(int id)
+        {
+            var payment = await _unitOfWork.paymentUpFrontRepository.UndoPaymentUpFrontAsync(id);
+            if (payment == null)
+            {
+                return null;
+            }
+            await _unitOfWork.SaveChangesAsync();
+            return new PaymentUpFrontResponse
+            {
+                PaymentUpFrontId = payment.PaymentUpFrontId,
+                TotalAmount = payment.TotalAmount,
+                CustomerGive = payment.CustomerGive,
+                RemainChange = payment.RemainChange,
+                ScoreDiscountAmount = 0m, // Nếu cần lấy từ invoice thì có thể truy vấn thêm
+                CreatedAt = payment.CreatedAt,
+                Status = payment.Status,
+                InvoiceId = payment.InvoiceId
+            };
+        }
     }
 }

@@ -50,6 +50,17 @@ namespace MV.InfrastructureLayer.Repositories
             _context.Entry(payment).State = EntityState.Modified;
             return payment;
         }
+
+        public async Task<PaymentUpFront> UndoPaymentUpFrontAsync(int id)
+        {
+            var payment = await _context.PaymentUpFronts.FindAsync(id);
+            if (payment != null)
+            {
+                payment.Status = "Canceled";
+                _context.Entry(payment).State = EntityState.Modified;
+            }
+            return payment;
+        }
     }
 } 
 
