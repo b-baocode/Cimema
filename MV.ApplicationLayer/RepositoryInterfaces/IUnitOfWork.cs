@@ -24,6 +24,7 @@
 
         IShowtimeRepository showtimeRepository { get; }
 
+        IDashboardRepository dashboardRepository { get; }
         //Single commit point
         Task<int> SaveChangesAsync();
     }
