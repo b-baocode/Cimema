@@ -41,13 +41,13 @@ namespace MV.ApplicationLayer.Services
             // 1. Validate user
             var user = await _unitOfWork.userRepository.GetByIdAsync(request.UserId);
             if (user == null)
-                throw new Exception("User không tồn tại.");
+                throw new Exception("User does not exist.");
             //lỗi ở đây
             
             // 2. Get ShowtimeRoomInstance
             var showtimeRoomInstance = await _showtimeRoomInstanceService.GetRoomInstanceWithSeatById(request.ShowtimeInstanceId);
             if (showtimeRoomInstance == null)
-                throw new Exception("ShowtimeRoomInstance không tồn tại cho RoomInstanceId này.");
+                throw new Exception("ShowtimeRoomInstance does not exist for this RoomInstanceId.");
 
             // 3. Get and validate seats
             var seatDataDict = await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeRoomInstance.RoomInstanceId);

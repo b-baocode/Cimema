@@ -34,7 +34,7 @@ namespace MV.ApplicationLayer.Services
         {
             var food = await _unitOfWork.foodRepository.GetFoodByIdAsync(id);
             if (food == null)
-                throw new ValidationException("Food not found");
+                throw new ValidationException("Food not found.");
 
             return MapToResponse(food);
         }

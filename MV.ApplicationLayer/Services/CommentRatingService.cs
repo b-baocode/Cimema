@@ -17,9 +17,6 @@ namespace MV.ApplicationLayer.Services
             _unitOfWork = unitOfWork;
         }
 
-
-
-
         public async Task<PagedResult<CommentRatingResponse>> GetByMovieIdAsync(int movieId, CommentRatingPagingRequest request)
         {
             var commentRatings = await _unitOfWork.commentRatingRepository.GetByMovieIdAsync(

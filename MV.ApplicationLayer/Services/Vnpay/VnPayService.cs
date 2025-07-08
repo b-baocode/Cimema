@@ -170,7 +170,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
                 if (showtimeRoomInstance == null)
                     return;
 
-                var emailSubject = "🎬 Thanh toán thành công - CosmoCiné";
+                var emailSubject = "🎬 Payment successful - CosmoCiné";
                 var emailBody = await GeneratePaymentSuccessEmailBodyWithQrAsync(user, invoice, payment, showtimeRoomInstance);
                 
                 await _emailService.SendEmailAsync(user.Email, emailSubject, emailBody);
@@ -238,7 +238,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
               <head>
                 <meta charset=""UTF-8"" />
                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0""/>
-                <title>Payment successful - CosmoCiné</title>
+                <title>Payment Successful - CosmoCiné</title>
                 <link href=""https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;600&display=swap"" rel=""stylesheet"">
                 <style>
                   body {{
@@ -506,7 +506,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
               <head>
                 <meta charset=""UTF-8"" />
                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0""/>
-                <title>Payment successful - CosmoCiné</title>
+                <title>Payment Successful - CosmoCiné</title>
                 <link href=""https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;600&display=swap"" rel=""stylesheet"">
                 <style>
                   body {{
