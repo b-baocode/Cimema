@@ -320,6 +320,12 @@ namespace MV.ApplicationLayer.Services
             return movies.Select(MapToResponse).ToList();
         }
 
+        public async Task<List<MovieResponse>> GetActiveMoviesByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            var movies = await _unitOfWork.movieRepository.GetActiveMoviesByDateRangeAsync(startDate, endDate);
+            return movies.Select(MapToResponse).ToList();
+        }
+
         private MovieResponse MapToResponse(Movie movie)
         {
             // Update status based on current time

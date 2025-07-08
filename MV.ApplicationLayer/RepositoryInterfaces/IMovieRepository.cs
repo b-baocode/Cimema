@@ -33,5 +33,15 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         /// <param name="date">Ngày cần lấy phim Now Showing (nếu null thì lấy ngày hiện tại)</param>
         /// <returns>Danh sách phim Now Showing</returns>
         Task<List<Movie>> GetNowShowingMoviesByShowtimeAsync(DateTime? date = null);
+        
+        /// <summary>
+        /// Lấy danh sách phim Active có FromDate/ToDate giao với khoảng thời gian truyền vào
+        /// </summary>
+        /// <param name="startDate">Ngày bắt đầu</param>
+        /// <param name="endDate">Ngày kết thúc</param>
+        /// <returns>Danh sách phim</returns>
+        Task<List<Movie>> GetActiveMoviesByDateRangeAsync(DateTime startDate, DateTime endDate);
+
+        // XÓA HÀM GetActiveMoviesByShowtimeRangeAsync (lọc theo Showtime)
     }
 }

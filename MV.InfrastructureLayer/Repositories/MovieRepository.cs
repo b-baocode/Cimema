@@ -380,5 +380,14 @@ namespace MV.InfrastructureLayer.Repositories
                     .Min(s => s.StartTime))
                 .ToListAsync();
         }
+
+        public async Task<List<Movie>> GetActiveMoviesByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.Movies
+                .Include(m => m.Genres)
+                .Where(m => m.Status == "Active" && m.FromDate <= endDate && m.ToDate >= startDate)
+                .OrderBy(m => m.FromDate)
+                .ToListAsync();
+        }
     }
 }
