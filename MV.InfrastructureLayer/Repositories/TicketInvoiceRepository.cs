@@ -27,6 +27,7 @@ namespace MV.InfrastructureLayer.Repositories
                 .Include(ti => ti.TicketDetails)
                 .Include(ti => ti.TicketInvoiceFoodItems)
                 .Include(ti => ti.Promotion)
+                .Include(ti => ti.User)
                 .FirstOrDefaultAsync(ti => ti.InvoiceId == invoiceId);
         }
 

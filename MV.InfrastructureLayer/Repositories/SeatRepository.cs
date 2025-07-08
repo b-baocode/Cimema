@@ -103,6 +103,9 @@ namespace MV.InfrastructureLayer.Repositories
                 .ToListAsync();
         }
 
-        
+        public async Task<Seat?> GetSeatByIdAsync(int seatId)
+        {
+            return await _context.Seats.FirstOrDefaultAsync(s => s.SeatId == seatId);
+        }
     }
 }
