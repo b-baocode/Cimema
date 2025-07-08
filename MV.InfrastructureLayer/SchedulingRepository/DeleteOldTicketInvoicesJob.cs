@@ -32,11 +32,11 @@ namespace MV.InfrastructureLayer.SchedulingRepository
             // Muốn đổi thành mili giây AddMilliseconds(-1) tức là 1 mili giây
             // Muốn đổi thành micro giây AddMicroseconds(-1) tức là 1 micro giây
             // var oneHourAgo = DateTime.UtcNow.AddHours(-1); // Sửa nếu muốn thay đổi mốc thời gian (UtcNow là giờ Quốc Tế)
-                var oneMinuteAgo = DateTime.Now.AddMinutes(-1); // Đổi thành 1 phút để test nhanh
+                var oneMonthAgo = DateTime.Now.AddMonths(-1); // Đổi thành 1 phút để test nhanh
                 var oldInvoices = _unitOfWork
                     .ticketInvoiceRepository
                     .GetAll()
-                    .Where(i => i.CreatedAt < oneMinuteAgo)
+                    .Where(i => i.CreatedAt < oneMonthAgo)
                     .ToList();
 
                 if (oldInvoices.Any())

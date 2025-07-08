@@ -31,11 +31,11 @@ namespace MV.InfrastructureLayer.SchedulingRepository
             // Muốn đổi thành mili giây AddMilliseconds(-1) tức là 1 mili giây
             // Muốn đổi thành micro giây AddMicroseconds(-1) tức là 1 micro giây
             // var oneHourAgo = DateTime.UtcNow.AddHours(-1); // Sửa nếu muốn thay đổi mốc thời gian (UtcNow là giờ Quốc Tế)
-            var oneHourAgo = DateTime.Now.AddHours(-1); // (Now: Lấy theo giờ Việt Nam)
+            var oneMonthAgo = DateTime.Now.AddMonths(-1); // (Now: Lấy theo giờ Việt Nam)
             var oldPayments = _unitOfWork
                 .paymentOnlineRepository
                 .GetAll()
-                .Where(p => p.Status == "Success" && p.CreatedAt < oneHourAgo) // Sửa nếu muốn thay đổi mốc thời gian
+                .Where(p => p.Status == "Success" && p.CreatedAt < oneMonthAgo) // Sửa nếu muốn thay đổi mốc thời gian
                 .ToList();
 
             if (oldPayments.Any())

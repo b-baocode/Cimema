@@ -366,5 +366,19 @@ namespace MV.InfrastructureLayer.Repositories
                 .Select(m => m.Title)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<List<Movie>> GetNowShowingMoviesByShowtimeAsync(DateTime? date = null)
+        {
+            var targetDate = date?.Date ?? DateTime.Today;
+            return await _context.Movies
+                .Include(m => m.Genres)
+                .Include(m => m.Showtimes)
+                .Where(m => m.Status == "Active" &&
+                    m.Showtimes.Any(s => s.StartTime.Date <= targetDate && targetDate <= s.EndTime.Date))
+                .OrderBy(m => m.Showtimes
+                    .Where(s => s.StartTime.Date <= targetDate && targetDate <= s.EndTime.Date)
+                    .Min(s => s.StartTime))
+                .ToListAsync();
+        }
     }
 }

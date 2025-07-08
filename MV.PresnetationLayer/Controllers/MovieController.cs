@@ -169,5 +169,13 @@ namespace MV.PresnetationLayer.Controllers
             var result = await _movieService.GetComingSoonMoviesAsync(request);
             return Ok(result);
         }
+
+        [HttpGet("now-showing")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<MovieResponse>>> GetNowShowingMovies([FromQuery] DateTime? date = null)
+        {
+            var movies = await _movieService.GetNowShowingMoviesByShowtimeAsync(date);
+            return Ok(movies);
+        }
     }
 }

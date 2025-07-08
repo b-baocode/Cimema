@@ -314,6 +314,12 @@ namespace MV.ApplicationLayer.Services
             };
         }
 
+        public async Task<List<MovieResponse>> GetNowShowingMoviesByShowtimeAsync(DateTime? date = null)
+        {
+            var movies = await _unitOfWork.movieRepository.GetNowShowingMoviesByShowtimeAsync(date);
+            return movies.Select(MapToResponse).ToList();
+        }
+
         private MovieResponse MapToResponse(Movie movie)
         {
             // Update status based on current time
