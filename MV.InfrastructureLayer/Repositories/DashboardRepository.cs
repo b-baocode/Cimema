@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest;
 using MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.InfrastructureLayer.DBContext;
@@ -51,6 +52,57 @@ namespace MV.InfrastructureLayer.Repositories
                 return "year";
             else
                 return "custom";
+        }
+
+        public async Task<RevenueChartResponse> GetRevenueChartAsync(RevenueChartRequest request)
+        {
+            var query = _context.TicketInvoices
+                .Where(ti => (ti.Status == "Success" || ti.Status == "Checked")
+                    && ti.CreatedAt >= request.StartDate && ti.CreatedAt <= request.EndDate);
+
+            List<RevenueChartItem> data;
+
+            if (request.Type == "day")
+            {
+                data = await query
+                    .GroupBy(ti => ti.CreatedAt.Date)
+                    .Select(g => new RevenueChartItem
+                    {
+                        Label = g.Key.ToString("yyyy-MM-dd"),
+                        Revenue = g.Sum(ti => (decimal)ti.ScoreDiscountAmount),
+                        TotalOrders = g.Count()
+                    }).ToListAsync();
+            }
+            else if (request.Type == "month")
+            {
+                data = await query
+                    .GroupBy(ti => new { ti.CreatedAt.Year, ti.CreatedAt.Month })
+                    .Select(g => new RevenueChartItem
+                    {
+                        Label = g.Key.Year + "-" + g.Key.Month.ToString("D2"),
+                        Revenue = g.Sum(ti => (decimal)ti.ScoreDiscountAmount),
+                        TotalOrders = g.Count()
+                    }).ToListAsync();
+            }
+            else // year
+            {
+                data = await query
+                    .GroupBy(ti => ti.CreatedAt.Year)
+                    .Select(g => new RevenueChartItem
+                    {
+                        Label = g.Key.ToString(),
+                        Revenue = g.Sum(ti => (decimal)ti.ScoreDiscountAmount),
+                        TotalOrders = g.Count()
+                    }).ToListAsync();
+            }
+
+            return new RevenueChartResponse
+            {
+                Type = request.Type,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate,
+                Data = data
+            };
         }
     }
 } 

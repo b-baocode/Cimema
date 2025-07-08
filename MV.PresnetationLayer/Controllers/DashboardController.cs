@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest;
 using MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse;
 using MV.ApplicationLayer.ServiceInterfaces;
 
@@ -64,6 +65,19 @@ namespace MV.PresnetationLayer.Controllers
             {
                 return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("revenue/chart")]
+        public async Task<IActionResult> GetRevenueChart([FromBody] RevenueChartRequest request)
+        {
+            if (!new[] { "day", "month", "year" }.Contains(request.Type))
+                return BadRequest(new { message = "type must be 'day', 'month', or 'year'" });
+            if (request.StartDate > request.EndDate)
+                return BadRequest(new { message = "startDate must be before endDate" });
+
+            var result = await _dashboardService.GetRevenueChartAsync(request);
+            return Ok(result);
         }
     }
 } 

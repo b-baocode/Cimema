@@ -56,6 +56,8 @@ namespace MV.InfrastructureLayer.Repositories
                 .Include(ti => ti.TicketDetails)
                 .Include(ti => ti.TicketInvoiceFoodItems)
                 .Include(ti => ti.Promotion)
+                .OrderByDescending(ti => ti.CreatedAt)
+                .Take(20)
                 .ToListAsync();
         }
 

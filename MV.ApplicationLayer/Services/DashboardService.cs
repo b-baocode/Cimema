@@ -1,3 +1,4 @@
+using MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest;
 using MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
@@ -90,6 +91,11 @@ namespace MV.ApplicationLayer.Services
             }
 
             return await _unitOfWork.dashboardRepository.GetRevenueAsync(queryStart, queryEnd);
+        }
+
+        public async Task<RevenueChartResponse> GetRevenueChartAsync(RevenueChartRequest request)
+        {
+            return await _unitOfWork.dashboardRepository.GetRevenueChartAsync(request);
         }
     }
 } 
