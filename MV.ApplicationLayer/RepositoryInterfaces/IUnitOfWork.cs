@@ -21,6 +21,7 @@
         ITicketInvoiceRepository ticketInvoiceRepository { get; }
         IScoreRepository scoreRepository { get; }
         IScoreHistoryRepository scoreHistoryRepository { get; }
+        IPaymentOnlineRepository paymentOnlineRepository { get; }
 
         IShowtimeRepository showtimeRepository { get; }
 

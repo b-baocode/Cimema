@@ -50,6 +50,15 @@ namespace MV.InfrastructureLayer.Repositories
                 .ToListAsync();
         }
 
+        public IEnumerable<TicketInvoice> GetAll()
+        {
+            return _context.TicketInvoices
+                .Include(ti => ti.TicketDetails)
+                .Include(ti => ti.TicketInvoiceFoodItems)
+                .Include(ti => ti.Promotion)
+                .AsEnumerable();
+        }
+
         public async Task UpdateAsync(TicketInvoice invoice)
         {
             _context.TicketInvoices.Update(invoice);
