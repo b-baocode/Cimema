@@ -29,7 +29,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -44,7 +44,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -63,7 +63,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -74,7 +74,7 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 if (request == null)
-                    return BadRequest("Invalid request data");
+                    return BadRequest("Invalid request data.");
 
                 var foodCategory = await _foodCategoryService.CreateFoodCategoryAsync(request);
                 return CreatedAtAction(nameof(GetFoodCategoryById), new { id = foodCategory.FoodCateId }, foodCategory);
@@ -85,7 +85,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -96,7 +96,7 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 if (request == null)
-                    return BadRequest("Invalid request data");
+                    return BadRequest("Invalid request data.");
 
                 var foodCategory = await _foodCategoryService.UpdateFoodCategoryAsync(id, request);
                 return Ok(foodCategory);
@@ -107,7 +107,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -118,7 +118,7 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 await _foodCategoryService.DeleteFoodCategoryAsync(id);
-                return Ok("Food category deleted successfully");
+                return Ok("Food category deleted successfully.");
             }
             catch (ValidationException ex)
             {
@@ -126,7 +126,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
     }

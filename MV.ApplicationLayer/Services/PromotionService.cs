@@ -94,7 +94,7 @@ namespace MV.ApplicationLayer.Services
             }
             else
             {
-                throw new ValidationException("Image is required");
+                throw new ValidationException("Image is required.");
             }
 
             // Determine initial status based on dates
@@ -256,32 +256,32 @@ namespace MV.ApplicationLayer.Services
         private void ValidatePromotionData(PromotionCreateRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.PromotionName))
-                throw new ValidationException("Promotion Name is required");
+                throw new ValidationException("Promotion Name is required.");
 
             if (request.Image == null || request.Image.Length == 0)
                 throw new ValidationException("Image is required");
 
             if (request.DiscountRate < 0 || request.DiscountRate > 100)
-                throw new ValidationException("Discount Rate must be between 0 and 100");
+                throw new ValidationException("Discount Rate must be between 0 and 100.");
 
             if (string.IsNullOrWhiteSpace(request.Description))
-                throw new ValidationException("Description is required");
+                throw new ValidationException("Description is required.");
         }
 
         private void ValidatePromotionData(PromotionUpdateRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.PromotionName))
-                throw new ValidationException("Promotion Name is required");
+                throw new ValidationException("Promotion Name is required.");
 
             // Remove image validation for update
             // if (request.Image == null || request.Image.Length == 0)
             //     throw new ValidationException("Image is required");
 
             if (request.DiscountRate < 0 || request.DiscountRate > 100)
-                throw new ValidationException("Discount Rate must be between 0 and 100");
+                throw new ValidationException("Discount Rate must be between 0 and 100.");
 
             if (string.IsNullOrWhiteSpace(request.Description))
-                throw new ValidationException("Description is required");
+                throw new ValidationException("Description is required.");
         }
 
         /// <summary>

@@ -64,7 +64,7 @@ namespace MV.ApplicationLayer.Services
                 ScoreId = score.ScoreId,
                 ScoreIn = scoreToAdd,
                 ScoreOut = 0,
-                Description = $"Cộng điểm từ hóa đơn {invoiceId}",
+                Description = $"Earn points from your bill {invoiceId}",
                 ChangeDate = DateTime.Now,
                 InvoiceId = invoiceId
             };
@@ -95,7 +95,7 @@ namespace MV.ApplicationLayer.Services
                 ScoreId = score.ScoreId,
                 ScoreIn = 0,
                 ScoreOut = scoresActuallyUsed,
-                Description = $"Trừ điểm khi sử dụng cho hóa đơn{(invoiceId.HasValue ? $" {invoiceId}" : "")}",
+                Description = $"Deduct points when used for invoice{(invoiceId.HasValue ? $" {invoiceId}" : "")}",
                 ChangeDate = DateTime.Now,
                 InvoiceId = invoiceId
             };
@@ -124,7 +124,7 @@ namespace MV.ApplicationLayer.Services
                 ScoreId = score.ScoreId,
                 ScoreIn = 0,
                 ScoreOut = usableScore,
-                Description = $"Trừ điểm khi sử dụng cho hóa đơn {invoiceId}",
+                Description = $"Deduct points when used for invoice {invoiceId}",
                 ChangeDate = DateTime.Now,
                 InvoiceId = invoiceId
             };

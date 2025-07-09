@@ -99,7 +99,7 @@ namespace MV.ApplicationLayer.Services
             {
                 await _firebaseStorageService.DeleteImageAsync(imgUrl);
 
-                throw new RoomTypeNameAlreadyExistException(roomTypeCreate.RoomTypeName, "This room type name already in used", ex);
+                throw new RoomTypeNameAlreadyExistException(roomTypeCreate.RoomTypeName, "This room type name already in used.", ex);
             }
             catch (Exception ex)
             {
@@ -156,17 +156,17 @@ namespace MV.ApplicationLayer.Services
 
             if (findRoomTypeToDelete == null)
             {
-                return (false, "Not exist");
+                return (false, "Not exist.");
             }
 
             if (findRoomTypeToDelete.CinemaRooms?.Count > 0)
             {
-                return (false, $"Room with id {deleteRoomTypeId} is being used");
+                return (false, $"Room with id {deleteRoomTypeId} is being used.");
             }
 
             if (findRoomTypeToDelete.RoomTypeName == "Standard")
             {
-                return (false, $"Can't delete Standard type");
+                return (false, $"Can not delete Standard type.");
             }
 
             findRoomTypeToDelete.Status = "InActive";
