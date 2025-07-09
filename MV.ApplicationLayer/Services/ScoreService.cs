@@ -69,6 +69,7 @@ namespace MV.ApplicationLayer.Services
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
+            await _unitOfWork.SaveChangesAsync();
         }
         /// <summary>
         /// Tính toán discount amount từ điểm (chỉ tính toán, không trừ điểm thực tế)
@@ -100,6 +101,7 @@ namespace MV.ApplicationLayer.Services
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
+             await _unitOfWork.SaveChangesAsync();
         }
         public async Task<Score?> GetScoreByUserIdAsync(string userId)
         {
@@ -129,6 +131,7 @@ namespace MV.ApplicationLayer.Services
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
+             await _unitOfWork.SaveChangesAsync();
         }
     }
 

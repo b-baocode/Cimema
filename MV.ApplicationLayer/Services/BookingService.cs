@@ -113,8 +113,7 @@ namespace MV.ApplicationLayer.Services
             // 8. Update seat status
             await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "InActive", showtimeRoomInstance.RoomInstanceId);
 
-            // 9. Update food quantity
-            if (request.Foods != null && request.Foods.Any())
+            // 9. Update food quantityf
             {
                 foreach (var foodReq in request.Foods)
                 {
@@ -225,6 +224,52 @@ namespace MV.ApplicationLayer.Services
         {
             // Lấy tất cả hóa đơn của user
             var invoices = await _unitOfWork.ticketInvoiceRepository.GetByUserIdAsync(userId);
+            var responses = new List<BookingResponse>();
+            foreach (var invoice in invoices)
+            {
+                var ticketDetails = invoice.TicketDetails.ToList();
+                var showtimeInstanceId = ticketDetails.FirstOrDefault()?.ShowtimeInstanceId;
+                var seatDataDict = showtimeInstanceId.HasValue
+                    ? await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeInstanceId.Value)
+                    : new Dictionary<int, SeatDataForShowtime>();
+                var foods = invoice.TicketInvoiceFoodItems.ToList();
+                var foodIds = foods.Select(f => f.FoodId).ToList();
+                var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
+                responses.Add(new BookingResponse
+                {
+                    InvoiceId = invoice.InvoiceId,
+                    TotalPrice = (decimal)invoice.TotalPrice,
+                    Status = invoice.Status,
+                    CreatedAt = invoice.CreatedAt,
+                    PaymentType = invoice.PaymentType,
+                    PromotionId = invoice.PromotionId,
+                    PromotionName = invoice.Promotion?.PromotionName,
+                    UserId = invoice.Userid,
+                    ScoresUsed = (int)invoice.ScoresUsed,
+                    ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
+                    Seats = ticketDetails.Select(td => new BookingSeatResponse
+                    {
+                        SeatId = td.SeatDataId,
+                        SeatName = seatDataDict.ContainsKey(td.SeatDataId) ? seatDataDict[td.SeatDataId].RowLabel + seatDataDict[td.SeatDataId].ColumnNumber : "",
+                        Price = td.TicketPrice,
+                        Status = td.Status
+                    }).ToList(),
+                    Foods = foods.Select(fi => new BookingFoodResponse
+                    {
+                        FoodId = fi.FoodId,
+                        FoodName = foodEntities.FirstOrDefault(f => f.FoodId == fi.FoodId)?.FoodName ?? "",
+                        Quantity = fi.BoughtQuantity,
+                        Price = fi.TotalFoodPrice
+                    }).ToList()
+                });
+            }
+            return responses;
+        }
+
+        public async Task<List<BookingResponse>> GetBookingsByUserAndStatusAsync(string userId, string status)
+        {
+            // Lấy hóa đơn của user với status cụ thể
+            var invoices = await _unitOfWork.ticketInvoiceRepository.GetByUserIdAndStatusAsync(userId, status);
             var responses = new List<BookingResponse>();
             foreach (var invoice in invoices)
             {
