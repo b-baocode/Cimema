@@ -175,5 +175,36 @@ namespace MV.PresnetationLayer.Controllers
                 return StatusCode(500, "An unexpected error occurred.");
             }
         }
+
+        [HttpPost("register-offline")]
+        [Authorize(Roles = "Manager,Employee")]
+        public async Task<IActionResult> RegisterOffline([FromBody] CustomerOfflineRegisterRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { errors });
+            }
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized();
+                await _userService.RegisterCustomerOfflineAsync(request, userId);
+                return Ok(new { message = "Registration successful. Email sent to customer." });
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred: " + ex.Message);
+            }
+        }
     }
 }

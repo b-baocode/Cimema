@@ -4,6 +4,9 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -11,11 +14,13 @@ namespace MV.ApplicationLayer.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFirebaseStorageService _firebaseStorageService;
+        private readonly IEmailService _emailService;
 
-        public UserService(IUnitOfWork unitOfWork, IFirebaseStorageService firebaseStorageService)
+        public UserService(IUnitOfWork unitOfWork, IFirebaseStorageService firebaseStorageService, IEmailService emailService)
         {
             _unitOfWork = unitOfWork;
             _firebaseStorageService = firebaseStorageService;
+            _emailService = emailService;
         }
 
         public async Task<CustomersReponse?> EditProfileAsync(CustomersRequest request)
@@ -382,6 +387,241 @@ namespace MV.ApplicationLayer.Services
                 PageSize = request.PageSize,
                 TotalPages = (int)Math.Ceiling(totalItems / (double)request.PageSize)
             };
+        }
+
+        public async Task<bool> RegisterCustomerOfflineAsync(CustomerOfflineRegisterRequest request, string createdByUserId)
+        {
+            // Lấy user tạo (Manager/Employee)
+            var creator = await _unitOfWork.userRepository.GetByIdAsync(createdByUserId);
+            if (creator == null || (creator.Roleid != 2 && creator.Roleid != 3)) // 2: Manager, 3: Employee
+                throw new UnauthorizedAccessException("You do not have permission to perform this function.");
+
+            // Kiểm tra trùng lặp email, phone
+            if (await _unitOfWork.userRepository.IsEmailExistsAsync(request.Email))
+                throw new ValidationException("Email already exists.");
+            if (await _unitOfWork.userRepository.IsPhoneExistsAsync(request.Phone))
+                throw new ValidationException("Phone number already exists.");
+
+            // Sinh userid và username
+            string userId = Guid.NewGuid().ToString();
+            string username = request.Email;
+            string password = "customer@123";
+            string hashedPassword = HashPassword(password);
+            string imageUrl = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media&token=11cc28fe-2437-4527-a755-909c0a332ffa";
+
+            var user = new User
+            {
+                Userid = userId,
+                Username = username,
+                Password = hashedPassword,
+                Image = imageUrl,
+                Fullname = null,
+                Birthdate = null,
+                Gender = null,
+                Identitynumber = null,
+                Email = request.Email,
+                Phone = request.Phone,
+                Address = null,
+                Status = 1, // Đã kích hoạt
+                Roleid = 4, // Customer
+                Joindate = DateTime.Now
+            };
+
+            await _unitOfWork.userRepository.CreateCustomerAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+
+            // Gửi email thông báo
+            string emailBody = $@"
+                <!DOCTYPE html>
+                <html lang='en'>
+                  <head>
+                    <meta charset='UTF-8' />
+                    <meta name='viewport' content='width=device-width, initial-scale=1.0'/>
+                    <title>Account Registration</title>
+                    <link href='https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;600&display=swap' rel='stylesheet'>
+                    <style>
+                      body {{
+                        background-color: #0a0a0a;
+                        font-family: 'Montserrat', sans-serif;
+                        color: white;
+                        margin: 0;
+                        padding: 0;
+                        line-height: 1.6;
+                      }}
+                      .container {{
+                        max-width: 500px;
+                        margin: 40px auto;
+                        background: radial-gradient(circle at top left, #1a1a1a, #000000);
+                        border-radius: 16px;
+                        box-shadow: 0 0 40px rgba(255, 215, 0, 0.1);
+                        overflow: hidden;
+                        border: 2px solid #e50914;
+                        position: relative;
+                      }}
+                      .premium-badge {{
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        background: linear-gradient(to right, #ffd700, #ffa500);
+                        color: #000;
+                        padding: 5px 15px;
+                        border-bottom-right-radius: 16px;
+                        font-size: 12px;
+                        font-weight: bold;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        z-index: 1;
+                      }}
+                      .header {{
+                        background: linear-gradient(to right, #e50914, #b2070f);
+                        text-align: center;
+                        padding: 40px 20px 20px;
+                        padding-top: 60px;
+                        position: relative;
+                        z-index: 0;
+                      }}
+                      .header img {{
+                        width: 60px;
+                        margin-bottom: 10px;
+                      }}
+                      .header h1 {{
+                        font-family: 'Playfair Display', serif;
+                        font-size: 26px;
+                        margin: 0;
+                        letter-spacing: 2px;
+                        text-transform: uppercase;
+                      }}
+                      .content {{
+                        padding: 30px 20px;
+                        text-align: center;
+                      }}
+                      .content p {{
+                        font-size: 16px;
+                        margin-bottom: 20px;
+                        color: #ccc;
+                      }}
+                      .info-table {{
+                        margin: 0 auto 20px auto;
+                        background: #121212;
+                        border: 2px solid #ffd700;
+                        border-radius: 10px;
+                        padding: 20px 10px;
+                        font-size: 18px;
+                        font-family: 'Playfair Display', serif;
+                        color: #ffd700;
+                        box-shadow: 0 0 20px rgba(255,215,0,0.3);
+                        width: 95%;
+                      }}
+                      .info-table td {{
+                        padding: 8px 12px;
+                        font-family: 'Montserrat', sans-serif;
+                        font-size: 16px;
+                      }}
+                      .info-table .label {{
+                        color: #ffd700;
+                        font-weight: bold;
+                        text-align: right;
+                        width: 40%;
+                      }}
+                      .info-table .value {{
+                        color: #fff;
+                        font-weight: bold;
+                        text-align: left;
+                        width: 60%;
+                        word-break: break-all;
+                      }}
+                      .note {{
+                        margin-top: 16px;
+                        color: #ffcc00;
+                        font-size: 15px;
+                      }}
+                      .support {{
+                        margin-top: 40px;
+                        background-color: #1e1e1e;
+                        padding: 20px;
+                        border-top: 1px solid #333;
+                        border-bottom-left-radius: 16px;
+                        border-bottom-right-radius: 16px;
+                      }}
+                      .support h3 {{
+                        color: #ffd700;
+                        font-size: 18px;
+                        margin-bottom: 10px;
+                      }}
+                      .support p {{
+                        color: #ffe135;
+                        margin: 5px 0;
+                        font-size: 14px;
+                      }}
+                      .support a {{
+                        color: #4faaff;
+                        text-decoration: none;
+                      }}
+                      .footer {{
+                        text-align: center;
+                        font-size: 12px;
+                        color: #666;
+                        padding: 20px;
+                      }}
+                      .footer a {{
+                        color: #ffd700;
+                        text-decoration: none;
+                        margin: 0 5px;
+                      }}
+                      .footer a:hover {{
+                        text-decoration: underline;
+                      }}
+                    </style>
+                  </head>
+                  <body>
+                    <div class='container'>
+                      <div class='premium-badge'>PREMIUM</div>
+                      <div class='header'>
+                        <img src='https://img.icons8.com/ios-filled/100/ffffff/movie-projector.png' alt='Cinema Icon' />
+                        <h1>REGISTER ACCOUNT SUCCESSFULLY</h1>
+                      </div>
+                      <div class='content'>
+                        <p>Welcome to <strong>CosmoCiné Cinema</strong>!<br>
+                          Your account has been successfully created by our staff at the counter.</p>
+                        <table class='info-table'>
+                          <tr><td class='label'>Account (Email):</td><td class='value'>{username}</td></tr>
+                          <tr><td class='label'>Password:</td><td class='value'>{password}</td></tr>
+                        </table>
+                        <div class='note'>For your security, please <b>change your password</b> after your first login.</div>
+                        <p>If you have any questions, please contact our support team.</p>
+                      </div>
+                      <div class='support'>
+                        <h3>Need Help ?</h3>
+                        <p>📞 Phone: <strong>0775743304</strong></p>
+                        <p>📧 Email: <a href='mailto:hoangnvse183852@fpt.edu.vn'>hoangnvse183852@fpt.edu.vn</a></p>
+                      </div>
+                      <div class='footer'>
+                        <div>
+                          <a href='https://www.facebook.com/viethoang.ng1005/'>Facebook</a> |
+                          <a href='https://www.facebook.com/viethoang.ng1005/'>Twitter</a> |
+                          <a href='https://www.facebook.com/viethoang.ng1005/'>Instagram</a>
+                        </div>
+                        <p>&copy; 2024 Premium Cinema Management System. All rights reserved.</p>
+                        <p>This is an automated email, please do not reply.</p>
+                      </div>
+                    </div>
+                  </body>
+                </html>";
+            await _emailService.SendEmailAsync(request.Email, "Your Movie Theater Account Information", emailBody);
+
+            return true;
+        }
+
+        private string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                var builder = new StringBuilder();
+                foreach (var b in bytes)
+                    builder.Append(b.ToString("x2"));
+                return builder.ToString();
+            }
         }
     }
 }
