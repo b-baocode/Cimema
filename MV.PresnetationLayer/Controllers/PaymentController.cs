@@ -50,23 +50,19 @@ namespace MV.PresnetationLayer.Controllers
         [HttpGet("vnpay-callback")]
         public async Task<IActionResult> VnPayCallback([FromQuery] int? invoiceId = null)
         {
+            // 1. Xử lý logic và lưu dữ liệu như cũ
             var response = _vnPayService.PaymentExecute(Request.Query);
-
-            // Lưu tất cả các trường hợp thanh toán để tracking
             await _vnPayService.SavePaymentOnline(response, invoiceId);
 
-            // Trả về thông tin chi tiết về kết quả thanh toán
-            var result = new
-            {
-                success = response.Success,
-                responseCode = response.VnPayResponseCode,
-                message = GetPaymentMessage(response.VnPayResponseCode),
-                orderId = response.OrderId,
-                transactionId = response.TransactionId,
-                amount = response.OrderDescription
-            };
+            // 2. Chuẩn bị URL để chuyển hướng về Frontend
+            // Thay thế bằng URL trang kết quả của bạn
+            string frontendReturnUrl = "http://localhost:5173/vnpay-return";
 
-            return Ok(result);
+            // 3. Tạo URL cuối cùng với các tham số kết quả
+            var redirectUrl = $"{frontendReturnUrl}?success={response.Success}&responseCode={response.VnPayResponseCode}";
+
+            // 4. Thực hiện chuyển hướng
+            return Redirect(redirectUrl);
         }
 
         private string GetPaymentMessage(string vnPayResponseCode)
