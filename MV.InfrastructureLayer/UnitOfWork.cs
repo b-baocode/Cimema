@@ -52,16 +52,15 @@ namespace MV.InfrastructureLayer
         private ISeatDataForShowtimeRepository _seatDataForShowtimeRepository;
         private IShowtimeRoomInstanceRepository _showtimeRoomInstanceRepository;
         private ITicketInvoiceRepository _ticketInvoiceRepository;
-        // Thêm Repository xóa payment cũ
-        public ITicketInvoiceRepository ticketInvoiceRepository => _ticketInvoiceRepository ??= new TicketInvoiceRepository(_context);
         private IScoreHistoryRepository _scoreHistoryRepository;
         private IScoreRepository _scoreRepository;
         private IPaymentOnlineRepository _paymentOnlineRepository;
         // Thêm Repository xóa paymentonline cũ
         public IPaymentOnlineRepository paymentOnlineRepository => _paymentOnlineRepository ??= new PaymentOnlineRepository(_context);
 
-        private DashboardRepository _dashboardRepository;
+        private IDashboardRepository _dashboardRepository;
         // Expose repository INTERFACES
+        public IDashboardRepository dashboardRepository => _dashboardRepository ??= new DashboardRepository(_context);
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
         public IRoomRepository roomRepository => _roomRepository ??= new RoomRepository(_context);
         public ISeatRepository seatRepository => _seatRepository ??= new SeatRepository(_context);

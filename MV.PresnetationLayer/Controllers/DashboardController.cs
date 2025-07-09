@@ -67,7 +67,6 @@ namespace MV.PresnetationLayer.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("revenue/chart")]
         public async Task<IActionResult> GetRevenueChart([FromBody] RevenueChartRequest request)
         {
