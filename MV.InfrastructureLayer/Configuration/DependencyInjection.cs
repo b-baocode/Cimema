@@ -57,6 +57,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
             services.AddScoped<IPaymentOnlineRepository, PaymentOnlineRepository>();
+            services.AddScoped<IPaymentUpFrontService, PaymentUpFrontService>();
             services.AddScoped<IShowtimeRoomInstanceRepository, ShowtimeRoomInstanceRepository>();
 
 

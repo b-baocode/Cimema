@@ -29,8 +29,8 @@ namespace MV.ApplicationLayer.Services
                     throw new Exception("Invoice not found.");
                 }
 
-                // Tính toán số tiền thực tế cần thanh toán (sau khi trừ điểm tích lũy)
-            var actualAmountToPay = invoice.TotalPrice - (invoice.ScoreDiscountAmount ?? 0m);
+                // Tính toán số tiền thực tế cần thanh toán (không trừ điểm tích lũy nữa)
+                var actualAmountToPay = invoice.TotalPrice;
 
                 // Tính toán số tiền thừa
                 var remainChange = paymentRequest.CustomerGive - actualAmountToPay;
@@ -51,6 +51,9 @@ namespace MV.ApplicationLayer.Services
                 };
 
                 await _unitOfWork.paymentUpFrontRepository.AddPaymentUpFrontAsync(payment);
+                // Cập nhật trạng thái TicketInvoice sang Success
+                invoice.Status = "Success";
+                await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
                 await _unitOfWork.SaveChangesAsync();
 
                 return new PaymentUpFrontResponse
@@ -144,8 +147,8 @@ namespace MV.ApplicationLayer.Services
                     throw new Exception("Invoice not found.");
                 }
 
-                // Tính toán số tiền thực tế cần thanh toán (sau khi trừ điểm tích lũy)
-            var actualAmountToPay = invoice.TotalPrice - (invoice.ScoreDiscountAmount ?? 0m);
+                // Tính toán số tiền thực tế cần thanh toán (không trừ điểm tích lũy nữa)
+                var actualAmountToPay = invoice.TotalPrice;
 
                 // Tính toán số tiền thừa
                 var remainChange = paymentRequest.CustomerGive - actualAmountToPay;

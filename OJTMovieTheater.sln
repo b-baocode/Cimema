@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MV.DomainLayer", "MV.Domain
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MV.PresnetationLayer", "MV.PresnetationLayer\MV.PresnetationLayer.csproj", "{7D0F16B9-4385-4778-B4A9-AB8AA8B0ABF7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MV.UnitTestLayer", "MV.UnitTestLayer\MV.UnitTestLayer.csproj", "{591A51BE-5FF2-432F-9E37-52E4C9E2D636}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{7D0F16B9-4385-4778-B4A9-AB8AA8B0ABF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D0F16B9-4385-4778-B4A9-AB8AA8B0ABF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D0F16B9-4385-4778-B4A9-AB8AA8B0ABF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{591A51BE-5FF2-432F-9E37-52E4C9E2D636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{591A51BE-5FF2-432F-9E37-52E4C9E2D636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{591A51BE-5FF2-432F-9E37-52E4C9E2D636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{591A51BE-5FF2-432F-9E37-52E4C9E2D636}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
