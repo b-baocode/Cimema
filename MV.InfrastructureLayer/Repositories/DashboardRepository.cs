@@ -20,10 +20,11 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<RevenueResponse> GetRevenueAsync(DateTime startDate, DateTime endDate)
         {
+            var startDateOnly = startDate.Date;
+            var endDateOnly = endDate.Date.AddDays(1);
             var revenueData = await _context.TicketInvoices
-                .Where(ti => (ti.Status == "Success" || ti.Status == "Checked") && 
-                             ti.CreatedAt >= startDate && 
-                             ti.CreatedAt <= endDate)
+                .Where(ti => (ti.Status == "Success" || ti.Status == "Checked") &&
+                             ti.CreatedAt >= startDateOnly && ti.CreatedAt < endDateOnly)
                 .GroupBy(ti => 1)
                 .Select(g => new
                 {
@@ -56,9 +57,11 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<RevenueChartResponse> GetRevenueChartAsync(RevenueChartRequest request)
         {
+            var startDateOnly = request.StartDate.Date;
+            var endDateOnly = request.EndDate.Date.AddDays(1);
             var query = _context.TicketInvoices
                 .Where(ti => (ti.Status == "Success" || ti.Status == "Checked")
-                    && ti.CreatedAt >= request.StartDate && ti.CreatedAt <= request.EndDate);
+                    && ti.CreatedAt >= startDateOnly && ti.CreatedAt < endDateOnly);
 
             List<RevenueChartItem> data;
 
