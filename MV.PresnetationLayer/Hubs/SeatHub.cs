@@ -101,5 +101,20 @@ namespace MV.PresnetationLayer.Hubs
             }
             return base.OnDisconnectedAsync(exception);
         }
+        public async Task UpdateHoldStatus(string movieShowtimeRoomId, List<string> seatIds, string status)
+        {
+            string groupName;
+            try
+            {
+                groupName = SeatShowtimeNameGroupHelper.GetGroupNameForShowtimeSeat(movieShowtimeRoomId);
+            }
+            catch (FormatException ex)
+            {
+                _logger.LogInformation("Invalid format for movieShowtimeRoom");
+                return;
+            }
+
+            await Clients.OthersInGroup(groupName).SendAsync("ReceiveHoldUpdate", new { SeatIds = seatIds, Status = status });
+        }
     }
 }
