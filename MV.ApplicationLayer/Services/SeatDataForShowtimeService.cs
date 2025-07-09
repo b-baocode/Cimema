@@ -28,7 +28,7 @@ namespace MV.ApplicationLayer.Services
             var invalidSeats = requestedSeatIds.Where(id => !seatDataDict.ContainsKey(id)).ToList();
             if (invalidSeats.Any())
             {
-                throw new Exception($"Các ghế không hợp lệ: {string.Join(", ", invalidSeats)}");
+                throw new Exception($"Invalid seats: {string.Join(", ", invalidSeats)}.");
             }
 
             foreach (var seatId in requestedSeatIds)
@@ -36,7 +36,7 @@ namespace MV.ApplicationLayer.Services
                 var seatData = seatDataDict[seatId];
                 if (seatData.Status != null && seatData.Status != "Active")
                 {
-                    throw new Exception($"Ghế {seatId} đã được đặt hoặc không khả dụng.");
+                    throw new Exception($"Seat {seatId} is booked or unavailable.");
                 }
             }
             return Task.CompletedTask;

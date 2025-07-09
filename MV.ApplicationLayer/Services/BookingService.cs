@@ -41,13 +41,13 @@ namespace MV.ApplicationLayer.Services
             // 1. Validate user
             var user = await _unitOfWork.userRepository.GetByIdAsync(request.UserId);
             if (user == null)
-                throw new Exception("User không tồn tại.");
+                throw new Exception("User does not exist.");
             //lỗi ở đây
             
             // 2. Get ShowtimeRoomInstance
             var showtimeRoomInstance = await _showtimeRoomInstanceService.GetRoomInstanceWithSeatById(request.ShowtimeInstanceId);
             if (showtimeRoomInstance == null)
-                throw new Exception("ShowtimeRoomInstance không tồn tại cho RoomInstanceId này.");
+                throw new Exception("ShowtimeRoomInstance does not exist for this RoomInstanceId.");
 
             // 3. Get and validate seats
             var seatDataDict = await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeRoomInstance.RoomInstanceId);
@@ -61,12 +61,12 @@ namespace MV.ApplicationLayer.Services
                 var foodIds = request.Foods.Select(f => f.FoodId).ToList();
                 foods = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
                 if (foods.Count != foodIds.Count)
-                    throw new Exception("Một hoặc nhiều món ăn không hợp lệ.");
+                    throw new Exception("One or more dishes are invalid.");
                 foreach (var foodReq in request.Foods)
                 {
                     var food = foods.First(f => f.FoodId == foodReq.FoodId);
                     if (food.Quantity < foodReq.Quantity)
-                        throw new Exception($"Món {food.FoodId} không đủ số lượng.");
+                        throw new Exception($"Item {food.FoodId} is not available in sufficient quantity.");
                 }
             }
 
@@ -77,15 +77,15 @@ namespace MV.ApplicationLayer.Services
                 var allPromotions = await _unitOfWork.promotionRepository.GetPromotionsAsync(null, 0, int.MaxValue);
                 promotion = allPromotions.FirstOrDefault(p => p.PromotionId == request.PromotionId.Value);
                 if (promotion == null)
-                    throw new Exception("Mã khuyến mãi không hợp lệ.");
+                    throw new Exception("Invalid promo code.");
                 if (promotion.EndDate < DateTime.Now)
-                    throw new Exception("Mã khuyến mãi đã hết hạn.");
+                    throw new Exception("The promo code has expired.");
             }
 
             // TÍNH TIỀN CHUẨN
             var showtimeRoomInstanceEntity = await _showtimeRoomInstanceService.GetByShowtimeInstanceIdAsync(request.ShowtimeInstanceId);
             if (showtimeRoomInstanceEntity == null)
-                throw new Exception("Không tìm thấy ShowtimeRoomInstance entity cho RoomInstanceId này.");
+                throw new Exception("No ShowtimeRoomInstance entity found for this RoomInstanceId.");
 
             decimal totalTicketPrice = request.Seats.Sum(seatReq =>
                 seatDataDict[seatReq.SeatId].SeatTypePrice +
@@ -172,7 +172,7 @@ namespace MV.ApplicationLayer.Services
             // Lấy hóa đơn
             var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
             if (invoice == null)
-                throw new Exception($"Không tìm thấy hóa đơn với id {invoiceId}");
+                throw new Exception($"Invoice with id {invoiceId} not found.");
 
             // Lấy thông tin user
             var userId = invoice.Userid;
@@ -363,7 +363,7 @@ namespace MV.ApplicationLayer.Services
             // Lấy hóa đơn
             var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
             if (invoice == null)
-                throw new Exception($"Không tìm thấy hóa đơn với id {invoiceId}");
+                throw new Exception($"Invoice with id {invoiceId} not found.");
             if (invoice.Status == "Cancelled")
                 return false;
 

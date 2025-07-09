@@ -46,14 +46,14 @@ namespace MV.ApplicationLayer.Services
 
             if (getUser == null)
             {
-                return "User not exist";
+                return "User not exist.";
             }
 
             var checkOldPass = _passwordRepository.VerifyPassword(changePasswordRequest.OldPassword, getUser.Password);
 
             if (!checkOldPass)
             {
-                return "Wrong old password";
+                return "Wrong old password.";
             }
 
             getUser.Password = _passwordRepository.HashPassword(changePasswordRequest.NewPassword);

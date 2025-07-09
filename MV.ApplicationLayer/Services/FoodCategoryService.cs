@@ -32,7 +32,7 @@ namespace MV.ApplicationLayer.Services
         {
             var foodCategory = await _unitOfWork.foodCategoryRepository.GetFoodCategoryByIdAsync(id);
             if (foodCategory == null)
-                throw new ValidationException("Food category not found");
+                throw new ValidationException("Food category not found.");
 
             return MapToResponse(foodCategory);
         }
@@ -42,7 +42,7 @@ namespace MV.ApplicationLayer.Services
             // Check if food category name already exists
             var existingFoodCategory = await _unitOfWork.foodCategoryRepository.GetFoodCategoryByNameAsync(request.CateName);
             if (existingFoodCategory != null)
-                throw new ValidationException("Food category with this name already exists");
+                throw new ValidationException("Food category with this name already exists.");
 
             var foodCategory = new FoodCategory
             {
@@ -58,12 +58,12 @@ namespace MV.ApplicationLayer.Services
         {
             var foodCategory = await _unitOfWork.foodCategoryRepository.GetFoodCategoryByIdAsync(id);
             if (foodCategory == null)
-                throw new ValidationException("Food category not found");
+                throw new ValidationException("Food category not found.");
 
             // Check if new name conflicts with existing food category
             var existingFoodCategory = await _unitOfWork.foodCategoryRepository.GetFoodCategoryByNameAsync(request.CateName);
             if (existingFoodCategory != null && existingFoodCategory.FoodCateId != id)
-                throw new ValidationException("Food category with this name already exists");
+                throw new ValidationException("Food category with this name already exists.");
 
             foodCategory.CateName = request.CateName;
             foodCategory.Status = request.Status ?? "Active";
@@ -77,10 +77,10 @@ namespace MV.ApplicationLayer.Services
 
             var foodCategory = await _unitOfWork.foodCategoryRepository.GetFoodCategoryByIdAsync(id);
             if (foodCategory == null)
-                throw new ValidationException("Food category not found");
+                throw new ValidationException("Food category not found.");
 
             if (foodCategory.Status == "InActive")
-                throw new ValidationException("Food category is already deleted");
+                throw new ValidationException("Food category is already deleted.");
 
 
             if (foodCategory.Foods.Any(f => f.Status == "Active"))

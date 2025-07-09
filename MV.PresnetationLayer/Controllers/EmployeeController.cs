@@ -48,7 +48,7 @@ namespace MV.PresnetationLayer.Controllers
             // Check if current user is Manager and trying to view a Manager
             if (User.IsInRole("Manager") && employee.Role == "Manager")
             {
-                return Forbid("Managers can only view regular employees");
+                return Forbid("Managers can only view regular employees.");
             }
 
             return Ok(employee);
@@ -64,7 +64,7 @@ namespace MV.PresnetationLayer.Controllers
                 // Check if current user is Manager and trying to create a Manager
                 if (User.IsInRole("Manager") && request.RoleId == 2) // Assuming 2 is Manager role ID
                 {
-                    return Forbid("Managers can only create regular employees");
+                    return Forbid("Managers can only create regular employees.");
                 }
 
                 var employee = await _employeeService.CreateEmployeeAsync(request);
@@ -93,11 +93,11 @@ namespace MV.PresnetationLayer.Controllers
                 {
                     // Manager can't update Managers
                     if (currentEmployee.Role == "Manager")
-                        return Forbid("Managers can only update regular employees");
+                        return Forbid("Managers can only update regular employees.");
 
                     // Manager can't change role to Manager
                     if (request.RoleId == 2)
-                        return Forbid("Managers can't change role to Manager");
+                        return Forbid("Managers can't change role to Manager.");
                 }
 
                 var employee = await _employeeService.UpdateEmployeeAsync(id, request);

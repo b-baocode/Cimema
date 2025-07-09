@@ -52,8 +52,14 @@ namespace MV.InfrastructureLayer
         private ISeatDataForShowtimeRepository _seatDataForShowtimeRepository;
         private IShowtimeRoomInstanceRepository _showtimeRoomInstanceRepository;
         private ITicketInvoiceRepository _ticketInvoiceRepository;
+        // Thêm Repository xóa payment cũ
+        public ITicketInvoiceRepository ticketInvoiceRepository => _ticketInvoiceRepository ??= new TicketInvoiceRepository(_context);
         private IScoreHistoryRepository _scoreHistoryRepository;
         private IScoreRepository _scoreRepository;
+        private IPaymentOnlineRepository _paymentOnlineRepository;
+        // Thêm Repository xóa paymentonline cũ
+        public IPaymentOnlineRepository paymentOnlineRepository => _paymentOnlineRepository ??= new PaymentOnlineRepository(_context);
+
         private DashboardRepository _dashboardRepository;
         // Expose repository INTERFACES
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
@@ -74,7 +80,6 @@ namespace MV.InfrastructureLayer
 
         //public DbSet<TicketInvoice> TicketInvoices => _context.TicketInvoices;
         public IShowtimeRepository showtimeRepository => _showtimeRepository ??= new ShowtimeRepository(_context);
-        public IDashboardRepository dashboardRepository => _dashboardRepository ??= new DashboardRepository(_context);
 
         // CONSTRUCTOR INJECTION for DbContext
         public UnitOfWork(MovietheatermanagementContext context)

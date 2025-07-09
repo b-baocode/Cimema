@@ -7,5 +7,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         void Add(PaymentOnline paymentOnline);
         void Delete(PaymentOnline paymentOnline);
         Task<PaymentOnline?> GetByInvoiceIdAsync(int invoiceId);
+        IEnumerable<PaymentOnline> GetAll();
     }
 } 

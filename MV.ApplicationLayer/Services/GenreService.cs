@@ -32,7 +32,7 @@ namespace MV.ApplicationLayer.Services
         {
             var genre = await _unitOfWork.genreRepository.GetGenreByIdAsync(id);
             if (genre == null)
-                throw new ValidationException("Genre not found");
+                throw new ValidationException("Genre not found.");
 
             return MapToResponse(genre);
         }
@@ -42,7 +42,7 @@ namespace MV.ApplicationLayer.Services
             // Check if genre name already exists
             var existingGenre = await _unitOfWork.genreRepository.GetGenreByNameAsync(request.Name);
             if (existingGenre != null)
-                throw new ValidationException("Genre with this name already exists");
+                throw new ValidationException("Genre with this name already exists.");
 
             var genre = new Genre
             {
@@ -58,12 +58,12 @@ namespace MV.ApplicationLayer.Services
         {
             var genre = await _unitOfWork.genreRepository.GetGenreByIdAsync(id);
             if (genre == null)
-                throw new ValidationException("Genre not found");
+                throw new ValidationException("Genre not found.");
 
             // Check if new name conflicts with existing genre
             var existingGenre = await _unitOfWork.genreRepository.GetGenreByNameAsync(request.Name);
             if (existingGenre != null && existingGenre.GenreId != id)
-                throw new ValidationException("Genre with this name already exists");
+                throw new ValidationException("Genre with this name already exists.");
 
             genre.Name = request.Name;
             genre.Status = request.Status ?? "Active";
@@ -76,10 +76,10 @@ namespace MV.ApplicationLayer.Services
         {
             var genre = await _unitOfWork.genreRepository.GetGenreByIdAsync(id);
             if (genre == null)
-                throw new ValidationException("Genre not found");
+                throw new ValidationException("Genre not found.");
 
             if (genre.Status == "UnActive")
-                throw new ValidationException("Genre is already deleted");
+                throw new ValidationException("Genre is already deleted.");
 
             await _unitOfWork.genreRepository.DeleteGenreAsync(id);
         }

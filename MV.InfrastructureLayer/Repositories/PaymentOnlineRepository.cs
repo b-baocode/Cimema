@@ -30,5 +30,10 @@ namespace MV.InfrastructureLayer.Repositories
             return await _context.PaymentOnlines
                 .FirstOrDefaultAsync(p => p.InvoiceId == invoiceId);
         }
+
+        public IEnumerable<PaymentOnline> GetAll()
+        {
+            return _context.PaymentOnlines.AsEnumerable();
+        }
     }
 } 

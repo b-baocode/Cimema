@@ -408,19 +408,19 @@ namespace MV.PresnetationLayer.Controllers
                       <h3>📋 Transaction details (TEST)</h3>
                       <div class=""detail-row"">
                         <span class=""detail-label"">Invoice code:</span>
-                        <span class=""detail-value"">#{invoice.InvoiceId}</span>
+                        <span class=""detail-value""> {invoice.InvoiceId}</span>
                       </div>
                       <div class=""detail-row"">
                         <span class=""detail-label"">Payment method:</span>
-                        <span class=""detail-value"">{payment.PaymentMethod}</span>
+                        <span class=""detail-value""> {payment.PaymentMethod}</span>
                       </div>
                       <div class=""detail-row"">
                         <span class=""detail-label"">Payment time:</span>
-                        <span class=""detail-value"">{paymentDate}</span>
+                        <span class=""detail-value""> {paymentDate}</span>
                       </div>
                       <div class=""detail-row"">
                         <span class=""detail-label"">Number amount:</span>
-                        <span class=""detail-value amount"">{amount}</span>
+                        <span class=""detail-value amount""> {amount}</span>
                       </div>
                     </div>
                     
@@ -640,19 +640,19 @@ namespace MV.PresnetationLayer.Controllers
                     <h3>📋 Transaction details (TEST)</h3> 
                     <div class=""detail-row""> 
                     <span class=""detail-label"">Invoice code:</span> 
-                    <span class=""detail-value"">#{invoice.InvoiceId}</span> 
+                    <span class=""detail-value""> {invoice.InvoiceId}</span> 
                     </div> 
                     <div class=""detail-row""> 
                     <span class=""detail-label"">Payment method:</span> 
-                    <span class=""detail-value"">{payment.PaymentMethod}</span> 
+                    <span class=""detail-value""> {payment.PaymentMethod}</span> 
                     </div> 
                     <div class=""detail-row""> 
                     <span class=""detail-label"">Payment time:</span> 
-                    <span class=""detail-value"">{paymentDate}</span> 
+                    <span class=""detail-value""> {paymentDate}</span> 
                     </div> 
                     <div class=""detail-row""> 
                     <span class=""detail-label"">Number amount:</span>
-                    <span class=""detail-value amount"">{amount}</span>
+                    <span class=""detail-value amount""> {amount}</span>
                     </div>
                     </div>
                     <p style=""color: #4CAF50; font-weight: bold;"">🎉 Your transaction has been processed successfully!</p>
