@@ -9,7 +9,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,Manager")]
+   
     public class FoodController : ControllerBase
     {
         private readonly IFoodService _foodService;
