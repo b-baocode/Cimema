@@ -169,5 +169,25 @@ namespace MV.PresnetationLayer.Controllers
             var result = await _movieService.GetComingSoonMoviesAsync(request);
             return Ok(result);
         }
+
+        [HttpGet("now-showing")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<MovieResponse>>> GetNowShowingMovies([FromQuery] DateTime? date = null)
+        {
+            var movies = await _movieService.GetNowShowingMoviesByShowtimeAsync(date);
+            return Ok(movies);
+        }
+
+        // SỬA ENDPOINT active-by-month để gọi hàm lọc theo Movie (FromDate/ToDate + Status = Active), không dùng Showtime nữa
+        [HttpGet("active-by-month")]
+        [AllowAnonymous]
+        public async Task<ActionResult<List<MovieResponse>>> GetActiveMoviesByDateRange([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
+        {
+            // Nếu không truyền, mặc định lấy đầu tháng và cuối tháng hiện tại
+            var start = startDate ?? new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+            var end = endDate ?? new DateTime(DateTime.Today.Year, DateTime.Today.Month, DateTime.DaysInMonth(DateTime.Today.Year, DateTime.Today.Month));
+            var movies = await _movieService.GetActiveMoviesByDateRangeAsync(start, end);
+            return Ok(movies);
+        }
     }
 }

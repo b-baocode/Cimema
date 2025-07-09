@@ -134,7 +134,7 @@ namespace MV.ApplicationLayer.Services
             }
             catch (ExcludeConstraintViolationException ex)
             {
-                throw new ShowtimeRoomInstanceIsUnAvailableException(newShowtime.ShowtimeId.ToString(), "Some rooms is being used at this time range", ex);
+                throw new ShowtimeRoomInstanceIsUnAvailableException(newShowtime.ShowtimeId.ToString(), "Some rooms is being used at this time range.", ex);
             }
             catch (Exception ex)
             {

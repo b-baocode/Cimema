@@ -88,17 +88,17 @@ namespace MV.ApplicationLayer.Services
         {
             var employee = await _unitOfWork.employeeRepository.GetEmployeeByIdAsync(id);
             if (employee == null)
-                throw new ValidationException("Employee not found");
+                throw new ValidationException("Employee not found.");
 
             // Check if email is already used by another employee
             if (await _unitOfWork.employeeRepository.IsEmailExistsAsync(request.Email) &&
                 employee.Email != request.Email)
-                throw new ValidationException("Email already exists");
+                throw new ValidationException("Email already exists.");
 
             // Check if identity number is already used by another employee
             if (await _unitOfWork.employeeRepository.IsIdentityNumberExistsAsync(request.IdentityNumber) &&
                 employee.Identitynumber != request.IdentityNumber)
-                throw new ValidationException("Identity number already exists");
+                throw new ValidationException("Identity number already exists.");
 
             // Update basic information
             employee.Fullname = request.Fullname;
@@ -125,7 +125,7 @@ namespace MV.ApplicationLayer.Services
         {
             var employee = await _unitOfWork.employeeRepository.GetEmployeeByIdAsync(id);
             if (employee == null)
-                throw new ValidationException("Employee not found");
+                throw new ValidationException("Employee not found.");
 
             await _unitOfWork.employeeRepository.DeleteEmployeeAsync(id);
         }
