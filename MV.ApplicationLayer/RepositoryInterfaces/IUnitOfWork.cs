@@ -22,6 +22,7 @@
         IScoreRepository scoreRepository { get; }
         IScoreHistoryRepository scoreHistoryRepository { get; }
         IPaymentOnlineRepository paymentOnlineRepository { get; }
+        IPaymentUpFrontRepository paymentUpFrontRepository { get; }
 
         IShowtimeRepository showtimeRepository { get; }
 

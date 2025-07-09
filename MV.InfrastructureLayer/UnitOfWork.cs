@@ -57,6 +57,7 @@ namespace MV.InfrastructureLayer
         private IPaymentOnlineRepository _paymentOnlineRepository;
         // Thêm Repository xóa paymentonline cũ
         public IPaymentOnlineRepository paymentOnlineRepository => _paymentOnlineRepository ??= new PaymentOnlineRepository(_context);
+        private IPaymentUpFrontRepository _paymentUpFrontRepository;
 
         private IDashboardRepository _dashboardRepository;
         // Expose repository INTERFACES
@@ -76,6 +77,7 @@ namespace MV.InfrastructureLayer
         public ITicketInvoiceRepository ticketInvoiceRepository => _ticketInvoiceRepository ??= new TicketInvoiceRepository(_context);
         public IScoreHistoryRepository scoreHistoryRepository => _scoreHistoryRepository ??= new ScoreHistoryRepository(_context);
         public IScoreRepository scoreRepository => _scoreRepository ??= new ScoreRepository(_context);
+        public IPaymentUpFrontRepository paymentUpFrontRepository => _paymentUpFrontRepository ??= new PaymentUpFrontRepository(_context);
 
         //public DbSet<TicketInvoice> TicketInvoices => _context.TicketInvoices;
         public IShowtimeRepository showtimeRepository => _showtimeRepository ??= new ShowtimeRepository(_context);
