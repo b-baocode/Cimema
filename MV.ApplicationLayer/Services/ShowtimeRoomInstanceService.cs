@@ -46,6 +46,7 @@ namespace MV.ApplicationLayer.Services
                 RoomStatus = roomInstanceResult.RoomStatus,
                 RoomTypeName = roomInstanceResult.RoomTypeName,
                 RoomTypePrice = roomInstanceResult.RoomTypePrice,
+                MoviePrice = roomInstanceResult.MoviePrice,
                 TotalSeatCounts = roomInstanceResult.TotalSeatCounts,
                 StandardSeatCount = roomInstanceResult.StandardSeatCount,
                 VipSeatCount = roomInstanceResult.VipSeatCount,

@@ -24,6 +24,8 @@ namespace MV.DomainLayer.CustomQueryModels
 
         public decimal RoomTypePrice { get; set; }
 
+        public decimal MoviePrice { get; set; }
+
         public int TotalSeatCounts { get; set; }
 
         public int StandardSeatCount { get; set; }

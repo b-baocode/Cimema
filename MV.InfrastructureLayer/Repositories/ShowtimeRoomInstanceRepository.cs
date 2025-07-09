@@ -121,6 +121,7 @@ namespace MV.InfrastructureLayer.Repositories
                     RoomColumns = s.RoomColumns,
                     RoomTypeName = s.RoomTypeName,
                     RoomTypePrice = s.RoomTypePrice,
+                    MoviePrice = s.MoviePrice ?? 0m,
                     RoomStatus = s.Status,
                     TotalSeatCounts = s.SeatDataForShowtimes.Count(),
                     StandardSeatCount = s.SeatDataForShowtimes.Count(sta => sta.SeatTypeName == "Standard"),
