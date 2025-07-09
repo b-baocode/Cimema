@@ -15,8 +15,13 @@ namespace MV.InfrastructureLayer.Repositories
 
         public void Add(PaymentOnline paymentOnline)
         {
-            _context.PaymentOnlines.Add(paymentOnline);
-            _context.SaveChanges();
+            var existing = _context.PaymentOnlines.FirstOrDefault(p => p.InvoiceId == paymentOnline.InvoiceId);
+            if (existing == null)
+            {
+                _context.PaymentOnlines.Add(paymentOnline);
+                _context.SaveChanges();
+            }
+            // else: đã tồn tại, không thêm nữa
         }
 
         public void Delete(PaymentOnline paymentOnline)
