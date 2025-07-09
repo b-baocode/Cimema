@@ -30,8 +30,16 @@ namespace MV.ApplicationLayer.Library
                 }
             }
 
-            var orderId = Convert.ToInt64(vnPay.GetResponseData("vnp_TxnRef"));
-            var vnPayTranId = Convert.ToInt64(vnPay.GetResponseData("vnp_TransactionNo"));
+            var orderIdStr = vnPay.GetResponseData("vnp_TxnRef");
+            long orderId = 0;
+            if (!string.IsNullOrEmpty(orderIdStr) && long.TryParse(orderIdStr, out var tmpOrderId))
+                orderId = tmpOrderId;
+
+            var vnPayTranIdStr = vnPay.GetResponseData("vnp_TransactionNo");
+            long vnPayTranId = 0;
+            if (!string.IsNullOrEmpty(vnPayTranIdStr) && long.TryParse(vnPayTranIdStr, out var tmpTranId))
+                vnPayTranId = tmpTranId;
+
             var vnpResponseCode = vnPay.GetResponseData("vnp_ResponseCode");
             var vnpSecureHash =
                 collection.FirstOrDefault(k => k.Key == "vnp_SecureHash").Value; //hash của dữ liệu trả về

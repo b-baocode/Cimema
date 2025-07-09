@@ -52,8 +52,6 @@ namespace MV.InfrastructureLayer
         private ISeatDataForShowtimeRepository _seatDataForShowtimeRepository;
         private IShowtimeRoomInstanceRepository _showtimeRoomInstanceRepository;
         private ITicketInvoiceRepository _ticketInvoiceRepository;
-        // Thêm Repository xóa payment cũ
-        public ITicketInvoiceRepository ticketInvoiceRepository => _ticketInvoiceRepository ??= new TicketInvoiceRepository(_context);
         private IScoreHistoryRepository _scoreHistoryRepository;
         private IScoreRepository _scoreRepository;
         private IPaymentOnlineRepository _paymentOnlineRepository;
@@ -61,7 +59,9 @@ namespace MV.InfrastructureLayer
         public IPaymentOnlineRepository paymentOnlineRepository => _paymentOnlineRepository ??= new PaymentOnlineRepository(_context);
         private IPaymentUpFrontRepository _paymentUpFrontRepository;
 
+        private IDashboardRepository _dashboardRepository;
         // Expose repository INTERFACES
+        public IDashboardRepository dashboardRepository => _dashboardRepository ??= new DashboardRepository(_context);
         public IUserRepository userRepository => _userRepository ??= new UserRepository(_context);
         public IRoomRepository roomRepository => _roomRepository ??= new RoomRepository(_context);
         public ISeatRepository seatRepository => _seatRepository ??= new SeatRepository(_context);
@@ -74,6 +74,7 @@ namespace MV.InfrastructureLayer
             _seatDataForShowtimeRepository ??= new SeatDataForShowtimeRepository(_context);
         public IShowtimeRoomInstanceRepository showtimeRoomInstanceRepository =>
             _showtimeRoomInstanceRepository ??= new ShowtimeRoomInstanceRepository(_context);
+        public ITicketInvoiceRepository ticketInvoiceRepository => _ticketInvoiceRepository ??= new TicketInvoiceRepository(_context);
         public IScoreHistoryRepository scoreHistoryRepository => _scoreHistoryRepository ??= new ScoreHistoryRepository(_context);
         public IScoreRepository scoreRepository => _scoreRepository ??= new ScoreRepository(_context);
         public IPaymentUpFrontRepository paymentUpFrontRepository => _paymentUpFrontRepository ??= new PaymentUpFrontRepository(_context);

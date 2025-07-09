@@ -35,6 +35,13 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(new { userId = score.Userid, totalScore = score.TotalScore });
         }
 
+        [HttpGet("active-count")]
+        public async Task<IActionResult> GetActiveUserCount()
+        {
+            var count = await _userService.CountActiveUsersAsync();
+            return Ok(new { activeUserCount = count });
+        }
+
     }
 }
 
