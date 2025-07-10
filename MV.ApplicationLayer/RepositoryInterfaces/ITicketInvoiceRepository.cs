@@ -8,9 +8,11 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task AddAsync(TicketInvoice invoice);
         Task<TicketInvoice?> GetByIdAsync(int invoiceId);
         Task<List<TicketInvoice>> GetByUserIdAsync(string userId);
+        Task<List<TicketInvoice>> GetByUserIdAndStatusAsync(string userId, string status);
         Task<List<TicketInvoice>> GetAllAsync();
         Task UpdateAsync(TicketInvoice invoice);
         Task DeleteAsync(int invoiceId);
+        IEnumerable<TicketInvoice> GetAll();
         // Có thể bổ sung các method khác nếu cần (GetByUser, ...)
     }
 }

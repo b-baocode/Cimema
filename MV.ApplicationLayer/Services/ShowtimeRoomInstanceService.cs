@@ -21,7 +21,7 @@ namespace MV.ApplicationLayer.Services
             var showtimeRoomInstance = await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeIdAsync(showtimeId);
             if (showtimeRoomInstance == null)
             {
-                throw new Exception("ShowtimeRoomInstance không tồn tại cho suất chiếu này.");
+                throw new Exception("ShowtimeRoomInstance does not exist for this showtime.");
             }
             return showtimeRoomInstance;
         }
@@ -46,6 +46,7 @@ namespace MV.ApplicationLayer.Services
                 RoomStatus = roomInstanceResult.RoomStatus,
                 RoomTypeName = roomInstanceResult.RoomTypeName,
                 RoomTypePrice = roomInstanceResult.RoomTypePrice,
+                MoviePrice = roomInstanceResult.MoviePrice,
                 TotalSeatCounts = roomInstanceResult.TotalSeatCounts,
                 StandardSeatCount = roomInstanceResult.StandardSeatCount,
                 VipSeatCount = roomInstanceResult.VipSeatCount,

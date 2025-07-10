@@ -81,6 +81,30 @@ builder.Services.AddScoped<ISeatNotificationService, SeatNotificationSignalR>();
 // Configure JWT Authentication using the extension method
 builder.Services.AddJwtAuthentication(builder.Configuration);
 
+// Thêm Google Authentication
+// Thêm Google Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = "Cookies";
+    options.DefaultChallengeScheme = "Google";
+})
+.AddCookie("Cookies", options =>
+{
+    // Cấu hình này rất quan trọng để đảm bảo cookie hoạt động đúng
+    // trên môi trường HTTPS local
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+})
+.AddGoogle("Google", options =>
+{
+    options.ClientId = builder.Configuration["GoogleKeys:ClientId"];
+    options.ClientSecret = builder.Configuration["GoogleKeys:ClientSecret"];
+    options.CallbackPath = "/api/auth/google-callback"; // Đường dẫn này phải khớp với Google Console
+    options.SaveTokens = true;
+    options.Scope.Add("email");
+    options.Scope.Add("profile");
+});
+
 //Configure Quartz
 builder.Services.AddQuartzConfiguration(builder.Configuration);
 
@@ -90,6 +114,7 @@ builder.Services.AddScoped<IMovieService, MovieService>();
 builder.Services.AddScoped<IPromotionService, PromotionService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 
 var app = builder.Build();

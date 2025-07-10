@@ -13,7 +13,7 @@ namespace MV.PresnetationLayer.Hubs
         private readonly IShowtimeService _showtimeService;
 
         public SeatHub(ILogger<SeatHub> logger, IMovieService movieService
-            , IShowtimeRoomInstanceService showtimeRoomInstanceService, 
+            , IShowtimeRoomInstanceService showtimeRoomInstanceService,
             IShowtimeService showtimeService
             )
         {
@@ -87,7 +87,7 @@ namespace MV.PresnetationLayer.Hubs
             _logger.LogInformation("Client {ConnectionId} unsubscribed from group '{GroupName}'" + Environment.NewLine, Context.ConnectionId, groupName);
         }
 
-        
+
         public override Task OnDisconnectedAsync(Exception? exception)
         {
 
@@ -100,6 +100,21 @@ namespace MV.PresnetationLayer.Hubs
                 _logger.LogInformation("Client {ConnectionId} disconnected." + Environment.NewLine, Context.ConnectionId);
             }
             return base.OnDisconnectedAsync(exception);
+        }
+        public async Task UpdateHoldStatus(string movieShowtimeRoomId, List<string> seatIds, string status)
+        {
+            string groupName;
+            try
+            {
+                groupName = SeatShowtimeNameGroupHelper.GetGroupNameForShowtimeSeat(movieShowtimeRoomId);
+            }
+            catch (FormatException ex)
+            {
+                _logger.LogInformation("Invalid format for movieShowtimeRoom");
+                return;
+            }
+
+            await Clients.OthersInGroup(groupName).SendAsync("ReceiveHoldUpdate", new { SeatIds = seatIds, Status = status });
         }
     }
 }

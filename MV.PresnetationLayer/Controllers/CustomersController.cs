@@ -31,11 +31,11 @@ namespace MV.PresnetationLayer.Controllers
                 {
                     return BadRequest(changeResult);
                 }
-                return Ok("Password changed successfully");
+                return Ok("Password changed successfully.");
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while changing password");
+                return StatusCode(500, "An error occurred while changing password.");
             }
         }
 
@@ -45,17 +45,17 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 if (string.IsNullOrEmpty(id))
-                    return BadRequest("Invalid user ID");
+                    return BadRequest("Invalid user ID.");
 
                 var user = await _userService.GetUserByIdAsync(id);
                 if (user == null)
-                    return NotFound("User not found");
+                    return NotFound("User not found.");
 
                 return Ok(user);
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -78,14 +78,14 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 if (request == null)
-                    return BadRequest("Invalid request data");
+                    return BadRequest("Invalid request data.");
 
                 if (string.IsNullOrEmpty(request.Userid))
-                    return BadRequest("User ID is required");
+                    return BadRequest("User ID is required.");
 
                 var result = await _userService.EditProfileAsync(request);
                 if (result == null)
-                    return NotFound("User not found");
+                    return NotFound("User not found.");
 
                 return Ok(result);
             }
@@ -95,7 +95,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -110,7 +110,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -121,17 +121,17 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 if (string.IsNullOrEmpty(id))
-                    return BadRequest("Invalid user ID");
+                    return BadRequest("Invalid user ID.");
 
                 var result = await _userService.DeleteCustomerAsync(id);
                 if (!result)
-                    return NotFound("User not found");
+                    return NotFound("User not found.");
 
-                return Ok("User deleted successfully");
+                return Ok("User deleted successfully.");
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -145,7 +145,7 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 if (request == null)
-                    return BadRequest("Invalid request data");
+                    return BadRequest("Invalid request data.");
 
                 var result = await _userService.CreateCustomerAsync(request);
                 return CreatedAtAction(nameof(GetUserById), new { id = result.Userid }, result);
@@ -156,7 +156,7 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
             }
         }
 
@@ -172,7 +172,38 @@ namespace MV.PresnetationLayer.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "An unexpected error occurred");
+                return StatusCode(500, "An unexpected error occurred.");
+            }
+        }
+
+        [HttpPost("register-offline")]
+        [Authorize(Roles = "Manager,Employee")]
+        public async Task<IActionResult> RegisterOffline([FromBody] CustomerOfflineRegisterRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToList();
+                return BadRequest(new { errors });
+            }
+            try
+            {
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                    return Unauthorized();
+                await _userService.RegisterCustomerOfflineAsync(request, userId);
+                return Ok(new { message = "Registration successful. Email sent to customer." });
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "An unexpected error occurred: " + ex.Message);
             }
         }
     }

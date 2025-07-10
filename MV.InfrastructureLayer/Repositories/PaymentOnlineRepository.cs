@@ -1,6 +1,7 @@
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
+using Microsoft.EntityFrameworkCore;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -14,8 +15,30 @@ namespace MV.InfrastructureLayer.Repositories
 
         public void Add(PaymentOnline paymentOnline)
         {
-            _context.PaymentOnlines.Add(paymentOnline);
+            var existing = _context.PaymentOnlines.FirstOrDefault(p => p.InvoiceId == paymentOnline.InvoiceId);
+            if (existing == null)
+            {
+                _context.PaymentOnlines.Add(paymentOnline);
+                _context.SaveChanges();
+            }
+            // else: đã tồn tại, không thêm nữa
+        }
+
+        public void Delete(PaymentOnline paymentOnline)
+        {
+            _context.PaymentOnlines.Remove(paymentOnline);
             _context.SaveChanges();
+        }
+
+        public async Task<PaymentOnline?> GetByInvoiceIdAsync(int invoiceId)
+        {
+            return await _context.PaymentOnlines
+                .FirstOrDefaultAsync(p => p.InvoiceId == invoiceId);
+        }
+
+        public IEnumerable<PaymentOnline> GetAll()
+        {
+            return _context.PaymentOnlines.AsEnumerable();
         }
     }
 } 

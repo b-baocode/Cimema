@@ -12,6 +12,7 @@ using MV.ApplicationLayer.Library;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
 using MV.ApplicationLayer.RepositoryInterfaces;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
 
 namespace MV.ApplicationLayer.Services.Vnpay
 {
@@ -27,6 +28,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
         private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
         private readonly IQrCodeService _qrCodeService;
         private readonly IShowtimeRoomInstanceRepository _showtimeRoomInstanceRepository;
+        private readonly ISeatNotificationService _seatNotificationService;
 
         public VnpayService(
             IConfiguration configuration,
@@ -37,7 +39,8 @@ namespace MV.ApplicationLayer.Services.Vnpay
             IEmailService emailService,
             IUserRepository userRepository,
             IQrCodeService qrCodeService,
-            IShowtimeRoomInstanceRepository showtimeRoomInstanceRepository
+            IShowtimeRoomInstanceRepository showtimeRoomInstanceRepository,
+            ISeatNotificationService seatNotificationService
         )
         {
             _configuration = configuration;
@@ -49,6 +52,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
             _userRepository = userRepository;
             _qrCodeService = qrCodeService;
             _showtimeRoomInstanceRepository = showtimeRoomInstanceRepository;
+            _seatNotificationService = seatNotificationService;
         }
 
         public string CreatePaymentUrl(PaymentInformationRequest model, double amount, HttpContext context)
@@ -127,8 +131,24 @@ namespace MV.ApplicationLayer.Services.Vnpay
                 }
                 else
                 {
-                    // Payment thất bại - xóa invoice và cập nhật trạng thái ghế về Active
-                    _ticketInvoiceService.DeleteAsync(invoiceId.Value).GetAwaiter().GetResult();
+                    // Payment thất bại - cập nhật status invoice thành Cancelled và xóa PaymentOnline record
+                    var invoice = _ticketInvoiceService.GetByIdAsync(invoiceId.Value).GetAwaiter().GetResult();
+                    if (invoice != null)
+                    {
+                        // Cập nhật status invoice thành Cancelled
+                        invoice.Status = "Cancelled";
+                        _ticketInvoiceService.UpdateAsync(invoice).GetAwaiter().GetResult();
+                        
+                        // Xóa PaymentOnline record
+                        var paymentToDelete = await _paymentOnlineRepository.GetByInvoiceIdAsync(invoiceId.Value);
+                        if (paymentToDelete != null)
+                        {
+                            _paymentOnlineRepository.Delete(paymentToDelete);
+                        }
+                        
+                        // Cập nhật trạng thái ghế về "Active" và gửi SignalR notification
+                        await HandlePaymentFailureAsync(invoice);
+                    }
                 }
                 
             }
@@ -150,7 +170,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
                 if (showtimeRoomInstance == null)
                     return;
 
-                var emailSubject = "🎬 Thanh toán thành công - CosmoCiné";
+                var emailSubject = "🎬 Payment successful - CosmoCiné";
                 var emailBody = await GeneratePaymentSuccessEmailBodyWithQrAsync(user, invoice, payment, showtimeRoomInstance);
                 
                 await _emailService.SendEmailAsync(user.Email, emailSubject, emailBody);
@@ -195,20 +215,20 @@ namespace MV.ApplicationLayer.Services.Vnpay
             // Kiểm tra QR code có được tạo thành công không
             var qrCodeHtml = !string.IsNullOrEmpty(qrCodeBase64) 
                 ? $@"<div class=""qr-section"">
-                      <h3>🎫 Mã QR Vé Xem Phim</h3>
+                      <h3>🎫 Movie Ticket QR Code.</h3>
                       <div class=""qr-code"">
                         <img src=""data:image/png;base64,{qrCodeBase64}"" alt=""QR Code"" />
                       </div>
                       <div class=""qr-note"">
-                        📱 Quét mã QR này tại rạp để vào xem phim<br>
-                        💡 Lưu ý: Mã QR này chứa toàn bộ thông tin vé của bạn
+                        📱 Scan this QR code at the theater to get in to see the movie.<br>
+                        💡 Note: This QR code contains all your ticket information.
                       </div>
                     </div>"
                 : $@"<div class=""qr-section"">
-                      <h3>🎫 Thông Tin Vé Xem Phim</h3>
+                      <h3>🎫 Movie Ticket Information</h3>
                       <div class=""qr-note"">
-                        📱 Vui lòng mang theo thông tin này khi đến rạp<br>
-                        💡 Mã QR tạm thời không khả dụng
+                        📱 Please bring this information with you to the theater.<br>
+                        💡 QR code temporarily unavailable.
                       </div>
                     </div>";
             
@@ -218,7 +238,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
               <head>
                 <meta charset=""UTF-8"" />
                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0""/>
-                <title>Thanh toán thành công - CosmoCiné</title>
+                <title>Payment Successful - CosmoCiné</title>
                 <link href=""https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;600&display=swap"" rel=""stylesheet"">
                 <style>
                   body {{
@@ -396,44 +416,44 @@ namespace MV.ApplicationLayer.Services.Vnpay
                   <div class=""premium-badge"">COSMOCINÉ</div>
                   <div class=""header"">
                     <img src=""https://img.icons8.com/ios-filled/100/ffffff/movie-projector.png"" alt=""Cinema Icon"" />
-                    <h1>THANH TOÁN THÀNH CÔNG</h1>
+                    <h1>PAYMENT SUCCESSFUL</h1>
                   </div>
                   <div class=""content"">
                     <div class=""success-icon"">✅</div>
                     <div class=""greeting"">
-                      Xin chào <strong>{user.Fullname}</strong>!<br>
-                      Cảm ơn bạn đã sử dụng dịch vụ của CosmoCiné.
+                      Hi <strong>{user.Fullname}</strong>!<br>
+                      Thank you for using CosmoCiné services.
                     </div>
                     <div class=""payment-details"">
-                      <h3>📋 Chi tiết giao dịch</h3>
+                      <h3>📋 Transaction details</h3>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Mã hóa đơn:</span>
-                        <span class=""detail-value"">#{invoice.InvoiceId}</span>
+                        <span class=""detail-label"">Invoice code:</span>
+                        <span class=""detail-value""> #{invoice.InvoiceId}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Phương thức thanh toán:</span>
-                        <span class=""detail-value"">{payment.PaymentMethod}</span>
+                        <span class=""detail-label"">Payment method:</span>
+                        <span class=""detail-value""> {payment.PaymentMethod}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Thời gian thanh toán:</span>
-                        <span class=""detail-value"">{paymentDate}</span>
+                        <span class=""detail-label"">Payment time:</span>
+                        <span class=""detail-value""> {paymentDate}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Số tiền:</span>
-                        <span class=""detail-value amount"">{amount}</span>
+                        <span class=""detail-label"">Amount:</span>
+                        <span class=""detail-value amount""> {amount}</span>
                       </div>
                     </div>
                     
                     {qrCodeHtml}
                     
-                    <p style=""color: #4CAF50; font-weight: bold;"">🎉 Giao dịch của bạn đã được xử lý thành công!</p>
-                    <p style=""color: #ccc; font-size: 14px;"">Vui lòng đến rạp trước giờ chiếu 15 phút để quét mã QR.</p>
+                    <p style=""color: #4CAF50; font-weight: bold;"">🎉 Your transaction has been successfully processed!</p>
+                    <p style=""color: #ccc; font-size: 14px;"">Please arrive at the theater 15 minutes before showtime to scan the QR Checkin code.</p>
                   </div>
                   <div class=""support"">
-                    <h3>Hỗ trợ khách hàng</h3>
-                    <p>📞 Hotline: <strong>0776743504</strong></p>
+                    <h3>Customer Support</h3>
+                    <p>📞 Hotline: <strong>0775743304</strong></p>
                     <p>📧 Email: <a href=""mailto:hoangnvse183852@fpt.edu.vn"">hoangnvse183852@fpt.edu.vn</a></p>
-                    <p>🕒 Giờ làm việc: 8:00 - 22:00 (Thứ 2 - Chủ nhật)</p>
+                    <p>🕒 Working hours: 8:00 - 22:00 (Monday - Sunday)</p>
                   </div>
                   <div class=""footer"">
                     <div>
@@ -442,7 +462,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
                       <a href=""https://www.facebook.com/viethoang.ng1005/"">Instagram</a>
                     </div>
                     <p>&copy; 2024 CosmoCiné Management System. All rights reserved.</p>
-                    <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+                    <p>This email was sent automatically, please do not reply.</p>
                   </div>
                 </div>
               </body>
@@ -486,7 +506,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
               <head>
                 <meta charset=""UTF-8"" />
                 <meta name=""viewport"" content=""width=device-width, initial-scale=1.0""/>
-                <title>Thanh toán thành công</title>
+                <title>Payment Successful - CosmoCiné</title>
                 <link href=""https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Montserrat:wght@400;600&display=swap"" rel=""stylesheet"">
                 <style>
                   body {{
@@ -592,6 +612,35 @@ namespace MV.ApplicationLayer.Services.Vnpay
                     color: #4CAF50;
                     font-weight: bold;
                   }}
+                  .qr-section {{
+                    background: #1a1a1a;
+                    border: 2px solid #4CAF50;
+                    border-radius: 10px;
+                    padding: 20px;
+                    margin: 20px 0;
+                    text-align: center;
+                  }}
+                  .qr-section h3 {{
+                    color: #4CAF50;
+                    font-size: 18px;
+                    margin-bottom: 15px;
+                  }}
+                  .qr-code {{
+                    margin: 20px auto;
+                    padding: 15px;
+                    background: white;
+                    border-radius: 10px;
+                    display: inline-block;
+                  }}
+                  .qr-code img {{
+                    width: 200px;
+                    height: 200px;
+                  }}
+                  .qr-note {{
+                    color: #ccc;
+                    font-size: 14px;
+                    margin-top: 15px;
+                  }}
                   .support {{
                     margin-top: 40px;
                     background-color: #1e1e1e;
@@ -632,44 +681,45 @@ namespace MV.ApplicationLayer.Services.Vnpay
               </head>
               <body>
                 <div class=""container"">
-                  <div class=""premium-badge"">PREMIUM</div>
+                  <div class=""premium-badge"">COSMOCINÉ</div>
                   <div class=""header"">
                     <img src=""https://img.icons8.com/ios-filled/100/ffffff/movie-projector.png"" alt=""Cinema Icon"" />
-                    <h1>THANH TOÁN THÀNH CÔNG</h1>
+                    <h1>PAYMENT SUCCESSFUL</h1>
                   </div>
                   <div class=""content"">
                     <div class=""success-icon"">✅</div>
                     <div class=""greeting"">
-                      Xin chào <strong>{user.Fullname}</strong>!<br>
-                      Cảm ơn bạn đã sử dụng dịch vụ của Premium Cinema.
+                      Hi <strong>{user.Fullname}</strong>!<br>
+                      Thank you for using CosmoCiné services.
                     </div>
                     <div class=""payment-details"">
-                      <h3>📋 Chi tiết giao dịch</h3>
+                      <h3>📋 Transaction details</h3>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Mã hóa đơn:</span>
-                        <span class=""detail-value"">#{invoice.InvoiceId}</span>
+                        <span class=""detail-label"">Invoice code:</span>
+                        <span class=""detail-value""> #{invoice.InvoiceId}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Phương thức thanh toán:</span>
-                        <span class=""detail-value"">{payment.PaymentMethod}</span>
+                        <span class=""detail-label"">Payment method:</span>
+                        <span class=""detail-value""> {payment.PaymentMethod}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Thời gian thanh toán:</span>
-                        <span class=""detail-value"">{paymentDate}</span>
+                        <span class=""detail-label"">Payment time:</span>
+                        <span class=""detail-value""> {paymentDate}</span>
                       </div>
                       <div class=""detail-row"">
-                        <span class=""detail-label"">Số tiền:</span>
-                        <span class=""detail-value amount"">{amount}</span>
+                        <span class=""detail-label"">Amount:</span>
+                        <span class=""detail-value amount""> {amount}</span>
                       </div>
                     </div>
-                    <p style=""color: #4CAF50; font-weight: bold;"">🎉 Giao dịch của bạn đã được xử lý thành công!</p>
-                    <p style=""color: #ccc; font-size: 14px;"">Vui lòng kiểm tra email để xem thông tin chi tiết về vé và suất chiếu.</p>
+                                        
+                    <p style=""color: #4CAF50; font-weight: bold;"">🎉 Your transaction has been successfully processed!</p>
+                    <p style=""color: #ccc; font-size: 14px;"">Please arrive at the theater 15 minutes before showtime to scan the QR Checkin code.</p>
                   </div>
                   <div class=""support"">
-                    <h3>Hỗ trợ khách hàng</h3>
-                    <p>📞 Hotline: <strong>0776743504</strong></p>
+                    <h3>Customer Support</h3>
+                    <p>📞 Hotline: <strong>0775743304</strong></p>
                     <p>📧 Email: <a href=""mailto:hoangnvse183852@fpt.edu.vn"">hoangnvse183852@fpt.edu.vn</a></p>
-                    <p>🕒 Giờ làm việc: 8:00 - 22:00 (Thứ 2 - Chủ nhật)</p>
+                    <p>🕒 Working hours: 8:00 - 22:00 (Monday - Sunday)</p>
                   </div>
                   <div class=""footer"">
                     <div>
@@ -677,8 +727,8 @@ namespace MV.ApplicationLayer.Services.Vnpay
                       <a href=""https://www.facebook.com/viethoang.ng1005/"">Twitter</a> |
                       <a href=""https://www.facebook.com/viethoang.ng1005/"">Instagram</a>
                     </div>
-                    <p>&copy; 2024 Premium Cinema Management System. All rights reserved.</p>
-                    <p>Email này được gửi tự động, vui lòng không trả lời.</p>
+                    <p>&copy; 2024 CosmoCiné Management System. All rights reserved.</p>
+                    <p>This email was sent automatically, please do not reply.</p>
                   </div>
                 </div>
               </body>
@@ -707,6 +757,40 @@ namespace MV.ApplicationLayer.Services.Vnpay
                 _ => $" - Giao dịch thất bại (Mã lỗi: {vnPayResponseCode})"
             };
             return baseNote + statusNote;
+        }
+
+        private async Task HandlePaymentFailureAsync(TicketInvoice invoice)
+        {
+            try
+            {
+                // Lấy danh sách seatId và showtimeInstanceId từ TicketDetails
+                var seatIds = invoice.TicketDetails.Select(td => td.SeatDataId).ToList();
+                var showtimeInstanceId = invoice.TicketDetails.FirstOrDefault()?.ShowtimeInstanceId;
+
+                if (seatIds.Any() && showtimeInstanceId.HasValue)
+                {
+                    // Cập nhật trạng thái ghế về "Active" khi payment thất bại
+                    await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
+
+                    //SignalR notification
+                    var showtimeMovieId = await _showtimeRoomInstanceRepository.GetShowtimeMovieIdByInstanceId(showtimeInstanceId);
+                    if (showtimeMovieId.HasValue)
+                    {
+                        var (movieId, showtimeId) = showtimeMovieId.Value;
+                        var groupName = $"{movieId}-{showtimeId}-{showtimeInstanceId}";
+
+                        string seatIdString = string.Join(", ", seatIds);
+                        string message = $"The following seat data IDs is cancelled: {seatIdString}; Status = Active";
+
+                        Console.WriteLine($"Attempting to send message to group: {groupName}");
+                        await _seatNotificationService.SendMessageToGroupAsync(groupName, message);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error handling payment failure: {ex.Message}");
+            }
         }
     }
 }

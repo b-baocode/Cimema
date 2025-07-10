@@ -35,6 +35,22 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(new { userId = score.Userid, totalScore = score.TotalScore });
         }
 
+        [HttpGet("active-count")]
+        public async Task<IActionResult> GetActiveUserCount()
+        {
+            var count = await _userService.CountActiveUsersAsync();
+            return Ok(new { activeUserCount = count });
+        }
+
+        [HttpGet("by-phone/{phone}")]
+        public async Task<IActionResult> GetUserIdByPhone(string phone)
+        {
+            var userId = await _userService.GetUserIdByPhoneAsync(phone);
+            if (userId == null)
+                return NotFound("User not found with this phone number.");
+            return Ok(new { userId });
+        }
+
     }
 }
 

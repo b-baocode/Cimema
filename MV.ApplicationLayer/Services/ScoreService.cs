@@ -64,11 +64,12 @@ namespace MV.ApplicationLayer.Services
                 ScoreId = score.ScoreId,
                 ScoreIn = scoreToAdd,
                 ScoreOut = 0,
-                Description = $"Cộng điểm từ hóa đơn {invoiceId}",
+                Description = $"Earn points from your bill {invoiceId}",
                 ChangeDate = DateTime.Now,
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
+            await _unitOfWork.SaveChangesAsync();
         }
         /// <summary>
         /// Tính toán discount amount từ điểm (chỉ tính toán, không trừ điểm thực tế)
@@ -95,11 +96,12 @@ namespace MV.ApplicationLayer.Services
                 ScoreId = score.ScoreId,
                 ScoreIn = 0,
                 ScoreOut = scoresActuallyUsed,
-                Description = $"Trừ điểm khi sử dụng cho hóa đơn{(invoiceId.HasValue ? $" {invoiceId}" : "")}",
+                Description = $"Deduct points when used for invoice{(invoiceId.HasValue ? $" {invoiceId}" : "")}",
                 ChangeDate = DateTime.Now,
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
+             await _unitOfWork.SaveChangesAsync();
         }
         public async Task<Score?> GetScoreByUserIdAsync(string userId)
         {
@@ -124,11 +126,12 @@ namespace MV.ApplicationLayer.Services
                 ScoreId = score.ScoreId,
                 ScoreIn = 0,
                 ScoreOut = usableScore,
-                Description = $"Trừ điểm khi sử dụng cho hóa đơn {invoiceId}",
+                Description = $"Deduct points when used for invoice {invoiceId}",
                 ChangeDate = DateTime.Now,
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
+             await _unitOfWork.SaveChangesAsync();
         }
     }
 

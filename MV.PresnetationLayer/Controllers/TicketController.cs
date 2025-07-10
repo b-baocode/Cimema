@@ -28,7 +28,7 @@ namespace MV.PresnetationLayer.Controllers
             {
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return BadRequest("UserId is required");
+                    return BadRequest("UserId is required.");
                 }
 
                 var tickets = await _ticketInvoiceService.GetTicketsByUserIdAsync(userId);
@@ -52,18 +52,18 @@ namespace MV.PresnetationLayer.Controllers
             {
                 if (ticketId <= 0)
                 {
-                    return BadRequest("Invalid ticket ID");
+                    return BadRequest("Invalid ticket ID.");
                 }
 
                 var result = await _ticketInvoiceService.CheckTicketAsync(ticketId);
                 
                 if (result)
                 {
-                    return Ok(new { success = true, message = "Ticket checked successfully" });
+                    return Ok(new { success = true, message = "Ticket checked successfully." });
                 }
                 else
                 {
-                    return NotFound(new { success = false, message = "Ticket not found" });
+                    return NotFound(new { success = false, message = "Ticket not found." });
                 }
             }
             catch (Exception ex)
@@ -107,7 +107,7 @@ namespace MV.PresnetationLayer.Controllers
         public async Task<ActionResult<TicketDetailFullResponse>> GetTicketDetailByInvoiceId(int invoiceId)
         {
             if (invoiceId <= 0)
-                return BadRequest("Invalid invoiceId");
+                return BadRequest("Invalid invoiceId.");
             var result = await _ticketInvoiceService.GetTicketDetailByInvoiceIdAsync(invoiceId);
             if (result == null)
                 return NotFound();

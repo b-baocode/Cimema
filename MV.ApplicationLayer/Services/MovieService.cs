@@ -63,7 +63,7 @@ namespace MV.ApplicationLayer.Services
             ValidateDates(request.FromDate, request.ToDate, request.PublishDate);
 
             if (await _unitOfWork.movieRepository.IsTitleExistsAsync(request.Title))
-                throw new ValidationException("A movie with this title already exists");
+                throw new ValidationException("A movie with this title already exists.");
 
             // Get the last movie ID and increment it
             var lastMovie = await _unitOfWork.movieRepository.GetLastMovieAsync();
@@ -86,7 +86,7 @@ namespace MV.ApplicationLayer.Services
             }
             else
             {
-                throw new ValidationException("Poster is required");
+                throw new ValidationException("Poster is required.");
             }
 
             var movie = new Movie
@@ -111,7 +111,7 @@ namespace MV.ApplicationLayer.Services
             // Add genres
             var genres = await _unitOfWork.genreRepository.GetGenresByIdsAsync(request.GenreIds);
             if (!genres.Any())
-                throw new ValidationException("No valid genres found for the provided genre IDs");
+                throw new ValidationException("No valid genres found for the provided genre IDs.");
 
             movie.Genres = genres.ToList();
 
@@ -133,13 +133,13 @@ namespace MV.ApplicationLayer.Services
         {
             var movie = await _unitOfWork.movieRepository.GetMovieByIdAsync(id);
             if (movie == null)
-                throw new ValidationException("Movie not found");
+                throw new ValidationException("Movie not found.");
 
             ValidateMovieData(request);
             ValidateDates(request.FromDate, request.ToDate, request.PublishDate);
 
             if (movie.Title != request.Title && await _unitOfWork.movieRepository.IsTitleExistsAsync(request.Title))
-                throw new ValidationException("A movie with this title already exists");
+                throw new ValidationException("A movie with this title already exists.");
 
             // Update poster if provided
             if (request.Poster != null && request.Poster.Length > 0)
@@ -174,7 +174,7 @@ namespace MV.ApplicationLayer.Services
             // Update genres
             var genres = await _unitOfWork.genreRepository.GetGenresByIdsAsync(request.GenreIds);
             if (!genres.Any())
-                throw new ValidationException("No valid genres found for the provided genre IDs");
+                throw new ValidationException("No valid genres found for the provided genre IDs.");
 
             movie.Genres.Clear();
             movie.Genres = genres.ToList();
@@ -187,7 +187,7 @@ namespace MV.ApplicationLayer.Services
         {
             var movie = await _unitOfWork.movieRepository.GetMovieByIdAsync(id);
             if (movie == null)
-                throw new ValidationException("Movie not found");
+                throw new ValidationException("Movie not found.");
 
             // Check if movie is currently showing
             // if (movie.FromDate <= DateTime.Now && movie.ToDate >= DateTime.Now)
@@ -270,7 +270,7 @@ namespace MV.ApplicationLayer.Services
         {
             // Validate price range
             if (request.MinPrice > request.MaxPrice)
-                throw new ValidationException("MinPrice cannot be greater than MaxPrice");
+                throw new ValidationException("MinPrice cannot be greater than MaxPrice.");
 
             var movies = await _unitOfWork.movieRepository.GetMoviesByPriceRangeAsync(
                 request.MinPrice,
@@ -312,6 +312,18 @@ namespace MV.ApplicationLayer.Services
                 PageSize = request.PageSize,
                 TotalPages = (int)Math.Ceiling(totalItems / (double)request.PageSize)
             };
+        }
+
+        public async Task<List<MovieResponse>> GetNowShowingMoviesByShowtimeAsync(DateTime? date = null)
+        {
+            var movies = await _unitOfWork.movieRepository.GetNowShowingMoviesByShowtimeAsync(date);
+            return movies.Select(MapToResponse).ToList();
+        }
+
+        public async Task<List<MovieResponse>> GetActiveMoviesByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            var movies = await _unitOfWork.movieRepository.GetActiveMoviesByDateRangeAsync(startDate, endDate);
+            return movies.Select(MapToResponse).ToList();
         }
 
         private MovieResponse MapToResponse(Movie movie)
@@ -361,13 +373,13 @@ namespace MV.ApplicationLayer.Services
 
             if (fromDateVietnam >= toDateVietnam)
             {
-                throw new ValidationException("From date must be before to date");
+                throw new ValidationException("From date must be before to date.");
             }
 
             // Allow same day but not past dates
             if (fromDateVietnam.Date < currentVietnamTime.Date)
             {
-                throw new ValidationException("From date cannot be in the past");
+                throw new ValidationException("From date cannot be in the past.");
             }
 
             if (publishDate.HasValue)
@@ -378,7 +390,7 @@ namespace MV.ApplicationLayer.Services
 
                 if (publishDateVietnam > DateOnly.FromDateTime(toDateVietnam))
                 {
-                    throw new ValidationException("Publish date cannot be after to date");
+                    throw new ValidationException("Publish date cannot be after to date.");
                 }
             }
         }
@@ -386,80 +398,80 @@ namespace MV.ApplicationLayer.Services
         private void ValidateMovieData(MovieCreateRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Title))
-                throw new ValidationException("Title is required");
+                throw new ValidationException("Title is required.");
 
             if (request.Poster == null || request.Poster.Length == 0)
-                throw new ValidationException("Poster is required");
+                throw new ValidationException("Poster is required.");
 
             if (string.IsNullOrWhiteSpace(request.Actors))
-                throw new ValidationException("Actors is required");
+                throw new ValidationException("Actors is required.");
 
             if (string.IsNullOrWhiteSpace(request.Director))
-                throw new ValidationException("Director is required");
+                throw new ValidationException("Director is required.");
 
             if (string.IsNullOrWhiteSpace(request.Studio))
-                throw new ValidationException("Studio is required");
+                throw new ValidationException("Studio is required.");
 
             if (request.Duration <= 0)
-                throw new ValidationException("Duration must be greater than 0");
+                throw new ValidationException("Duration must be greater than 0.");
 
             if (request.Version <= 0)
-                throw new ValidationException("Version must be greater than 0");
+                throw new ValidationException("Version must be greater than 0.");
 
             if (string.IsNullOrWhiteSpace(request.TrailerUrl))
-                throw new ValidationException("Trailer URL is required");
+                throw new ValidationException("Trailer URL is required.");
 
             if (!Uri.TryCreate(request.TrailerUrl, UriKind.Absolute, out _))
-                throw new ValidationException("Invalid Trailer URL format");
+                throw new ValidationException("Invalid Trailer URL format.");
 
             if (string.IsNullOrWhiteSpace(request.Description))
-                throw new ValidationException("Description is required");
+                throw new ValidationException("Description is required.");
 
             if (request.MoviePrice <= 0)
-                throw new ValidationException("Movie price must be greater than 0");
+                throw new ValidationException("Movie price must be greater than 0.");
 
             if (request.GenreIds == null || !request.GenreIds.Any())
-                throw new ValidationException("At least one genre is required");
+                throw new ValidationException("At least one genre is required.");
         }
 
         private void ValidateMovieData(MovieUpdateRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.Title))
-                throw new ValidationException("Title is required");
+                throw new ValidationException("Title is required.");
 
             // Remove poster validation for update
             // if (request.Poster == null || request.Poster.Length == 0)
             //     throw new ValidationException("Poster is required");
 
             if (string.IsNullOrWhiteSpace(request.Actors))
-                throw new ValidationException("Actors is required");
+                throw new ValidationException("Actors is required.");
 
             if (string.IsNullOrWhiteSpace(request.Director))
-                throw new ValidationException("Director is required");
+                throw new ValidationException("Director is required.");
 
             if (string.IsNullOrWhiteSpace(request.Studio))
-                throw new ValidationException("Studio is required");
+                throw new ValidationException("Studio is required.");
 
             if (request.Duration <= 0)
-                throw new ValidationException("Duration must be greater than 0");
+                throw new ValidationException("Duration must be greater than 0.");
 
             if (request.Version <= 0)
-                throw new ValidationException("Version must be greater than 0");
+                throw new ValidationException("Version must be greater than 0.");
 
             if (string.IsNullOrWhiteSpace(request.TrailerUrl))
-                throw new ValidationException("Trailer URL is required");
+                throw new ValidationException("Trailer URL is required.");
 
             if (!Uri.TryCreate(request.TrailerUrl, UriKind.Absolute, out _))
-                throw new ValidationException("Invalid Trailer URL format");
+                throw new ValidationException("Invalid Trailer URL format.");
 
             if (string.IsNullOrWhiteSpace(request.Description))
-                throw new ValidationException("Description is required");
+                throw new ValidationException("Description is required.");
 
             if (request.MoviePrice <= 0)
-                throw new ValidationException("Movie price must be greater than 0");
+                throw new ValidationException("Movie price must be greater than 0.");
 
             if (request.GenreIds == null || !request.GenreIds.Any())
-                throw new ValidationException("At least one genre is required");
+                throw new ValidationException("At least one genre is required.");
         }
 
         private string GetMovieStatus(DateTime fromDate, DateTime toDate)

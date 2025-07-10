@@ -194,7 +194,7 @@ namespace MV.PresnetationLayer.Controllers
                   </div>
                   <div class=""support"">
                     <h3>Need Help ?</h3>
-                    <p>📞 Phone: <strong>0776743504</strong></p>
+                    <p>📞 Phone: <strong>0775743304</strong></p>
                     <p>📧 Email: <a href=""mailto:hoangnvse183852@fpt.edu.vn"">hoangnvse183852@fpt.edu.vn</a></p>
                   </div>
                   <div class=""footer"">

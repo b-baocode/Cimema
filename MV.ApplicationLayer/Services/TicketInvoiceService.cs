@@ -19,8 +19,8 @@ namespace MV.ApplicationLayer.Services
         private readonly IQrCodeService _qrCodeService;
 
         public TicketInvoiceService(
-            IUnitOfWork unitOfWork, 
-            ISeatDataForShowtimeService seatDataForShowtimeService, 
+            IUnitOfWork unitOfWork,
+            ISeatDataForShowtimeService seatDataForShowtimeService,
             ISeatNotificationService seatNotificationService,
             IQrCodeService qrCodeService)
         {
@@ -31,9 +31,9 @@ namespace MV.ApplicationLayer.Services
         }
 
         public async Task<TicketInvoice> CreateInvoiceAsync(
-            CreateBookingRequest request, 
-            User user, 
-            Promotion? promotion, 
+            CreateBookingRequest request,
+            User user,
+            Promotion? promotion,
             decimal totalPrice,
             ShowtimeRoomInstance showtimeRoomInstance,
             Dictionary<int, SeatDataForShowtime> seatDataDict,
@@ -86,7 +86,7 @@ namespace MV.ApplicationLayer.Services
             }
 
             await _unitOfWork.ticketInvoiceRepository.AddAsync(invoice);
-            
+
             return invoice;
         }
 
@@ -112,7 +112,7 @@ namespace MV.ApplicationLayer.Services
 
                 if (seatIds.Any() && showtimeInstanceId.HasValue)
                 {
-                    
+
                     // Cập nhật trạng thái ghế về "Active" khi payment thất bại hoặc xóa invoice
                     await _seatDataForShowtimeService.UpdateSeatsStatusAsync(seatIds, "Active", showtimeInstanceId.Value);
                     // Đảm bảo lưu thay đổi trạng thái ghế vào database
@@ -130,7 +130,7 @@ namespace MV.ApplicationLayer.Services
                     Console.WriteLine($"Atempting to send message to group: {groupName}");
                     await _seatNotificationService.SendMessageToGroupAsync(groupName, message);
                 }
-                
+
                 // Xóa invoice và tất cả dữ liệu liên quan
                 await _unitOfWork.ticketInvoiceRepository.DeleteAsync(invoiceId);
             }
@@ -147,7 +147,7 @@ namespace MV.ApplicationLayer.Services
                 {
                     InvoiceId = invoice.InvoiceId,
                     CreatedAt = invoice.CreatedAt,
-                    TotalPrice = invoice.TotalPrice,
+                    TotalPrice = (decimal)invoice.ScoreDiscountAmount,
                     Status = invoice.Status ?? "Unknown",
                     PaymentType = invoice.PaymentType,
                     TicketDetails = new List<TicketDetailResponse>(),
@@ -170,12 +170,14 @@ namespace MV.ApplicationLayer.Services
                     var showtimeInstance = await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdAsync(detail.ShowtimeInstanceId);
                     if (showtimeInstance != null)
                     {
-                        var movie = showtimeInstance.Showtime.MovieId.HasValue 
-                            ? await _unitOfWork.movieRepository.GetMovieByIdAsync(showtimeInstance.Showtime.MovieId.Value)
-                            : null;
+                        Movie? movie = null;
+                        if (showtimeInstance.Showtime != null && showtimeInstance.Showtime.MovieId.HasValue)
+                        {
+                            movie = await _unitOfWork.movieRepository.GetMovieByIdAsync(showtimeInstance.Showtime.MovieId.Value);
+                        }
                         var room = await _unitOfWork.roomRepository.GetRoomByIdAsync(showtimeInstance.OriginalRoomId);
                         var seatData = await _unitOfWork.seatDataForShowtimeRepository.GetSeatDataAsync(detail.SeatDataId);
-                        
+
                         // Get seat name from seat data
                         string? seatName = null;
                         if (seatData != null)
@@ -229,12 +231,12 @@ namespace MV.ApplicationLayer.Services
             await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
             await _unitOfWork.SaveChangesAsync();
 
-            // Update all ticket details status to "Checked"
-            foreach (var detail in invoice.TicketDetails)
-            {
-                detail.Status = "Checked";
-            }
-            await _unitOfWork.SaveChangesAsync();
+            // Update all ticket details status to "Checked": Chuyển đổi tất cả các chi tiết vé sang trạng thái "Checked"
+            //foreach (var detail in invoice.TicketDetails)
+            //{
+            //    detail.Status = "Checked";
+            //}
+            //await _unitOfWork.SaveChangesAsync();
 
             return true;
         }
@@ -258,43 +260,48 @@ namespace MV.ApplicationLayer.Services
                 return null;
 
             // Lấy thông tin showtime, movie, room, seat, user, ...
-            var ticketDetail = invoice.TicketDetails.FirstOrDefault();
-            if (ticketDetail == null)
+            var ticketDetails = invoice.TicketDetails.ToList();
+            if (!ticketDetails.Any())
                 return null;
 
-            var showtimeInstance = await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdWithDetailsAsync(ticketDetail.ShowtimeInstanceId);
+            var firstTicketDetail = ticketDetails.First();
+            var showtimeInstance = await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdWithDetailsAsync(firstTicketDetail.ShowtimeInstanceId);
             var movie = showtimeInstance?.Showtime?.Movie;
             var room = await _unitOfWork.roomRepository.GetRoomByIdAsync(showtimeInstance.OriginalRoomId);
-            var seatData = await _unitOfWork.seatDataForShowtimeRepository.GetSeatDataAsync(ticketDetail.SeatDataId);
-            var seat = seatData != null ? await _unitOfWork.seatRepository.GetSeatByIdAsync(seatData.SeatDataId) : null;
             var user = await _unitOfWork.userRepository.GetByIdAsync(invoice.Userid);
 
-            // Tạo QR code
-            var seatNames = new List<string> { seatData != null ? $"{seatData.RowLabel}{seatData.ColumnNumber}" : "N/A" };
+            // Lấy tất cả tên ghế đã mua
+            var seatNames = new List<string>();
+            foreach (var ticketDetail in ticketDetails)
+            {
+                var seatData = await _unitOfWork.seatDataForShowtimeRepository.GetSeatDataAsync(ticketDetail.SeatDataId);
+                if (seatData != null)
+                {
+                    seatNames.Add($"{seatData.RowLabel}{seatData.ColumnNumber}");
+                }
+            }
+
+            // Tạo QR code với tất cả tên ghế
             var qrCode = await _qrCodeService.GenerateBookingQrCodeAsync(invoice, user, showtimeInstance, seatNames);
+
+            // Tạo chuỗi tên ghế để hiển thị
+            var seatNameDisplay = string.Join(", ", seatNames);
 
             return new TicketDetailFullResponse
             {
-                Id = ticketDetail.SeatDataId.ToString(),
-                ShowTimeSeatId = ticketDetail.ShowtimeInstanceId.ToString(),
-                SeatName = seatData != null ? $"{seatData.RowLabel}{seatData.ColumnNumber}" : "N/A",
-                CoupleShowTimeSeatId = null,
-                SeatCoupleName = null,
-                ScheduleId = showtimeInstance?.ShowtimeId.ToString(),
-                ShowTimeId = showtimeInstance?.ShowtimeId.ToString(),
+                UserId = invoice.Userid,
+                InvoiceId = invoice.InvoiceId.ToString(),
+                ShowTimeSeatId = firstTicketDetail.ShowtimeInstanceId.ToString(),
+                SeatName = seatNameDisplay,
+                showtimeInstanceId = showtimeInstance?.ShowtimeId.ToString(),
                 MovieId = movie?.MovieId.ToString(),
                 MovieName = movie?.Title,
-                MoviePoster = movie?.Poster,
-                MovieNews = "",
-                RoomId = room?.RoomId.ToString(),
+                RoomId = room?.RoomId.ToString(), 
                 RoomName = room?.Name,
-                Status = ticketDetail.Status,
-                TicketType = "Normal",
-                MovieType = "",
-                Price = (int)ticketDetail.TicketPrice,
-                QrCodeBase64 = qrCode,
-                UserId = invoice.Userid
+                Status = invoice.Status,
+                Price = (int)invoice.ScoreDiscountAmount,
+                QrCodeBase64 = qrCode
             };
         }
     }
-} 
+}

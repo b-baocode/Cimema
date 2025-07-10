@@ -41,13 +41,13 @@ namespace MV.ApplicationLayer.Services
             // 1. Validate user
             var user = await _unitOfWork.userRepository.GetByIdAsync(request.UserId);
             if (user == null)
-                throw new Exception("User không tồn tại.");
+                throw new Exception("User does not exist.");
             //lỗi ở đây
             
             // 2. Get ShowtimeRoomInstance
             var showtimeRoomInstance = await _showtimeRoomInstanceService.GetRoomInstanceWithSeatById(request.ShowtimeInstanceId);
             if (showtimeRoomInstance == null)
-                throw new Exception("ShowtimeRoomInstance không tồn tại cho RoomInstanceId này.");
+                throw new Exception("ShowtimeRoomInstance does not exist for this RoomInstanceId.");
 
             // 3. Get and validate seats
             var seatDataDict = await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeRoomInstance.RoomInstanceId);
@@ -61,12 +61,12 @@ namespace MV.ApplicationLayer.Services
                 var foodIds = request.Foods.Select(f => f.FoodId).ToList();
                 foods = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
                 if (foods.Count != foodIds.Count)
-                    throw new Exception("Một hoặc nhiều món ăn không hợp lệ.");
+                    throw new Exception("One or more dishes are invalid.");
                 foreach (var foodReq in request.Foods)
                 {
                     var food = foods.First(f => f.FoodId == foodReq.FoodId);
                     if (food.Quantity < foodReq.Quantity)
-                        throw new Exception($"Món {food.FoodId} không đủ số lượng.");
+                        throw new Exception($"Item {food.FoodId} is not available in sufficient quantity.");
                 }
             }
 
@@ -77,15 +77,15 @@ namespace MV.ApplicationLayer.Services
                 var allPromotions = await _unitOfWork.promotionRepository.GetPromotionsAsync(null, 0, int.MaxValue);
                 promotion = allPromotions.FirstOrDefault(p => p.PromotionId == request.PromotionId.Value);
                 if (promotion == null)
-                    throw new Exception("Mã khuyến mãi không hợp lệ.");
+                    throw new Exception("Invalid promo code.");
                 if (promotion.EndDate < DateTime.Now)
-                    throw new Exception("Mã khuyến mãi đã hết hạn.");
+                    throw new Exception("The promo code has expired.");
             }
 
             // TÍNH TIỀN CHUẨN
             var showtimeRoomInstanceEntity = await _showtimeRoomInstanceService.GetByShowtimeInstanceIdAsync(request.ShowtimeInstanceId);
             if (showtimeRoomInstanceEntity == null)
-                throw new Exception("Không tìm thấy ShowtimeRoomInstance entity cho RoomInstanceId này.");
+                throw new Exception("No ShowtimeRoomInstance entity found for this RoomInstanceId.");
 
             decimal totalTicketPrice = request.Seats.Sum(seatReq =>
                 seatDataDict[seatReq.SeatId].SeatTypePrice +
@@ -113,8 +113,7 @@ namespace MV.ApplicationLayer.Services
             // 8. Update seat status
             await _seatDataForShowtimeService.UpdateSeatsStatusAsync(requestedSeatIds, "InActive", showtimeRoomInstance.RoomInstanceId);
 
-            // 9. Update food quantity
-            if (request.Foods != null && request.Foods.Any())
+            // 9. Update food quantityf
             {
                 foreach (var foodReq in request.Foods)
                 {
@@ -173,7 +172,7 @@ namespace MV.ApplicationLayer.Services
             // Lấy hóa đơn
             var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
             if (invoice == null)
-                throw new Exception($"Không tìm thấy hóa đơn với id {invoiceId}");
+                throw new Exception($"Invoice with id {invoiceId} not found.");
 
             // Lấy thông tin user
             var userId = invoice.Userid;
@@ -267,6 +266,52 @@ namespace MV.ApplicationLayer.Services
             return responses;
         }
 
+        public async Task<List<BookingResponse>> GetBookingsByUserAndStatusAsync(string userId, string status)
+        {
+            // Lấy hóa đơn của user với status cụ thể
+            var invoices = await _unitOfWork.ticketInvoiceRepository.GetByUserIdAndStatusAsync(userId, status);
+            var responses = new List<BookingResponse>();
+            foreach (var invoice in invoices)
+            {
+                var ticketDetails = invoice.TicketDetails.ToList();
+                var showtimeInstanceId = ticketDetails.FirstOrDefault()?.ShowtimeInstanceId;
+                var seatDataDict = showtimeInstanceId.HasValue
+                    ? await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(showtimeInstanceId.Value)
+                    : new Dictionary<int, SeatDataForShowtime>();
+                var foods = invoice.TicketInvoiceFoodItems.ToList();
+                var foodIds = foods.Select(f => f.FoodId).ToList();
+                var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
+                responses.Add(new BookingResponse
+                {
+                    InvoiceId = invoice.InvoiceId,
+                    TotalPrice = (decimal)invoice.TotalPrice,
+                    Status = invoice.Status,
+                    CreatedAt = invoice.CreatedAt,
+                    PaymentType = invoice.PaymentType,
+                    PromotionId = invoice.PromotionId,
+                    PromotionName = invoice.Promotion?.PromotionName,
+                    UserId = invoice.Userid,
+                    ScoresUsed = (int)invoice.ScoresUsed,
+                    ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
+                    Seats = ticketDetails.Select(td => new BookingSeatResponse
+                    {
+                        SeatId = td.SeatDataId,
+                        SeatName = seatDataDict.ContainsKey(td.SeatDataId) ? seatDataDict[td.SeatDataId].RowLabel + seatDataDict[td.SeatDataId].ColumnNumber : "",
+                        Price = td.TicketPrice,
+                        Status = td.Status
+                    }).ToList(),
+                    Foods = foods.Select(fi => new BookingFoodResponse
+                    {
+                        FoodId = fi.FoodId,
+                        FoodName = foodEntities.FirstOrDefault(f => f.FoodId == fi.FoodId)?.FoodName ?? "",
+                        Quantity = fi.BoughtQuantity,
+                        Price = fi.TotalFoodPrice
+                    }).ToList()
+                });
+            }
+            return responses;
+        }
+
         public async Task<List<BookingResponse>> GetAllBookingsAsync()
         {
             // Lấy tất cả hóa đơn
@@ -318,12 +363,12 @@ namespace MV.ApplicationLayer.Services
             // Lấy hóa đơn
             var invoice = await _unitOfWork.ticketInvoiceRepository.GetByIdAsync(invoiceId);
             if (invoice == null)
-                throw new Exception($"Không tìm thấy hóa đơn với id {invoiceId}");
-            if (invoice.Status == "Canceled")
+                throw new Exception($"Invoice with id {invoiceId} not found.");
+            if (invoice.Status == "Cancelled")
                 return false;
 
             // Cập nhật trạng thái hóa đơn
-            invoice.Status = "Canceled";
+            invoice.Status = "Cancelled";
 
             // Cập nhật trạng thái ghế về "Active" (có thể đặt lại)
             var seatIdsToRelease = invoice.TicketDetails.Select(td => td.SeatDataId);
@@ -338,7 +383,7 @@ namespace MV.ApplicationLayer.Services
 
             string seatIdString = string.Join(", ", seatIdsToRelease);
 
-            string message = $"The following seat data IDs is cancelled: {seatIdString}; Status = Active";
+            string message = $"The following seat data IDs is Cancelled: {seatIdString}; Status = Active";
 
             Console.WriteLine($"Atempting to send message to group: {groupName}");
 
@@ -346,7 +391,7 @@ namespace MV.ApplicationLayer.Services
 
             foreach (var ticketDetail in invoice.TicketDetails)
             {
-                ticketDetail.Status = "Canceled";
+                ticketDetail.Status = "Cancelled";
             }
             
             await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
