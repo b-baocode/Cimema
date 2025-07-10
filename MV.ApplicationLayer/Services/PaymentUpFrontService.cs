@@ -14,10 +14,12 @@ namespace MV.ApplicationLayer.Services
         public class PaymentUpFrontService : IPaymentUpFrontService
         {
             private readonly IUnitOfWork _unitOfWork;
+            private readonly IScoreService _scoreService;
 
-            public PaymentUpFrontService(IUnitOfWork unitOfWork)
+            public PaymentUpFrontService(IUnitOfWork unitOfWork, IScoreService scoreService)
             {
                 _unitOfWork = unitOfWork;
+                _scoreService = scoreService;
             }
 
             public async Task<PaymentUpFrontResponse> CreatePaymentUpFrontAsync(PaymentUpFrontRequest paymentRequest)
@@ -30,15 +32,12 @@ namespace MV.ApplicationLayer.Services
                         }
 
                 // Tính toán số tiền thực tế cần thanh toán (không trừ điểm tích lũy nữa)
-  var actualAmountToPay = invoice.TotalPrice;
+                var actualAmountToPay = invoice.ScoreDiscountAmount ?? 0m;
 
                 // Tính toán số tiền thừa
                 var remainChange = paymentRequest.CustomerGive - actualAmountToPay;
 
-                if (remainChange < 0)
-                {
-                    throw new Exception("Số tiền khách đưa không đủ để thanh toán.");
-                }
+           
 
                 var payment = new PaymentUpFront
                 {
@@ -57,6 +56,17 @@ namespace MV.ApplicationLayer.Services
                 await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
                 
                 await _unitOfWork.SaveChangesAsync();
+
+                // Cộng điểm cho user (1% tổng tiền thực trả)
+                if (!string.IsNullOrEmpty(invoice.Userid))
+                {
+                    await _scoreService.AddScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, (decimal)invoice.ScoreDiscountAmount);
+                    // Trừ điểm nếu có sử dụng điểm
+                    if (invoice.ScoresUsed.HasValue && invoice.ScoresUsed.Value > 0)
+                    {
+                        await _scoreService.UseScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, invoice.ScoresUsed.Value);
+                    }
+                }
 
                 return new PaymentUpFrontResponse
                 {

@@ -388,5 +388,11 @@ namespace MV.ApplicationLayer.Services
         {
             return await _unitOfWork.userRepository.CountActiveUsersAsync();
         }
+
+        public async Task<string?> GetUserIdByPhoneAsync(string phone)
+        {
+            var users = await _unitOfWork.userRepository.SearchByPhoneAsync(phone);
+            return users.FirstOrDefault()?.Userid;
+        }
     }
 }

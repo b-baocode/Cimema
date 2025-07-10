@@ -32,5 +32,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<bool> IsPhoneExistsAsync(string phone);
         Task<bool> IsIdentityNumberExistsAsync(string identityNumber);
         Task<int> CountActiveUsersAsync();
+        Task<List<User>> SearchByPhoneAsync(string phone);
     }
 }
