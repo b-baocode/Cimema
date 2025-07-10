@@ -104,13 +104,12 @@ namespace MV.InfrastructureLayer.Repositories
                 Gender = registerRequest.Gender,
                 Identitynumber = registerRequest.Identitynumber,
                 Address = registerRequest.Address,
-                //Accumulatedpoints = 0,
                 Status = 1,
                 Roleid = 4,
             };
 
-            _context.Users.Add(newUser);
-            return await Task.FromResult(true);
+            await _context.Users.AddAsync(newUser);
+            return true;
         }
 
         public async Task<User> GetUserByUsername(string userName)

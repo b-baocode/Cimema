@@ -581,8 +581,8 @@ namespace MV.ApplicationLayer.Services
                         <h1>REGISTER ACCOUNT SUCCESSFULLY</h1>
                       </div>
                       <div class='content'>
-                        <p>Welcome to <strong>CosmoCiné Cinema</strong>!<br>
-                          Your account has been successfully created by our staff at the counter.</p>
+                        <p>Welcome to <strong>CosmoCiné Cinema</strong>!<br></p>
+                          <p>Your account has been successfully created by our staff at the counter.</p>
                         <table class='info-table'>
                           <tr><td class='label'>Account (Email):</td><td class='value'>{username}</td></tr>
                           <tr><td class='label'>Password:</td><td class='value'>{password}</td></tr>
