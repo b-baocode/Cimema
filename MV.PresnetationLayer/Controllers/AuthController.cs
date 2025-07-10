@@ -3,6 +3,8 @@ using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -254,6 +256,79 @@ namespace MV.PresnetationLayer.Controllers
             var token = _authRepository.GenerateJwtToken(loginResponse);
 
             return Ok(new { user = loginResponse, token });
+        }
+
+        [HttpGet("google-login")]
+        public IActionResult GoogleLogin()
+        {
+            // Endpoint này sẽ được gọi sau khi Google xác thực thành công và middleware đã tạo cookie.
+            string redirectUrl = Url.Action(nameof(GoogleLoginCallback));
+
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, "Google");
+        }
+
+        [HttpGet("google-login-callback")] // Đổi tên route để không bị xung đột
+        public async Task<IActionResult> GoogleLoginCallback()
+        {
+            var authenticateResult = await HttpContext.AuthenticateAsync("Cookies");
+            if (!authenticateResult.Succeeded || authenticateResult.Principal == null)
+            {
+                // Chuyển hướng về trang frontend báo lỗi
+                return Redirect("http://localhost:5173/login?error=AuthenticationFailed");
+            }
+
+            var email = authenticateResult.Principal.FindFirst(ClaimTypes.Email)?.Value;
+            var name = authenticateResult.Principal.FindFirst(ClaimTypes.Name)?.Value;
+            if (string.IsNullOrEmpty(email))
+            {
+                return Redirect("http://localhost:5173/login?error=EmailNotFound");
+            }
+
+            var user = await _unitOfWork.userRepository.GetUserByUsername(email);
+            if (user == null)
+            {
+                // Nếu user chưa tồn tại, tạo mới
+                var registerRequest = new RegisterRequest
+                {
+                    Username = email,
+                    Email = email,
+                    Password = Guid.NewGuid().ToString("N") + "!Aa1", // Mật khẩu ngẫu nhiên, không dùng đến
+                    Phone = "0000000000",
+                    Fullname = name ?? "Google User",
+                    Birthdate = DateOnly.FromDateTime(DateTime.Now.AddYears(-18)),
+                    Gender = 2,
+                    Identitynumber = Guid.NewGuid().ToString("N").Substring(0, 12),
+                    Address = "",
+                    RoleId = 4
+                };
+
+                var creationError = await _registerService.RegisterUser(registerRequest);
+                if (!string.IsNullOrEmpty(creationError))
+                {
+                    return Redirect("http://localhost:5173/login?error=UserCreationError");
+                }
+                await _unitOfWork.SaveChangesAsync();
+                user = await _unitOfWork.userRepository.GetUserByUsername(email);
+            }
+
+            // Tạo JWT token
+            var loginResponse = new LoginResponse
+            {
+                Userid = user.Userid,
+                Username = user.Username,
+                Email = user.Email,
+                Phone = user.Phone,
+                Role = user.Role.Name
+            };
+            var token = _authRepository.GenerateJwtToken(loginResponse);
+
+            // Xóa cookie tạm thời
+            await HttpContext.SignOutAsync("Cookies");
+
+            // Chuyển hướng về trang frontend với token trong URL
+            // Frontend sẽ cần một trang để xử lý việc lấy token từ URL và lưu lại
+            return Redirect($"http://localhost:5173/login-success?token={token}");
         }
     }
 }

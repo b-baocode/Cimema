@@ -13,7 +13,7 @@ namespace MV.PresnetationLayer.Hubs
         private readonly IShowtimeService _showtimeService;
 
         public SeatHub(ILogger<SeatHub> logger, IMovieService movieService
-            , IShowtimeRoomInstanceService showtimeRoomInstanceService, 
+            , IShowtimeRoomInstanceService showtimeRoomInstanceService,
             IShowtimeService showtimeService
             )
         {
@@ -87,7 +87,7 @@ namespace MV.PresnetationLayer.Hubs
             _logger.LogInformation("Client {ConnectionId} unsubscribed from group '{GroupName}'" + Environment.NewLine, Context.ConnectionId, groupName);
         }
 
-        
+
         public override Task OnDisconnectedAsync(Exception? exception)
         {
 

@@ -16,7 +16,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<UserResponse> UpdateUserAsync(string id, UserRequest request);
         Task DeleteUserAsync(string id);
 
-        Task<int> CountActiveUsersAsync();
-        Task<string?> GetUserIdByPhoneAsync(string phone);
+        // Register Offline 
+        Task<bool> RegisterCustomerOfflineAsync(CustomerOfflineRegisterRequest request, string createdByUserId);
     }
 }

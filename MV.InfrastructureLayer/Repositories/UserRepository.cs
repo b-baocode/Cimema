@@ -109,8 +109,8 @@ namespace MV.InfrastructureLayer.Repositories
                 Score = new Score { TotalScore = 0, Userid = generatedId }
             };
 
-            _context.Users.Add(newUser);
-            return await Task.FromResult(true);
+            await _context.Users.AddAsync(newUser);
+            return true;
         }
 
         public async Task<User> GetUserByUsername(string userName)
