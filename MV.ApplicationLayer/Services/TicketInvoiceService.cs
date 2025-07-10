@@ -147,7 +147,7 @@ namespace MV.ApplicationLayer.Services
                 {
                     InvoiceId = invoice.InvoiceId,
                     CreatedAt = invoice.CreatedAt,
-                    TotalPrice = invoice.TotalPrice,
+                    TotalPrice = (decimal)invoice.ScoreDiscountAmount,
                     Status = invoice.Status ?? "Unknown",
                     PaymentType = invoice.PaymentType,
                     TicketDetails = new List<TicketDetailResponse>(),

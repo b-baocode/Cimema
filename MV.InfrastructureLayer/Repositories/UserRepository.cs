@@ -106,6 +106,7 @@ namespace MV.InfrastructureLayer.Repositories
                 Address = registerRequest.Address,
                 Status = 1,
                 Roleid = 4,
+                Score = new Score { TotalScore = 0, Userid = generatedId }
             };
 
             await _context.Users.AddAsync(newUser);
@@ -278,6 +279,11 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.Users
                 .AnyAsync(u => u.Identitynumber == identityNumber);
+        }
+
+        public async Task<int> CountActiveUsersAsync()
+        {
+            return await _context.Users.CountAsync(u => u.Status == 1);
         }
     }
 }

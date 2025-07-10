@@ -57,6 +57,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
             services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
             services.AddScoped<IPaymentOnlineRepository, PaymentOnlineRepository>();
+            services.AddScoped<IPaymentUpFrontRepository, PaymentUpFrontRepository>();
             services.AddScoped<IShowtimeRoomInstanceRepository, ShowtimeRoomInstanceRepository>();
 
 
@@ -80,6 +81,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IScoreService, ScoreService>();
             services.AddScoped<IScoreHistoryRepository, ScoreHistoryRepository>();
             services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IPaymentUpFrontService, PaymentUpFrontService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
