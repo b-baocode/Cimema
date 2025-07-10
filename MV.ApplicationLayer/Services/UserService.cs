@@ -623,5 +623,17 @@ namespace MV.ApplicationLayer.Services
                 return builder.ToString();
             }
         }
+
+        public async Task<string?> GetUserIdByPhoneAsync(string phone)
+        {
+            var users = await _unitOfWork.userRepository.SearchByPhoneAsync(phone);
+            var user = users.FirstOrDefault();
+            return user?.Userid;
+        }
+
+        public async Task<int> CountActiveUsersAsync()
+        {
+            return await _unitOfWork.userRepository.CountActiveUsersAsync();
+        }
     }
 }
