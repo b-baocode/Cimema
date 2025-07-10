@@ -42,6 +42,15 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(new { activeUserCount = count });
         }
 
+        [HttpGet("by-phone/{phone}")]
+        public async Task<IActionResult> GetUserIdByPhone(string phone)
+        {
+            var userId = await _userService.GetUserIdByPhoneAsync(phone);
+            if (userId == null)
+                return NotFound("User not found with this phone number.");
+            return Ok(new { userId });
+        }
+
     }
 }
 

@@ -17,5 +17,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task DeleteUserAsync(string id);
 
         Task<int> CountActiveUsersAsync();
+        Task<string?> GetUserIdByPhoneAsync(string phone);
     }
 }
