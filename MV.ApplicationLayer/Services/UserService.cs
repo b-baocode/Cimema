@@ -15,12 +15,14 @@ namespace MV.ApplicationLayer.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IFirebaseStorageService _firebaseStorageService;
         private readonly IEmailService _emailService;
+        private readonly IPasswordRepository _passwordRepository;
 
-        public UserService(IUnitOfWork unitOfWork, IFirebaseStorageService firebaseStorageService, IEmailService emailService)
+        public UserService(IUnitOfWork unitOfWork, IFirebaseStorageService firebaseStorageService, IEmailService emailService, IPasswordRepository passwordRepository)
         {
             _unitOfWork = unitOfWork;
             _firebaseStorageService = firebaseStorageService;
             _emailService = emailService;
+            _passwordRepository = passwordRepository;
         }
 
         public async Task<CustomersReponse?> EditProfileAsync(CustomersRequest request)
@@ -405,8 +407,8 @@ namespace MV.ApplicationLayer.Services
             // Sinh userid và username
             string userId = Guid.NewGuid().ToString();
             string username = request.Email;
-            string password = "customer@123";
-            string hashedPassword = HashPassword(password);
+            string password = "Customer@123";
+            string hashedPassword = _passwordRepository.HashPassword(password);
             string imageUrl = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media&token=11cc28fe-2437-4527-a755-909c0a332ffa";
 
             var user = new User
@@ -415,13 +417,13 @@ namespace MV.ApplicationLayer.Services
                 Username = username,
                 Password = hashedPassword,
                 Image = imageUrl,
-                Fullname = null,
-                Birthdate = null,
-                Gender = null,
-                Identitynumber = null,
+                Fullname = "Customer Offline", // Giá trị mặc định
+                Birthdate = DateOnly.FromDateTime(DateTime.Now.AddYears(-18)), // 18 tuổi
+                Gender = 2, // Không xác định hoặc giá trị mặc định
+                Identitynumber = "000000000000", // 12 số 0
                 Email = request.Email,
                 Phone = request.Phone,
-                Address = null,
+                Address = "N/A", // Giá trị mặc định
                 Status = 1, // Đã kích hoạt
                 Roleid = 4, // Customer
                 Joindate = DateTime.Now
@@ -610,18 +612,6 @@ namespace MV.ApplicationLayer.Services
             await _emailService.SendEmailAsync(request.Email, "Your Movie Theater Account Information", emailBody);
 
             return true;
-        }
-
-        private string HashPassword(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                var builder = new StringBuilder();
-                foreach (var b in bytes)
-                    builder.Append(b.ToString("x2"));
-                return builder.ToString();
-            }
         }
 
         public async Task<string?> GetUserIdByPhoneAsync(string phone)
