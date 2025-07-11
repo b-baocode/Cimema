@@ -77,7 +77,7 @@ namespace MV.ApplicationLayer.Services
                 //sb.AppendLine($"💺 GHẾ: {seatNamesText}");
                 
                 // Thông tin đơn hàng
-                sb.AppendLine($"🎫 Invoice's ID: {invoice?.InvoiceId ?? 0}");
+                sb.AppendLine($"{invoice?.InvoiceId ?? 0}");
                 
                 // Thông tin người mua
                 //var userName = user?.Fullname ?? "N/A";
