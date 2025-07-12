@@ -87,10 +87,9 @@ builder.Services.AddScoped<ISeatNotificationService, SeatNotificationSignalR>();
 // Cấu hình các phương thức xác thực (Authentication Schemes)
 builder.Services.AddAuthentication(options =>
 {
-    // Đặt Bearer (JWT) làm phương thức mặc định để xác thực các request API
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
 .AddJwtBearer(options =>
 {
@@ -113,7 +112,6 @@ builder.Services.AddAuthentication(options =>
         ClockSkew = TimeSpan.Zero
     };
 
-    // Cấu hình cho việc xử lý token
     options.Events = new JwtBearerEvents
     {
         OnAuthenticationFailed = context =>
