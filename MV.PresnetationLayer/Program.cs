@@ -10,6 +10,11 @@ using MV.PresnetationLayer.Hubs;
 using MV.PresnetationLayer.SignalR;
 using MV.ApplicationLayer.Services.Vnpay;
 using MV.ApplicationLayer.HelperMethodsForThirdParty;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.AspNetCore.Authentication;
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
@@ -78,25 +83,68 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<INotificationService, SignalRNotificationService>();
 builder.Services.AddScoped<ISeatNotificationService, SeatNotificationSignalR>();
 
-// Configure JWT Authentication using the extension method
-builder.Services.AddJwtAuthentication(builder.Configuration);
+// === CẤU HÌNH AUTHENTICATION ĐÃ SỬA LẠI ===
+// Cấu hình các phương thức xác thực (Authentication Schemes)
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var jwtKey = builder.Configuration["Jwt:Key"];
+    var jwtIssuer = builder.Configuration["Jwt:Issuer"];
 
-// Thêm Google và Cookie như các scheme phụ
-builder.Services.AddAuthentication()
-    .AddCookie("Cookies", options =>
+    if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer))
     {
-        options.Cookie.SameSite = SameSiteMode.None;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-    })
-    .AddGoogle("Google", options =>
+        throw new InvalidOperationException("JWT configuration is missing in appsettings.json");
+    }
+
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.ClientId = builder.Configuration["GoogleKeys:ClientId"];
-        options.ClientSecret = builder.Configuration["GoogleKeys:ClientSecret"];
-        options.CallbackPath = "/api/auth/google-callback";
-        options.SaveTokens = true;
-        options.Scope.Add("email");
-        options.Scope.Add("profile");
-    });
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ClockSkew = TimeSpan.Zero
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine($"Authentication failed: {context.Exception.Message}");
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("Token validated successfully");
+            return Task.CompletedTask;
+        }
+    };
+})
+.AddCookie("Cookies", options =>
+{
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+})
+.AddGoogle("Google", options =>
+{
+    options.ClientId = builder.Configuration["GoogleKeys:ClientId"];
+    options.ClientSecret = builder.Configuration["GoogleKeys:ClientSecret"];
+    options.CallbackPath = "/api/auth/google-callback";
+    options.SaveTokens = true;
+    options.Scope.Add("email");
+    options.Scope.Add("profile");
+});
+
+// Thêm Authorization
+builder.Services.AddAuthorization();
+
+// === KẾT THÚC CẤU HÌNH AUTHENTICATION ===
 
 //Configure Quartz
 builder.Services.AddQuartzConfiguration(builder.Configuration);

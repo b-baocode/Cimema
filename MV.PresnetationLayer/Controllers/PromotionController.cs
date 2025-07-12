@@ -40,7 +40,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<ActionResult<PromotionResponse>> CreatePromotion(
             [FromForm] PromotionCreateRequest request)
         {
@@ -66,7 +66,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<ActionResult<PromotionResponse>> UpdatePromotion(
             int id, [FromForm] PromotionUpdateRequest request)
         {
@@ -91,7 +91,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<ActionResult> DeletePromotion(int id)
         {
             try
@@ -106,7 +106,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPut("UnUpdate/{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<ActionResult> UnUpdatePromotion(int id)
         {
             try
@@ -121,6 +121,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet("coming-soon")]
+        [AllowAnonymous]
         public async Task<ActionResult<PagedResult<PromotionResponse>>> GetComingSoonPromotions([FromQuery] PromotionSearchRequest request)
         {
             var promotions = await _promotionService.GetComingSoonPromotionsAsync(request);
