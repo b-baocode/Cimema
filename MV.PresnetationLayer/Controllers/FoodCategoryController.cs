@@ -68,7 +68,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<FoodCategoryResponse>> CreateFoodCategory([FromBody] FoodCategoryRequest request)
         {
             try

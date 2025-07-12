@@ -69,7 +69,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<FoodResponse>> CreateFood([FromForm] FoodRequest request)
         {
             if (request.FoodPoster == null || request.FoodPoster.Length == 0)
