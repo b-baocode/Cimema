@@ -21,8 +21,24 @@ namespace MV.PresnetationLayer.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateBooking([FromBody] CreateBookingRequest request)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            request.UserId = userId; // Overwrite for security
+            var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+            // Nếu user hiện tại là Admin, Manager, Employee hoặc Staff, cho phép đặt vé cho user khác
+            if (User.IsInRole("Admin") || User.IsInRole("Manager") || User.IsInRole("Employee") || User.IsInRole("Staff"))
+            {
+                // Cho phép đặt vé cho user khác, nhưng vẫn kiểm tra userId có hợp lệ
+                if (string.IsNullOrEmpty(request.UserId))
+                {
+                    return BadRequest("UserId is required when booking for another user");
+                }
+            }
+            else
+            {
+                // Nếu là Customer, chỉ được đặt vé cho chính mình
+                request.UserId = currentUserId;
+            }
+
             var result = await _bookingService.CreateBookingAsync(request);
             return Ok(result);
         }
