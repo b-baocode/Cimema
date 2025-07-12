@@ -411,6 +411,13 @@ namespace MV.ApplicationLayer.Services
             string hashedPassword = _passwordRepository.HashPassword(password);
             string imageUrl = "https://firebasestorage.googleapis.com/v0/b/swp391-2004.appspot.com/o/UserImages%2FPlaceholder-Profile-Image.jpg?alt=media&token=11cc28fe-2437-4527-a755-909c0a332ffa";
 
+            // Sinh identitynumber duy nhất
+            string identityNumber;
+            Random random = new Random();
+            do
+            {
+                identityNumber = string.Concat(Enumerable.Range(0, 12).Select(_ => random.Next(0, 10).ToString()));
+            } while (await _unitOfWork.userRepository.IsIdentityNumberExistsAsync(identityNumber));
             var user = new User
             {
                 Userid = userId,
@@ -420,7 +427,7 @@ namespace MV.ApplicationLayer.Services
                 Fullname = "Customer Offline", // Giá trị mặc định
                 Birthdate = DateOnly.FromDateTime(DateTime.Now.AddYears(-18)), // 18 tuổi
                 Gender = 2, // Không xác định hoặc giá trị mặc định
-                Identitynumber = "000000000000", // 12 số 0
+                Identitynumber = identityNumber, // Đảm bảo duy nhất
                 Email = request.Email,
                 Phone = request.Phone,
                 Address = "N/A", // Giá trị mặc định
