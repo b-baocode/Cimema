@@ -49,6 +49,10 @@ namespace MV.PresnetationLayer.Controllers
             {
                 return Conflict(new { message = ex.Message }); // 409 Conflict
             }
+            catch (UserHasNotWatchedMovieException ex)
+            {
+                return BadRequest(new { message = ex.Message }); // 400 Bad Request
+            }
             catch (UniqueConstraintViolationException ex)
             {
                 return Conflict(new { message = ex.Message }); // 409 Conflict
