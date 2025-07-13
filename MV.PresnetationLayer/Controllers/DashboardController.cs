@@ -8,7 +8,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,Manager")]
+    // [Authorize(Roles = "Admin,Manager")]
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
@@ -79,46 +79,46 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
 
-        //[HttpGet("debug/ticket-invoices")]
-        //public async Task<IActionResult> DebugTicketInvoices([FromQuery] DateTime? startDate = null, [FromQuery] DateTime? endDate = null)
-        //{
-        //    try
-        //    {
-        //        var query = _dashboardService.GetType().GetField("_unitOfWork", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)?.GetValue(_dashboardService) as IUnitOfWork;
-                
-        //        if (query == null)
-        //            return BadRequest("Cannot access unit of work");
+        [HttpPost("revenue/by-movie-chart")]
+        public async Task<IActionResult> GetMovieRevenueChartJson([FromBody] MovieRevenueChartRequest request)
+        {
+            try
+            {
+                if (!new[] { "day", "month", "year" }.Contains(request.Type))
+                    return BadRequest(new { message = "type must be 'day', 'month', or 'year'" });
+                if (request.StartDate == default || request.EndDate == default)
+                    return BadRequest(new { message = "startDate and endDate are required" });
+                if (request.StartDate > request.EndDate)
+                    return BadRequest(new { message = "startDate must be before endDate" });
+                var result = await _dashboardService.GetMovieRevenueChartAsync(request.Type, request.StartDate, request.EndDate, request.MovieIds);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
+        }
 
-        //        var invoices = query.ticketInvoiceRepository.GetAll()
-        //            .Where(ti => (ti.Status == "Success" || ti.Status == "Checked"))
-        //            .OrderByDescending(ti => ti.CreatedAt)
-        //            .Take(20)
-        //            .ToList();
+        [HttpPost("revenue/by-food-chart")]
+        public async Task<IActionResult> GetFoodRevenueChartJson([FromBody] FoodRevenueChartRequest request)
+        {
+            try
+            {
+                if (!new[] { "day", "month", "year" }.Contains(request.Type))
+                    return BadRequest(new { message = "type must be 'day', 'month', or 'year'" });
+                if (request.StartDate == default || request.EndDate == default)
+                    return BadRequest(new { message = "startDate and endDate are required" });
+                if (request.StartDate > request.EndDate)
+                    return BadRequest(new { message = "startDate must be before endDate" });
+                var result = await _dashboardService.GetFoodRevenueChartAsync(request.Type, request.StartDate, request.EndDate, request.FoodIds);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
+            }
+        }
 
-        //        var debugData = invoices.Select(ti => new
-        //        {
-        //            InvoiceId = ti.InvoiceId,
-        //            CreatedAt = ti.CreatedAt,
-        //            CreatedAtDate = ti.CreatedAt.Date,
-        //            Status = ti.Status,
-        //            ScoreDiscountAmount = ti.ScoreDiscountAmount,
-        //            TotalPrice = ti.TotalPrice
-        //        }).ToList();
-
-        //        return Ok(new
-        //        {
-        //            TotalInvoices = debugData.Count,
-        //            Invoices = debugData,
-        //            CurrentDateTime = DateTime.Now,
-        //            CurrentDate = DateTime.Now.Date,
-        //            RequestStartDate = startDate,
-        //            RequestEndDate = endDate
-        //        });
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(500, new { message = "Internal server error", error = ex.Message });
-        //    }
-        //}
+        
     }
 } 

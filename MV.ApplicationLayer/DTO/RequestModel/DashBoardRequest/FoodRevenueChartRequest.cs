@@ -1,0 +1,13 @@
+using System;
+using System.Collections.Generic;
+
+namespace MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest
+{
+    public class FoodRevenueChartRequest
+    {
+        public string Type { get; set; } = "month"; // "day", "month", "year"
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public List<int> FoodIds { get; set; }
+    }
+} 
