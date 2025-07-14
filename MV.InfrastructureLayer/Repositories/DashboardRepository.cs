@@ -206,7 +206,7 @@ namespace MV.InfrastructureLayer.Repositories
                 {
                     MovieId = movieGroup.Key.MovieId,
                     MovieName = movieGroup.Key.Title,
-                    Points = points
+                    Data = points
                 });
             }
             
@@ -311,7 +311,7 @@ namespace MV.InfrastructureLayer.Repositories
                 {
                     FoodId = foodGroup.Key.FoodId,
                     FoodName = foodGroup.Key.FoodName,
-                    Points = points
+                    Data = points
                 });
             }
             

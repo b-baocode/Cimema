@@ -8,7 +8,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,Manager")]
+    //[Authorize(Roles = "Admin,Manager")]
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
