@@ -19,7 +19,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,Staff,Customer")]
+        [Authorize(Roles = "Admin,Manager,Employee,Customer")]
         public async Task<ActionResult<IEnumerable<FoodCategoryResponse>>> GetAllFoodCategories()
         {
             try
@@ -90,7 +90,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<FoodCategoryResponse>> UpdateFoodCategory(int id, [FromBody] FoodCategoryUpdateRequest request)
         {
             try
@@ -112,7 +112,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeleteFoodCategory(int id)
         {
             try
