@@ -97,5 +97,15 @@ namespace MV.ApplicationLayer.Services
         {
             return await _unitOfWork.dashboardRepository.GetRevenueChartAsync(request);
         }
+
+        public async Task<MovieRevenueChartResponse> GetMovieRevenueChartAsync(string type, DateTime startDate, DateTime endDate, List<int> movieIds = null)
+        {
+            return await _unitOfWork.dashboardRepository.GetMovieRevenueChartAsync(type, startDate, endDate, movieIds);
+        }
+
+        public async Task<FoodRevenueChartResponse> GetFoodRevenueChartAsync(string type, DateTime startDate, DateTime endDate, List<int> foodIds = null)
+        {
+            return await _unitOfWork.dashboardRepository.GetFoodRevenueChartAsync(type, startDate, endDate, foodIds);
+        }
     }
 } 
