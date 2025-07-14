@@ -14,5 +14,13 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<CommentRating> UpdateAsync(CommentRating commentRating);
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
+        
+        /// <summary>
+        /// Kiểm tra người dùng đã thanh toán và xem phim chưa
+        /// </summary>
+        /// <param name="userId">ID của người dùng</param>
+        /// <param name="movieId">ID của phim</param>
+        /// <returns>True nếu đã thanh toán và xem phim, False nếu chưa</returns>
+        Task<bool> HasUserWatchedMovieAsync(string userId, int movieId);
     }
 }

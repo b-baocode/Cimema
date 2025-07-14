@@ -36,14 +36,20 @@ namespace MV.ApplicationLayer.Services
             };
         }
 
-
-
         public async Task<CommentRatingResponse> CreateAsync(CommentRatingRequest request)
         {
+            // Kiểm tra xem user đã đánh giá phim này chưa
             var existingComment = await _unitOfWork.commentRatingRepository.GetByUserIdAndMovieIdAsync(request.UserId, request.MovieId);
             if (existingComment != null)
             {
                 throw new CommentAlreadyExistsException("You have already commented on this movie.");
+            }
+
+            // Kiểm tra xem user đã thanh toán và xem phim này chưa
+            var hasWatchedMovie = await _unitOfWork.commentRatingRepository.HasUserWatchedMovieAsync(request.UserId, request.MovieId);
+            if (!hasWatchedMovie)
+            {
+                throw new UserHasNotWatchedMovieException("You must purchase and watch this movie before you can rate it.");
             }
 
             var commentRating = new CommentRating
@@ -58,9 +64,11 @@ namespace MV.ApplicationLayer.Services
             var createdComment = await _unitOfWork.commentRatingRepository.CreateAsync(commentRating);
             await _unitOfWork.SaveChangesAsync();
 
-            return MapToResponse(createdComment);
+            // Truy vấn dùng để trả lại đầy đủ thông tin bao gồm username và moviename
+            // Nếu không trả về username = null và moviename = null
+            var fullComment = await _unitOfWork.commentRatingRepository.GetByIdAsync(createdComment.CommentRatingId);
+            return MapToResponse(fullComment);
         }
-
 
         public async Task<bool> DeleteAsync(int id)
         {
