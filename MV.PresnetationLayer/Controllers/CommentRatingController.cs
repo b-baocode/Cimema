@@ -5,6 +5,7 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.GenericExceptionReport;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.SpecificExceptionReport;
+using System.Security.Claims;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -63,8 +64,32 @@ namespace MV.PresnetationLayer.Controllers
         [Authorize]
         public async Task<ActionResult> Delete(int id)
         {
-            await _commentRatingService.DeleteAsync(id);
-            return NoContent();
+            try
+            {
+                // Lấy thông tin user từ JWT token
+                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
+                if (string.IsNullOrEmpty(currentUserId))
+                {
+                    return Unauthorized(new { message = "User ID not found in token." });
+                }
+
+                await _commentRatingService.DeleteAsync(id, currentUserId, currentUserRole);
+                return NoContent();
+            }
+            catch (UnauthorizedToDeleteCommentException ex)
+            {
+                return StatusCode(403, new { message = ex.Message }); // 403 Forbidden
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message }); // 404 Not Found
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An unexpected error occurred." });
+            }
         }
     }
 }

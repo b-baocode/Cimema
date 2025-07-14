@@ -70,8 +70,21 @@ namespace MV.ApplicationLayer.Services
             return MapToResponse(fullComment);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id, string userId, string userRole)
         {
+            // CommentRating chỉ có thể xóa nếu tồn tại
+            var commentRating = await _unitOfWork.commentRatingRepository.GetByIdAsync(id);
+            if (commentRating == null)
+            {
+                throw new NotFoundException($"Comment rating with ID {id} not found.");
+            }
+
+            // Authentication CommentRating chỉ mỗi role "Admin" mới có thể xóa comment của người khác
+            if (userRole != "Admin" && commentRating.Userid != userId)
+            {
+                throw new UnauthorizedToDeleteCommentException("You cannot delete other people's Comment-Rating. Only Admin can delete.");
+            }
+
             var result = await _unitOfWork.commentRatingRepository.DeleteAsync(id);
             if (!result)
                 throw new NotFoundException($"Comment rating with ID {id} not found.");
