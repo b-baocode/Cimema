@@ -7,6 +7,8 @@ namespace MV.ApplicationLayer.ServiceInterfaces
     {
         Task<PagedResult<CommentRatingResponse>> GetByMovieIdAsync(int movieId, CommentRatingPagingRequest request);
         Task<CommentRatingResponse> CreateAsync(CommentRatingRequest request);
-        Task<bool> DeleteAsync(int id);
+
+        // Xóa cần chuyền RoleId để cấp quyền xóa
+        Task<bool> DeleteAsync(int id, string userId, string userRole);
     }
 }
