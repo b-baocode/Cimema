@@ -72,7 +72,7 @@ namespace MV.ApplicationLayer.Services
 
             // 5. Validate promotion
             Promotion? promotion = null;
-            if (request.PromotionId.HasValue)
+            if (request.PromotionId.HasValue && request.PromotionId.Value > 0)
             {
                 var allPromotions = await _unitOfWork.promotionRepository.GetPromotionsAsync(null, 0, int.MaxValue);
                 promotion = allPromotions.FirstOrDefault(p => p.PromotionId == request.PromotionId.Value);

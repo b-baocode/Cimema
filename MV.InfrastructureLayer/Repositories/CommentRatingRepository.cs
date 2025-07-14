@@ -95,5 +95,21 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.CommentRatings.FirstOrDefaultAsync(cr => cr.Userid == userId && cr.MovieId == movieId);
         }
+
+        public async Task<bool> HasUserWatchedMovieAsync(string userId, int movieId)
+        {
+            // Kiểm tra xem người dùng có vé đã thanh toán thành công cho phim này không
+            var hasWatchedMovie = await _context.TicketInvoices
+                .Include(ti => ti.TicketDetails)
+                .ThenInclude(td => td.ShowtimeInstance)
+                .ThenInclude(sri => sri.Showtime)
+                .Where(ti => ti.Userid == userId && 
+                           ti.Status == "Success" && // Chỉ tính những vé đã thanh toán thành công
+                           ti.TicketDetails.Any(td => 
+                               td.ShowtimeInstance.Showtime.MovieId == movieId))
+                .AnyAsync();
+
+            return hasWatchedMovie;
+        }
     }
 }
