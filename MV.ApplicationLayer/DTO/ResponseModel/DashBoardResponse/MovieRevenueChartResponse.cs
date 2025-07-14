@@ -14,7 +14,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse
     {
         public int MovieId { get; set; }
         public string MovieName { get; set; }
-        public List<MovieRevenueChartPoint> Points { get; set; }
+        public List<MovieRevenueChartPoint> Data { get; set; }
     }
 
     public class MovieRevenueChartResponse

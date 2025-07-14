@@ -14,7 +14,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse
     {
         public int FoodId { get; set; }
         public string FoodName { get; set; }
-        public List<FoodRevenueChartPoint> Points { get; set; }
+        public List<FoodRevenueChartPoint> Data { get; set; }
     }
 
     public class FoodRevenueChartResponse
