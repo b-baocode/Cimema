@@ -285,7 +285,7 @@ namespace MV.PresnetationLayer.Controllers
                 return Redirect("http://localhost:5173/login?error=EmailNotFound");
             }
 
-            var user = await _unitOfWork.userRepository.GetUserByUsername(email);
+            var user = await _unitOfWork.userRepository.GetUserByEmail(email);
             if (user == null)
             {
                 // Nếu user chưa tồn tại, tạo mới
