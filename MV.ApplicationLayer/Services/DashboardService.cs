@@ -10,7 +10,7 @@ namespace MV.ApplicationLayer.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IDashboardRepository _dashboardRepository;
 
-       public DashboardService(IUnitOfWork unitOfWork)
+        public DashboardService(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
@@ -108,4 +108,4 @@ namespace MV.ApplicationLayer.Services
             return await _unitOfWork.dashboardRepository.GetFoodRevenueChartAsync(type, startDate, endDate, foodIds);
         }
     }
-} 
+}

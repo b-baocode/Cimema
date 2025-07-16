@@ -5,4 +5,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel.BookingRequest
         public int FoodId { get; set; }
         public int Quantity { get; set; }
     }
-} 
+}

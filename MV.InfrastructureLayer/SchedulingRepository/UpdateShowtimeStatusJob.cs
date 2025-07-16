@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Text.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.QuarztInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using Quartz;
-using System.Text.Json;
 
 namespace MV.InfrastructureLayer.SchedulingRepository
 {
@@ -40,7 +40,7 @@ namespace MV.InfrastructureLayer.SchedulingRepository
             if (showtime == null) return;
 
             showtime.Status = newStatus!;
-            
+
             await _unitOfWork.showtimeRoomInstanceRepository.UpdateStatusForShowtimeRoomInstanceQuarztAsync(showtimeId, newStatus!);
 
             await _unitOfWork.SaveChangesAsync();

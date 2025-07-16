@@ -1,9 +1,5 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
-using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
 
@@ -45,4 +41,4 @@ namespace MV.InfrastructureLayer.Repositories
             return getSeats;
         }
     }
-} 
+}

@@ -134,6 +134,14 @@ namespace MV.InfrastructureLayer.Repositories
             return await _context.Users.FindAsync(userId);
         }
 
+        // Check Dulicaption Email When using Login GG
+        public async Task<User?> GetUserByEmail(string email)
+        {
+            return await _context.Set<User>()
+                .Include(u => u.Role)
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+        }
+
 
         public async Task<List<User>> GetAllCustomer()
         {

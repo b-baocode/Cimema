@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel.BookingResponse
 {
     public class BookingResponse
@@ -19,4 +16,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel.BookingResponse
         public int? PromotionId { get; set; }
         public string? PromotionName { get; set; }
     }
-} 
+}

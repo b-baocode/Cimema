@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -285,7 +285,7 @@ namespace MV.PresnetationLayer.Controllers
                 return Redirect("http://localhost:5173/login?error=EmailNotFound");
             }
 
-            var user = await _unitOfWork.userRepository.GetUserByUsername(email);
+            var user = await _unitOfWork.userRepository.GetUserByEmail(email);
             if (user == null)
             {
                 // Nếu user chưa tồn tại, tạo mới

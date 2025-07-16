@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel;
@@ -5,7 +6,6 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.GenericExceptionReport;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.SpecificExceptionReport;
-using System.Security.Claims;
 
 namespace MV.PresnetationLayer.Controllers
 {

@@ -1,10 +1,6 @@
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -45,7 +41,7 @@ namespace MV.ApplicationLayer.Services
         public async Task UpdateSeatsStatusAsync(IEnumerable<int> seatIds, string newStatus, int showtimeInstanceId)
         {
             var seatDataList = await _unitOfWork.seatDataForShowtimeRepository.GetSeatsByShowtimeInstanceIdAsync(showtimeInstanceId);
-            
+
             foreach (var seatId in seatIds)
             {
                 var seatToUpdate = seatDataList.FirstOrDefault(s => s.SeatDataId == seatId);
@@ -57,4 +53,4 @@ namespace MV.ApplicationLayer.Services
             }
         }
     }
-} 
+}

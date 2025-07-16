@@ -4,10 +4,6 @@ using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -296,7 +292,7 @@ namespace MV.ApplicationLayer.Services
                 showtimeInstanceId = showtimeInstance?.ShowtimeId.ToString(),
                 MovieId = movie?.MovieId.ToString(),
                 MovieName = movie?.Title,
-                RoomId = room?.RoomId.ToString(), 
+                RoomId = room?.RoomId.ToString(),
                 RoomName = room?.Name,
                 Status = invoice.Status,
                 Price = (int)invoice.ScoreDiscountAmount,

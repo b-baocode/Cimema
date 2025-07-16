@@ -1,12 +1,9 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest;
 using MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse;
 using MV.ApplicationLayer.RepositoryInterfaces;
-using MV.InfrastructureLayer.DBContext;
 using MV.DomainLayer.Entities;
+using MV.InfrastructureLayer.DBContext;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -109,23 +106,23 @@ namespace MV.InfrastructureLayer.Repositories
             };
         }
 
-        
+
 
         public async Task<MovieRevenueChartResponse> GetMovieRevenueChartAsync(string type, DateTime startDate, DateTime endDate, List<int> movieIds = null)
         {
             var startDateOnly = startDate.Date;
             var endDateOnly = endDate.Date.AddDays(1);
-            
+
             Console.WriteLine($"Debug: Querying from {startDateOnly} to {endDateOnly}");
-            
+
             // Bước 1: Lấy tất cả TicketInvoices trong khoảng thời gian
             var invoices = await _context.TicketInvoices
                 .Where(ti => (ti.Status == "Success" || ti.Status == "Checked") &&
                              ti.CreatedAt >= startDateOnly && ti.CreatedAt < endDateOnly)
                 .ToListAsync();
-            
+
             Console.WriteLine($"Debug: Found {invoices.Count} invoices");
-            
+
             // Bước 2: Lấy tất cả TicketDetails từ các invoices
             var ticketDetails = new List<TicketDetail>();
             foreach (var invoice in invoices)
@@ -140,31 +137,32 @@ namespace MV.InfrastructureLayer.Repositories
                     .ToListAsync();
                 ticketDetails.AddRange(details);
             }
-            
+
             Console.WriteLine($"Debug: Found {ticketDetails.Count} ticket details");
-            
+
             // Bước 3: Filter theo movieIds nếu có
             if (movieIds != null && movieIds.Any())
             {
                 ticketDetails = ticketDetails.Where(td => movieIds.Contains(td.ShowtimeInstance.Showtime.MovieId.Value)).ToList();
                 Console.WriteLine($"Debug: After movie filter: {ticketDetails.Count} ticket details");
             }
-            
+
             // Bước 4: Group theo movie
             var movieGroups = ticketDetails
-                .GroupBy(td => new { 
-                    MovieId = td.ShowtimeInstance.Showtime.MovieId.Value, 
-                    Title = td.ShowtimeInstance.Showtime.Movie.Title 
+                .GroupBy(td => new
+                {
+                    MovieId = td.ShowtimeInstance.Showtime.MovieId.Value,
+                    Title = td.ShowtimeInstance.Showtime.Movie.Title
                 })
                 .ToList();
-            
+
             Console.WriteLine($"Debug: Found {movieGroups.Count} movie groups");
-            
+
             var data = new List<MovieRevenueChartItem>();
             foreach (var movieGroup in movieGroups)
             {
                 Console.WriteLine($"Debug: Processing movie {movieGroup.Key.Title} with {movieGroup.Count()} tickets");
-                
+
                 List<MovieRevenueChartPoint> points;
                 if (type == "day")
                 {
@@ -199,9 +197,9 @@ namespace MV.InfrastructureLayer.Repositories
                             TotalOrders = g.Count()
                         }).OrderBy(p => p.Label).ToList();
                 }
-                
+
                 Console.WriteLine($"Debug: Movie {movieGroup.Key.Title} has {points.Count} points");
-                
+
                 data.Add(new MovieRevenueChartItem
                 {
                     MovieId = movieGroup.Key.MovieId,
@@ -209,7 +207,7 @@ namespace MV.InfrastructureLayer.Repositories
                     Data = points
                 });
             }
-            
+
             return new MovieRevenueChartResponse
             {
                 Type = type,
@@ -223,17 +221,17 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var startDateOnly = startDate.Date;
             var endDateOnly = endDate.Date.AddDays(1);
-            
+
             Console.WriteLine($"Debug Food: Querying from {startDateOnly} to {endDateOnly}");
-            
+
             // Bước 1: Lấy tất cả TicketInvoices trong khoảng thời gian
             var invoices = await _context.TicketInvoices
                 .Where(ti => (ti.Status == "Success" || ti.Status == "Checked") &&
                              ti.CreatedAt >= startDateOnly && ti.CreatedAt < endDateOnly)
                 .ToListAsync();
-            
+
             Console.WriteLine($"Debug Food: Found {invoices.Count} invoices");
-            
+
             // Bước 2: Lấy tất cả TicketInvoiceFoodItems từ các invoices
             var foodItems = new List<TicketInvoiceFoodItem>();
             foreach (var invoice in invoices)
@@ -245,31 +243,32 @@ namespace MV.InfrastructureLayer.Repositories
                     .ToListAsync();
                 foodItems.AddRange(items);
             }
-            
+
             Console.WriteLine($"Debug Food: Found {foodItems.Count} food items");
-            
+
             // Bước 3: Filter theo foodIds nếu có
             if (foodIds != null && foodIds.Any())
             {
                 foodItems = foodItems.Where(tifi => foodIds.Contains(tifi.FoodId)).ToList();
                 Console.WriteLine($"Debug Food: After food filter: {foodItems.Count} food items");
             }
-            
+
             // Bước 4: Group theo food
             var foodGroups = foodItems
-                .GroupBy(tifi => new { 
-                    FoodId = tifi.FoodId, 
-                    FoodName = tifi.Food.FoodName 
+                .GroupBy(tifi => new
+                {
+                    FoodId = tifi.FoodId,
+                    FoodName = tifi.Food.FoodName
                 })
                 .ToList();
-            
+
             Console.WriteLine($"Debug Food: Found {foodGroups.Count} food groups");
-            
+
             var data = new List<FoodRevenueChartItem>();
             foreach (var foodGroup in foodGroups)
             {
                 Console.WriteLine($"Debug Food: Processing food {foodGroup.Key.FoodName} with {foodGroup.Count()} items");
-                
+
                 List<FoodRevenueChartPoint> points;
                 if (type == "day")
                 {
@@ -304,9 +303,9 @@ namespace MV.InfrastructureLayer.Repositories
                             TotalOrders = g.Count()
                         }).OrderBy(p => p.Label).ToList();
                 }
-                
+
                 Console.WriteLine($"Debug Food: Food {foodGroup.Key.FoodName} has {points.Count} points");
-                
+
                 data.Add(new FoodRevenueChartItem
                 {
                     FoodId = foodGroup.Key.FoodId,
@@ -314,7 +313,7 @@ namespace MV.InfrastructureLayer.Repositories
                     Data = points
                 });
             }
-            
+
             return new FoodRevenueChartResponse
             {
                 Type = type,
@@ -324,4 +323,4 @@ namespace MV.InfrastructureLayer.Repositories
             };
         }
     }
-} 
+}

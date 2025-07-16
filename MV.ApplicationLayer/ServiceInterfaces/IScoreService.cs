@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using MV.DomainLayer.Entities;
 
 namespace MV.ApplicationLayer.ServiceInterfaces
@@ -13,4 +12,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<Score?> GetScoreByUserIdAsync(string userId);
         Task UseScoreForInvoiceAsync(string userId, int invoiceId, int scoresUsed);
     }
-} 
+}

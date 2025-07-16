@@ -7,4 +7,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel.BookingResponse
         public decimal Price { get; set; }
         public string Status { get; set; }
     }
-} 
+}

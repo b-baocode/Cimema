@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest;
-using MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse;
 using MV.ApplicationLayer.ServiceInterfaces;
 
 namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    //[Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager")]
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
@@ -30,7 +29,7 @@ namespace MV.PresnetationLayer.Controllers
             try
             {
                 // Validate period parameter
-                if (!string.IsNullOrEmpty(period) && 
+                if (!string.IsNullOrEmpty(period) &&
                     !new[] { "today", "month", "year", "custom" }.Contains(period.ToLower()))
                 {
                     return BadRequest(new { message = "Invalid period. Must be 'today', 'month', 'year', or 'custom'" });
@@ -119,6 +118,6 @@ namespace MV.PresnetationLayer.Controllers
             }
         }
 
-        
+
     }
-} 
+}

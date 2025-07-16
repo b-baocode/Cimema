@@ -1,5 +1,3 @@
-using System;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse
 {
     public class RevenueResponse
@@ -10,4 +8,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse
         public DateTime EndDate { get; set; }
         public string Period { get; set; }
     }
-} 
+}

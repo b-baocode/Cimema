@@ -79,7 +79,7 @@ namespace MV.PresnetationLayer.Controllers
             {
                 var updateResult = await _seatService.UpdateSeatTypePriceAsync(seatTypePriceUpdateRequest);
 
-                if(!updateResult.IsSuccess)
+                if (!updateResult.IsSuccess)
                 {
                     return NotFound(
                        new ProblemDetails

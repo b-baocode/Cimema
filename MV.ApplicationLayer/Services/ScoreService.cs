@@ -1,8 +1,6 @@
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using System;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -101,7 +99,7 @@ namespace MV.ApplicationLayer.Services
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
-             await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
         }
         public async Task<Score?> GetScoreByUserIdAsync(string userId)
         {
@@ -131,8 +129,8 @@ namespace MV.ApplicationLayer.Services
                 InvoiceId = invoiceId
             };
             await _unitOfWork.scoreHistoryRepository.AddAsync(history);
-             await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 
-} 
+}

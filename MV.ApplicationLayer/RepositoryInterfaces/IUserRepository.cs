@@ -33,5 +33,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<bool> IsIdentityNumberExistsAsync(string identityNumber);
         Task<int> CountActiveUsersAsync();
         Task<List<User>> SearchByPhoneAsync(string phone);
+        Task<User?> GetUserByEmail(string email);
     }
 }

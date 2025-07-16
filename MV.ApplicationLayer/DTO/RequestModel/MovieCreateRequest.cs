@@ -53,7 +53,7 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         [MaxLength(25)]
         public string? Status { get; set; }
         */
-        
+
         [Required(ErrorMessage = "At least one genre is required")]
         public List<int> GenreIds { get; set; }
     }

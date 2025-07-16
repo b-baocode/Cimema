@@ -1,9 +1,7 @@
+using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
-
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using Microsoft.EntityFrameworkCore;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -27,4 +25,4 @@ namespace MV.InfrastructureLayer.Repositories
             return await _context.Scores.FirstOrDefaultAsync(s => s.Userid == userId);
         }
     }
-} 
+}

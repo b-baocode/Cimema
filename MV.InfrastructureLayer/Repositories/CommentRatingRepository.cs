@@ -103,9 +103,9 @@ namespace MV.InfrastructureLayer.Repositories
                 .Include(ti => ti.TicketDetails)
                 .ThenInclude(td => td.ShowtimeInstance)
                 .ThenInclude(sri => sri.Showtime)
-                .Where(ti => ti.Userid == userId && 
+                .Where(ti => ti.Userid == userId &&
                            ti.Status == "Success" && // Chỉ tính những vé đã thanh toán thành công
-                           ti.TicketDetails.Any(td => 
+                           ti.TicketDetails.Any(td =>
                                td.ShowtimeInstance.Showtime.MovieId == movieId))
                 .AnyAsync();
 

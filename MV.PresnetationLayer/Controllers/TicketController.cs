@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.ServiceInterfaces;
-using System.Threading.Tasks;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -56,7 +55,7 @@ namespace MV.PresnetationLayer.Controllers
                 }
 
                 var result = await _ticketInvoiceService.CheckTicketAsync(ticketId);
-                
+
                 if (result)
                 {
                     return Ok(new { success = true, message = "Ticket checked successfully." });
@@ -114,4 +113,4 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
     }
-} 
+}

@@ -13,9 +13,9 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         /// <param name="seatNames">Danh sách tên ghế</param>
         /// <returns>Base64 string của QR code image</returns>
         Task<string> GenerateBookingQrCodeAsync(
-            TicketInvoice invoice, 
-            User user, 
-            ShowtimeRoomInstance showtimeRoomInstance, 
+            TicketInvoice invoice,
+            User user,
+            ShowtimeRoomInstance showtimeRoomInstance,
             List<string> seatNames);
 
         /// <summary>
@@ -25,4 +25,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         /// <returns>Base64 string của QR code image</returns>
         Task<string> GenerateSimpleQrCodeAsync(string text);
     }
-} 
+}

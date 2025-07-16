@@ -29,12 +29,11 @@ namespace MV.InfrastructureLayer.Repositories
                     EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
                     EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
                     EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
-                // m.Title.ToLower().Contains(keyword) ||
-                // m.Director.ToLower().Contains(keyword) ||
-                // m.Actors.ToLower().Contains(keyword) ||
-                // m.Studio.ToLower().Contains(keyword) ||
-                // m.PublishDate.ToString().ToLower().Contains(keyword));
             }
+
+            // Sắp xếp theo thứ tự ưu tiên status: Active > ComingSoon > Expired > InActive
+            query = query.OrderBy(m => m.Status == "Active" ? 0 : m.Status == "ComingSoon" ? 1 : m.Status == "Expired" ? 2 : 3)
+                         .ThenByDescending(m => m.MovieId);
 
             return await query
                 .Skip(skip)
@@ -57,11 +56,6 @@ namespace MV.InfrastructureLayer.Repositories
                     EF.Functions.Like(m.Director.ToLower(), $"%{keyword}%") ||
                     EF.Functions.Like(m.Actors.ToLower(), $"%{keyword}%") ||
                     EF.Functions.Like(m.Studio.ToLower(), $"%{keyword}%"));
-                // m.Title.ToLower().Contains(keyword) ||
-                // m.Director.ToLower().Contains(keyword) ||
-                // m.Actors.ToLower().Contains(keyword) ||
-                // m.Studio.ToLower().Contains(keyword) ||
-                // m.PublishDate.ToString().ToLower().Contains(keyword));
             }
 
             return await query.CountAsync();
@@ -101,43 +95,6 @@ namespace MV.InfrastructureLayer.Repositories
 
         public async Task<Movie> CreateMovieAsync(Movie movie)
         {
-            //try
-            //{
-            //    // First check if the movie with this title already exists
-            //    var existingMovie = await _context.Movies
-            //        .FirstOrDefaultAsync(m => m.Title == movie.Title);
-
-            //    if (existingMovie != null)
-            //    {
-            //        throw new InvalidOperationException($"A movie with title '{movie.Title}' already exists.");
-            //    }
-
-            //    _context.Movies.Add(movie);
-            //    await _context.SaveChangesAsync();
-
-            //    // Reload the movie to get the generated ID and ensure all relationships are loaded
-            //    var createdMovie = await _context.Movies
-            //        .Include(m => m.Genres)
-            //        .FirstOrDefaultAsync(m => m.Title == movie.Title);
-
-            //    if (createdMovie == null)
-            //    {
-            //        throw new InvalidOperationException("Movie was created but could not be retrieved.");
-            //    }
-
-            //    return createdMovie;
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Log the error
-            //    Console.WriteLine($"Error in CreateMovieAsync: {ex.Message}");
-            //    if (ex.InnerException != null)
-            //    {
-            //        Console.WriteLine($"Inner error: {ex.InnerException.Message}");
-            //    }
-            //    throw;
-            //}
-
             _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
             return movie;
@@ -150,26 +107,6 @@ namespace MV.InfrastructureLayer.Repositories
             return movie;
         }
 
-        // Soft Delete
-        // public async Task DeleteMovieAsync(int id)
-        // {
-        //     var movie = await _context.Movies
-        //         .Include(m => m.Showtimes)
-        //         .FirstOrDefaultAsync(m => m.MovieId == id);
-
-        //     if (movie != null)
-        //     {
-        //         if (movie.Showtimes.Any())
-        //         {
-        //             throw new InvalidOperationException("Cannot delete movie because it is associated with showtimes");
-        //         }
-
-        //         movie.IsDeleted = false; // Soft Delete: 0 means deleted
-        //         _context.Movies.Update(movie);
-        //         await _context.SaveChangesAsync();
-        //     }
-        // }
-
         // Hard Delete
         // public async Task PermanentDeleteMovieAsync(int id)
         // {
@@ -181,7 +118,6 @@ namespace MV.InfrastructureLayer.Repositories
         //     }
         // }
 
-        // Xóa đi nếu có trường IsDelete
         public async Task DeleteMovieAsync(int id)
         {
             var movie = await _context.Movies
