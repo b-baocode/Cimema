@@ -10,13 +10,13 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         public string FoodName { get; set; }
 
         [Required(ErrorMessage = "Food price is required")]
-        [Range(0, double.MaxValue, ErrorMessage = "Food price must be greater than or equal to 0")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Food price must be greater than 0")]
         public decimal FoodPrice { get; set; }
 
         public IFormFile? FoodPoster { get; set; }
 
         [Required(ErrorMessage = "Quantity is required")]
-        [Range(0, int.MaxValue, ErrorMessage = "Quantity must be greater than or equal to 0")]
+        [Range(1, int.MaxValue, ErrorMessage = "Quantity must be greater than 0")]
         public int Quantity { get; set; }
 
         public string? Status { get; set; }
