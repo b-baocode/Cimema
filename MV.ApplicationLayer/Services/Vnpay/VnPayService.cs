@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.Library;
+using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using MV.ApplicationLayer.RepositoryInterfaces;
-using MV.ApplicationLayer.HelperMethodsForThirdParty;
 
 namespace MV.ApplicationLayer.Services.Vnpay
 {
@@ -116,7 +110,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
                     {
                         invoice.Status = "Success";
                         _ticketInvoiceService.UpdateAsync(invoice).GetAwaiter().GetResult();
-                        
+
                         // Gửi email thông báo thanh toán thành công
                         await SendPaymentSuccessEmailAsync(invoice, payment);
 
@@ -138,19 +132,19 @@ namespace MV.ApplicationLayer.Services.Vnpay
                         // Cập nhật status invoice thành Cancelled
                         invoice.Status = "Cancelled";
                         _ticketInvoiceService.UpdateAsync(invoice).GetAwaiter().GetResult();
-                        
+
                         // Xóa PaymentOnline record
                         var paymentToDelete = await _paymentOnlineRepository.GetByInvoiceIdAsync(invoiceId.Value);
                         if (paymentToDelete != null)
                         {
                             _paymentOnlineRepository.Delete(paymentToDelete);
                         }
-                        
+
                         // Cập nhật trạng thái ghế về "Active" và gửi SignalR notification
                         await HandlePaymentFailureAsync(invoice);
                     }
                 }
-                
+
             }
         }
 
@@ -172,7 +166,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
 
                 var emailSubject = "🎬 Payment successful - CosmoCiné";
                 var emailBody = await GeneratePaymentSuccessEmailBodyWithQrAsync(user, invoice, payment, showtimeRoomInstance);
-                
+
                 await _emailService.SendEmailAsync(user.Email, emailSubject, emailBody);
             }
             catch (Exception ex)
@@ -205,15 +199,15 @@ namespace MV.ApplicationLayer.Services.Vnpay
         {
             var paymentDate = payment.CreatedAt.ToString("dd/MM/yyyy HH:mm");
             var amount = payment.Amount.ToString("N0") + " VNĐ";
-            
+
             // Lấy tên ghế
             var seatNames = await GetSeatNamesAsync(invoice, showtimeRoomInstance);
-            
+
             // Tạo QR code
             var qrCodeBase64 = await _qrCodeService.GenerateBookingQrCodeAsync(invoice, user, showtimeRoomInstance, seatNames);
-            
+
             // Kiểm tra QR code có được tạo thành công không
-            var qrCodeHtml = !string.IsNullOrEmpty(qrCodeBase64) 
+            var qrCodeHtml = !string.IsNullOrEmpty(qrCodeBase64)
                 ? $@"<div class=""qr-section"">
                       <h3>🎫 Movie Ticket QR Code.</h3>
                       <div class=""qr-code"">
@@ -231,7 +225,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
                         💡 QR code temporarily unavailable.
                       </div>
                     </div>";
-            
+
             return $@"
             <!DOCTYPE html>
             <html lang=""vi"">
@@ -474,18 +468,18 @@ namespace MV.ApplicationLayer.Services.Vnpay
             try
             {
                 var seatNames = new List<string>();
-                
+
                 foreach (var ticketDetail in invoice.TicketDetails)
                 {
                     var seatData = showtimeRoomInstance.SeatDataForShowtimes
                         .FirstOrDefault(s => s.SeatDataId == ticketDetail.SeatDataId);
-                    
+
                     if (seatData != null)
                     {
                         seatNames.Add($"{seatData.RowLabel}{seatData.ColumnNumber}");
                     }
                 }
-                
+
                 return seatNames;
             }
             catch (Exception ex)
@@ -499,7 +493,7 @@ namespace MV.ApplicationLayer.Services.Vnpay
         {
             var paymentDate = payment.CreatedAt.ToString("dd/MM/yyyy HH:mm");
             var amount = payment.Amount.ToString("N0") + " VNĐ";
-            
+
             return $@"
             <!DOCTYPE html>
             <html lang=""vi"">

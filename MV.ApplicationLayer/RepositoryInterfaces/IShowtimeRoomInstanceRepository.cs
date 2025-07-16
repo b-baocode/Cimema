@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
 
@@ -18,10 +17,10 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<IEnumerable<GetAllRoomInstanceForShowtimeForSearch?>> GetAllRoomInstanceForSearchAsync(List<int> showtimeIds);
 
         Task<ShowtimeRoomInstance?> GetByShowtimeInstanceIdAsync(int showtimeInstanceId);
-        
+
         /// <summary>
         /// Lấy ShowtimeRoomInstance với đầy đủ thông tin Showtime và Movie
         /// </summary>
         Task<ShowtimeRoomInstance?> GetByShowtimeInstanceIdWithDetailsAsync(int showtimeInstanceId);
     }
-} 
+}

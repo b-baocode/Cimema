@@ -9,4 +9,4 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<PaymentOnline?> GetByInvoiceIdAsync(int invoiceId);
         IEnumerable<PaymentOnline> GetAll();
     }
-} 
+}

@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Net.Sockets;
+﻿using System.Globalization;
 using System.Net;
+using System.Net.Sockets;
+using System.Security.Cryptography; // <--- THÊM DÒNG NÀY VÀO ĐÂY
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using MV.ApplicationLayer.DTO.ResponseModel;
-using System.Security.Cryptography; // <--- THÊM DÒNG NÀY VÀO ĐÂY
 
 
 namespace MV.ApplicationLayer.Library
@@ -47,7 +43,7 @@ namespace MV.ApplicationLayer.Library
             var amount = vnPay.GetResponseData("vnp_Amount");
             var checkSignature =
                 vnPay.ValidateSignature(vnpSecureHash!, hashSecret); //check Signature
-            
+
             if (!checkSignature)
                 return new PaymentInformationResponse()
                 {
@@ -61,7 +57,7 @@ namespace MV.ApplicationLayer.Library
             // 24: Khách hàng hủy giao dịch
             // Các mã khác: Giao dịch thất bại
             var isSuccess = vnpResponseCode == "00";
-            
+
             return new PaymentInformationResponse()
             {
                 Success = isSuccess,

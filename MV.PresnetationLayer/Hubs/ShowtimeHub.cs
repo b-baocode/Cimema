@@ -21,7 +21,7 @@ namespace MV.PresnetationLayer.Hubs
             _logger.LogInformation("Client {ConnectionId} subscribed to group '{GroupName}'" + Environment.NewLine, Context.ConnectionId, groupName);
         }
 
-        
+
         public async Task UnsubscribeFromMovie(string movieTitle)
         {
             string groupName = MovieNameGroupHelpers.GetGroupNameForMovie(movieTitle);
@@ -31,7 +31,7 @@ namespace MV.PresnetationLayer.Hubs
             _logger.LogInformation("Client {ConnectionId} unsubscribed from group '{GroupName}'" + Environment.NewLine, Context.ConnectionId, groupName);
         }
 
-        
+
         //public static string GetGroupNameForMovie(string movieTitle)
         //{
         //    var safeTitle = movieTitle.ToLower().Replace(":", "").Replace(" ", "-");
@@ -39,7 +39,7 @@ namespace MV.PresnetationLayer.Hubs
         //}
         public override Task OnDisconnectedAsync(Exception? exception)
         {
-            
+
             if (exception != null)
             {
                 _logger.LogWarning("Client {ConnectionId} disconnected with error: {Error}" + Environment.NewLine, Context.ConnectionId, exception.Message);

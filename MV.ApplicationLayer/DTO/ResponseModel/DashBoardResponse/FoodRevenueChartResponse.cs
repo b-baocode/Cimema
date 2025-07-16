@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse
 {
     public class FoodRevenueChartPoint
@@ -24,4 +21,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse
         public DateTime EndDate { get; set; }
         public List<FoodRevenueChartItem> Data { get; set; }
     }
-} 
+}

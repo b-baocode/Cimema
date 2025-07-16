@@ -9,7 +9,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-   
+
     public class FoodController : ControllerBase
     {
         private readonly IFoodService _foodService;
@@ -20,7 +20,7 @@ namespace MV.PresnetationLayer.Controllers
         }
 
         [HttpGet]
-       // [Authorize(Roles = "Admin,Manager, Employee ,Customer")]
+        // [Authorize(Roles = "Admin,Manager, Employee ,Customer")]
         public async Task<ActionResult<IEnumerable<FoodResponse>>> GetAllFoods()
         {
             try

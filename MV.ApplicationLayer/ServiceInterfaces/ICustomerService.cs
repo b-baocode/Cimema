@@ -6,4 +6,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
     {
         Task<bool> RegisterCustomerOfflineAsync(CustomerOfflineRegisterRequest request, string createdByUserId);
     }
-} 
+}

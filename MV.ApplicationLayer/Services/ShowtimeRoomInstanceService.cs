@@ -2,8 +2,6 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using System;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -83,4 +81,4 @@ namespace MV.ApplicationLayer.Services
         }
 
     }
-} 
+}

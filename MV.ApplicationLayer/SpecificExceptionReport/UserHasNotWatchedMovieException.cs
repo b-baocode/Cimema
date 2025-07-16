@@ -5,4 +5,4 @@ namespace MV.ApplicationLayer.SpecificExceptionReport
         public UserHasNotWatchedMovieException(string message) : base(message) { }
         public UserHasNotWatchedMovieException(string message, Exception innerException) : base(message, innerException) { }
     }
-} 
+}

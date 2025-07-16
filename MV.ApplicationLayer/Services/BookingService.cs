@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MV.ApplicationLayer.DTO.RequestModel.BookingRequest;
 using MV.ApplicationLayer.DTO.ResponseModel.BookingResponse;
+using MV.ApplicationLayer.HelperMethodsForThirdParty;
+using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using MV.ApplicationLayer.RepositoryInterfaces;
-using MV.ApplicationLayer.HelperMethodsForThirdParty;
 
 namespace MV.ApplicationLayer.Services
 {
@@ -43,7 +39,7 @@ namespace MV.ApplicationLayer.Services
             if (user == null)
                 throw new Exception("User does not exist.");
             //lỗi ở đây
-            
+
             // 2. Get ShowtimeRoomInstance
             var showtimeRoomInstance = await _showtimeRoomInstanceService.GetRoomInstanceWithSeatById(request.ShowtimeInstanceId);
             if (showtimeRoomInstance == null)
@@ -393,10 +389,10 @@ namespace MV.ApplicationLayer.Services
             {
                 ticketDetail.Status = "Cancelled";
             }
-            
+
             await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
             await _unitOfWork.SaveChangesAsync();
             return true;
         }
     }
-} 
+}

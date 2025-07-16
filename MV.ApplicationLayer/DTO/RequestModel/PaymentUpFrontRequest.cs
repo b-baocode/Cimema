@@ -9,11 +9,11 @@ namespace MV.ApplicationLayer.DTO.RequestModel
 {
     public class PaymentUpFrontRequest
     {
-        [Required(ErrorMessage = "Số tiền khách đưa là bắt buộc")]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Số tiền phải lớn hơn 0")]
+        [Required(ErrorMessage = "The amount of money the customer gives is mandatory.")]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Amount must be greater than 0.")]
         public decimal CustomerGive { get; set; }
 
-        [Required(ErrorMessage = "InvoiceId là bắt buộc")]
+        [Required(ErrorMessage = "Invoice's ID is required.")]
         public int InvoiceId { get; set; }
     }
 }

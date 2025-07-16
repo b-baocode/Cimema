@@ -634,7 +634,7 @@ namespace MV.ApplicationLayer.Services
         {
             var showtimeByIdResult = await _unitOfWork.showtimeRepository.GetShowtimeByIdAsync(showtimeGetByIdRequest.ShowtimeId);
 
-            if(showtimeByIdResult == null)
+            if (showtimeByIdResult == null)
             {
                 return null!;
             }

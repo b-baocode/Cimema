@@ -14,7 +14,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<CommentRating> UpdateAsync(CommentRating commentRating);
         Task<bool> DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
-        
+
         /// <summary>
         /// Kiểm tra người dùng đã thanh toán và xem phim chưa
         /// </summary>

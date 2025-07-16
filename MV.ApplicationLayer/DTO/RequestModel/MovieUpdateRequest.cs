@@ -7,8 +7,6 @@ namespace MV.ApplicationLayer.DTO.RequestModel
     {
         [Required(ErrorMessage = "Title is required")]
         public string Title { get; set; }
-
-        //[Required(ErrorMessage = "Poster is required")]
         public IFormFile? Poster { get; set; }
 
         [Required(ErrorMessage = "Publish date is required")]

@@ -1,6 +1,4 @@
 using MV.DomainLayer.Entities;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.ServiceInterfaces
 {
@@ -10,4 +8,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task ValidateSeatsAsync(List<int> requestedSeatIds, Dictionary<int, SeatDataForShowtime> seatDataDict);
         Task UpdateSeatsStatusAsync(IEnumerable<int> seatIds, string newStatus, int showtimeInstanceId);
     }
-} 
+}
