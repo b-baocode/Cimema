@@ -12,7 +12,7 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<PagedResult<MovieResponse>> SearchMoviesByPriceAsync(MovieSearchByPriceRequest request);
         Task<MovieResponse> CreateMovieAsync(MovieCreateRequest request);
         Task<MovieResponse> UpdateMovieAsync(int id, MovieUpdateRequest request);
-        Task DeleteMovieAsync(int id);
+        Task DeleteMovieAsync(int id); 
         Task<PagedResult<MovieResponse>> GetComingSoonMoviesAsync(MovieSearchRequest request);
         Task<string?> GetMovieNameById(int movieId);
 
