@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MV.ApplicationLayer.DTO.ResponseModel
+﻿namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class PaymentInformationResponse
     {

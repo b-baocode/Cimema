@@ -1,9 +1,8 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MV.ApplicationLayer.DTO.RequestModel.BookingRequest;
 using MV.ApplicationLayer.ServiceInterfaces;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace MV.PresnetationLayer.Controllers
 {
@@ -50,8 +49,8 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
 
-    
-      
+
+
 
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetBookingsByUserId(string userId)
@@ -67,6 +66,6 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
 
-      
+
     }
-} 
+}

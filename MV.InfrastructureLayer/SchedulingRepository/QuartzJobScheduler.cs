@@ -53,8 +53,8 @@ namespace MV.InfrastructureLayer.SchedulingRepository
             await scheduler.ScheduleJob(startJob, startTrigger);
             await scheduler.ScheduleJob(endJob, endTrigger);
 
-           Console.WriteLine($"Scheduled status updates for Showtime {showtime.ShowtimeId}: Start at {showtime.StartTime}" +
-                $", End at {showtime.EndTime}");
+            Console.WriteLine($"Scheduled status updates for Showtime {showtime.ShowtimeId}: Start at {showtime.StartTime}" +
+                 $", End at {showtime.EndTime}");
             Console.WriteLine($"Scheduled status updates for Showtime {showtime.ShowtimeId}: " +
                 $"Start at {startTimeOffset.ToLocalTime()} local ({startTimeOffset.UtcDateTime} UTC), " +
                 $"End at {endTimeOffset.ToLocalTime()} local ({endTimeOffset.UtcDateTime} UTC)");

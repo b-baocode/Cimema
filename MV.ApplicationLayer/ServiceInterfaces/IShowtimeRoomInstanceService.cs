@@ -1,6 +1,5 @@
 using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.DomainLayer.Entities;
-using System.Threading.Tasks;
 
 namespace MV.ApplicationLayer.ServiceInterfaces
 {
@@ -14,4 +13,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
 
         Task<ShowtimeRoomInstance?> GetByShowtimeInstanceIdAsync(int showtimeInstanceId);
     }
-} 
+}

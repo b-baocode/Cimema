@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using MV.ApplicationLayer.DTO.RequestModel.BookingRequest;
 using MV.ApplicationLayer.DTO.ResponseModel.BookingResponse;
 
@@ -14,4 +12,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<List<BookingResponse>> GetAllBookingsAsync();
         Task<bool> CancelBookingAsync(int invoiceId);
     }
-} 
+}

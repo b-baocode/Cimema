@@ -1,17 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using MV.ApplicationLayer.GenericExceptionReport;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.InfrastructureLayer.DBContext;
-using MV.DomainLayer.Entities;
 //using MV.InfrastructureLayer.Interfaces;
 using MV.InfrastructureLayer.Repositories;
 using Npgsql;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer
 {
@@ -95,7 +88,7 @@ namespace MV.InfrastructureLayer
             {
                 return await _context.SaveChangesAsync();
             }
-            catch(DbUpdateException ex)
+            catch (DbUpdateException ex)
             {
                 if (IsUniqueConstraintViolation(ex))
                 {
@@ -154,7 +147,7 @@ namespace MV.InfrastructureLayer
             {
                 if (disposing)
                 {
-                    _context.Dispose(); 
+                    _context.Dispose();
                 }
             }
             this.disposed = true;

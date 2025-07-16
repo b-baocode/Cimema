@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.SignalR;
 using MV.ApplicationLayer.HelperMethodsForThirdParty;
 using MV.ApplicationLayer.ServiceInterfaces;
-using System.Text.RegularExpressions;
 
 namespace MV.PresnetationLayer.Hubs
 {

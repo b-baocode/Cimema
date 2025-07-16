@@ -4,4 +4,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel.BookingRequest
     {
         public int SeatId { get; set; }
     }
-} 
+}

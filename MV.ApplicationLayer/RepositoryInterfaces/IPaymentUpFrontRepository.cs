@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MV.DomainLayer.Entities;
+﻿using MV.DomainLayer.Entities;
 
 namespace MV.ApplicationLayer.RepositoryInterfaces
 {

@@ -9,7 +9,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-     [Authorize(Roles = "Admin,Manager")]
+    [Authorize(Roles = "Admin,Manager")]
     public class MovieController : ControllerBase
     {
         private readonly IMovieService _movieService;

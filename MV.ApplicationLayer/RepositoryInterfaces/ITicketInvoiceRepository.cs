@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using MV.DomainLayer.Entities;
 
 namespace MV.ApplicationLayer.RepositoryInterfaces

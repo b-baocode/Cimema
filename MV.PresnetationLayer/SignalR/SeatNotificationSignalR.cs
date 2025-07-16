@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using MV.ApplicationLayer.HelperMethodsForThirdParty;
-using MV.ApplicationLayer.QuarztInterfaces;
 using MV.PresnetationLayer.Hubs;
 
 namespace MV.PresnetationLayer.SignalR

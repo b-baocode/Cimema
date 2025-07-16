@@ -1,11 +1,4 @@
-﻿using MV.DomainLayer.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MV.ApplicationLayer.DTO.ResponseModel
+﻿namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class ShowtimeGetByIdResponse
     {
@@ -26,7 +19,7 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public int RoomInstanceCount { get; set; }
 
         public PagedResult<ShowtimeRoomInstanceForShowtime>? listRoomInstances { get; set; }
-        
+
     }
 
     public class ShowtimeRoomInstanceForShowtime

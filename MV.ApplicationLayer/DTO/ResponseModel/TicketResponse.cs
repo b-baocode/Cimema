@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel
 {
     public class TicketResponse
@@ -51,4 +48,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel
         public int Price { get; set; }
         public string QrCodeBase64 { get; set; }
     }
-} 
+}

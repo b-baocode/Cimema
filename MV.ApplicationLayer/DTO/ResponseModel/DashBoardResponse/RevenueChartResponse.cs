@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse
 {
     public class RevenueChartResponse
@@ -17,4 +14,4 @@ namespace MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse
         public decimal Revenue { get; set; }
         public int TotalOrders { get; set; }
     }
-} 
+}

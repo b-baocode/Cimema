@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest
 {
     public class MovieRevenueChartRequest
@@ -10,4 +7,4 @@ namespace MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest
         public DateTime EndDate { get; set; }
         public List<int> MovieIds { get; set; }
     }
-} 
+}

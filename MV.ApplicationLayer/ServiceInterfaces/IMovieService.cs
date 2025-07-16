@@ -1,4 +1,3 @@
-using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.DTO.ResponseModel;
 
 namespace MV.ApplicationLayer.ServiceInterfaces
@@ -22,8 +21,8 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         /// <param name="date">Ngày cần lấy phim Now Showing (nếu null thì lấy ngày hiện tại)</param>
         /// <returns>Danh sách phim Now Showing</returns>
         Task<List<MovieResponse>> GetNowShowingMoviesByShowtimeAsync(DateTime? date = null);
-        
-        
+
+
         /// <summary>
         /// Lấy danh sách phim Active có FromDate/ToDate giao với khoảng thời gian truyền vào
         /// </summary>

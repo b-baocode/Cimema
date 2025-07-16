@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using MV.DomainLayer.Entities;
 
 namespace MV.ApplicationLayer.RepositoryInterfaces
@@ -11,4 +9,4 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task UpdateAsync(SeatDataForShowtime seatData);
         Task<IEnumerable<SeatDataForShowtime>> GetSeatsForRoomInstanceAsync(int roomInstanceId);
     }
-} 
+}

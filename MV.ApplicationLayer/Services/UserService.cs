@@ -4,9 +4,6 @@ using MV.ApplicationLayer.DTO.ResponseModel;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.DomainLayer.Entities;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace MV.ApplicationLayer.Services
 {

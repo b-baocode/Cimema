@@ -1,8 +1,5 @@
-using System;
-using System.Threading.Tasks;
 using MV.ApplicationLayer.DTO.RequestModel.DashBoardRequest;
 using MV.ApplicationLayer.DTO.ResponseModel.DashBoardResponse;
-using System.Collections.Generic;
 
 namespace MV.ApplicationLayer.ServiceInterfaces
 {
@@ -13,4 +10,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<MovieRevenueChartResponse> GetMovieRevenueChartAsync(string type, DateTime startDate, DateTime endDate, List<int> movieIds = null);
         Task<FoodRevenueChartResponse> GetFoodRevenueChartAsync(string type, DateTime startDate, DateTime endDate, List<int> foodIds = null);
     }
-} 
+}

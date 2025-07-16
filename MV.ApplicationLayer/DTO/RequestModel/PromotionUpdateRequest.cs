@@ -7,8 +7,6 @@ namespace MV.ApplicationLayer.DTO.RequestModel
     {
         [Required(ErrorMessage = "Promotion Name is required")]
         public string PromotionName { get; set; }
-
-        // Image is optional for updates
         public IFormFile? Image { get; set; }
 
         [Required(ErrorMessage = "Start Date is required")]
