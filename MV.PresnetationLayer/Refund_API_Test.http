@@ -1,0 +1,39 @@
+### Refund API Tests
+
+### 1. Kiểm tra điều kiện hoàn tiền
+GET {{baseUrl}}/api/refund/check-eligibility/123/user123
+Content-Type: application/json
+
+### 2. Tính toán số tiền hoàn tiền
+GET {{baseUrl}}/api/refund/calculate/123
+Content-Type: application/json
+
+### 3. Yêu cầu hoàn tiền (User)
+POST {{baseUrl}}/api/refund/request
+Content-Type: application/json
+
+{
+    "invoiceId": 123,
+    "refundReason": "Có việc đột xuất, không thể đi xem phim",
+    "userId": "user123"
+}
+
+### 4. Xử lý hoàn tiền (Admin/Manager)
+POST {{baseUrl}}/api/refund/process/123
+Content-Type: application/json
+
+{
+    "refundReason": "Khách hàng yêu cầu hoàn tiền do việc đột xuất",
+    "adminId": "admin001"
+}
+
+### 5. Lấy lịch sử hoàn tiền của user
+GET {{baseUrl}}/api/refund/history/user123
+Content-Type: application/json
+
+### 6. Lấy thông tin hoàn tiền theo invoice ID
+GET {{baseUrl}}/api/refund/invoice/123
+Content-Type: application/json
+
+### Variables
+@baseUrl = http://localhost:5000 

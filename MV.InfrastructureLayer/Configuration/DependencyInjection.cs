@@ -82,6 +82,7 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IScoreHistoryRepository, ScoreHistoryRepository>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IPaymentUpFrontService, PaymentUpFrontService>();
+            services.AddScoped<IRefundService, RefundService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
