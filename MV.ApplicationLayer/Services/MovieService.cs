@@ -89,14 +89,15 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("Poster is required.");
             }
 
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             var movie = new Movie
             {
                 MovieId = newMovieId,
                 Title = request.Title,
                 Poster = posterUrl,
                 PublishDate = request.PublishDate,
-                FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Unspecified),
-                ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Unspecified),
+                FromDate = TimeZoneInfo.ConvertTimeFromUtc(request.FromDate, vietnamTimeZone),
+                ToDate = TimeZoneInfo.ConvertTimeFromUtc(request.ToDate, vietnamTimeZone),
                 Actors = request.Actors,
                 Director = request.Director,
                 Studio = request.Studio,
@@ -157,10 +158,11 @@ namespace MV.ApplicationLayer.Services
             }
 
             // Update basic information
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             movie.Title = request.Title;
             movie.PublishDate = request.PublishDate;
-            movie.FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Unspecified);
-            movie.ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Unspecified);
+            movie.FromDate = TimeZoneInfo.ConvertTimeFromUtc(request.FromDate, vietnamTimeZone);
+            movie.ToDate = TimeZoneInfo.ConvertTimeFromUtc(request.ToDate, vietnamTimeZone);
             movie.Actors = request.Actors;
             movie.Director = request.Director;
             movie.Studio = request.Studio;
@@ -206,7 +208,7 @@ namespace MV.ApplicationLayer.Services
                 // Update movie IsDelete to true
                 // movie.IsDelete = true;
                 // Update movie status to InActive instead of using IsDelete
-                movie.Status = "InActive";
+                movie.Status = "Inactive";
                 await _unitOfWork.movieRepository.UpdateMovieAsync(movie);
             }
             catch (Exception ex)

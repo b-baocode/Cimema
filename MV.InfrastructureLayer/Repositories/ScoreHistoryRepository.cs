@@ -22,5 +22,12 @@ namespace MV.InfrastructureLayer.Repositories
                 .Where(s => s.Score.Userid == userId)
                 .ToListAsync();
         }
+        public async Task<ScoreHistory?> GetRefundScoreHistoryByInvoiceIdAsync(int invoiceId)
+        {
+            return await _context.ScoreHistories
+                .Where(sh => sh.InvoiceId == invoiceId && sh.ScoreIn > 0 && (sh.Description.Contains("refund") || sh.Description.Contains("Refund")))
+                .OrderByDescending(sh => sh.ChangeDate)
+                .FirstOrDefaultAsync();
+        }
     }
 }

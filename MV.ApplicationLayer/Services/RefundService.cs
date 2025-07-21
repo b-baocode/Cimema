@@ -13,17 +13,20 @@ namespace MV.ApplicationLayer.Services
         private readonly ISeatDataForShowtimeService _seatDataForShowtimeService;
         private readonly ISeatNotificationService _seatNotificationService;
         private readonly IEmailService _emailService;
+        private readonly IScoreService _scoreService;
 
         public RefundService(
             IUnitOfWork unitOfWork,
             ISeatDataForShowtimeService seatDataForShowtimeService,
             ISeatNotificationService seatNotificationService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IScoreService scoreService)
         {
             _unitOfWork = unitOfWork;
             _seatDataForShowtimeService = seatDataForShowtimeService;
             _seatNotificationService = seatNotificationService;
             _emailService = emailService;
+            _scoreService = scoreService;
         }
 
         public async Task<RefundResponse> RequestRefundAsync(RefundRequest request)
@@ -54,8 +57,13 @@ namespace MV.ApplicationLayer.Services
             // 4. Calculate refund amount (the logic is now in CalculateRefundAmountAsync)
             var refundAmount = await CalculateRefundAmountAsync(request.InvoiceId);
 
-            // 5. Create refund record
-            await CreateOnlineRefundRecordAsync(invoice, refundAmount, request.RefundReason, request.AdminId);
+            // 5. Hoàn điểm tích lũy thay vì hoàn tiền
+            if (!string.IsNullOrEmpty(invoice.Userid) && refundAmount > 0)
+            {
+                // 1đ = 1VNĐ, cộng điểm đúng số tiền hoàn
+                int scoreToAdd = (int)Math.Floor(refundAmount);
+                await _scoreService.AddScoreForInvoiceAsync(invoice.Userid, invoice.InvoiceId, refundAmount);
+            }
 
             // 6. Update invoice status
             invoice.Status = "Refunded";
@@ -64,7 +72,7 @@ namespace MV.ApplicationLayer.Services
             // 7. Release seats
             await ReleaseSeatsAsync(invoice);
 
-            // 8. Send email notification
+            // 8. Send email notification (cập nhật nội dung email ở hàm dưới)
             await SendRefundEmailAsyncV2(invoice, refundAmount, request.RefundReason);
 
             await _unitOfWork.SaveChangesAsync();
@@ -79,9 +87,10 @@ namespace MV.ApplicationLayer.Services
                 RefundAmount = refundAmount,
                 RefundReason = request.RefundReason,
                 Status = "Completed",
-                PaymentMethod = invoice.PaymentType,
+                PaymentMethod = "Score",
                 UserEmail = user?.Email,
-                UserName = user?.Fullname
+                UserName = user?.Fullname,
+                Notes = $"Refunded as score: {refundAmount:N0} points"
             };
         }
 
@@ -133,7 +142,13 @@ namespace MV.ApplicationLayer.Services
             if (showtime == null)
                 return 0;
 
-            var timeUntilShowtime = showtime.ActualStartTime - DateTime.Now;
+            // So sánh hoàn toàn theo UTC
+            var nowUtc = DateTime.UtcNow;
+            var showtimeUtc = showtime.ActualStartTime.Kind == DateTimeKind.Utc
+                ? showtime.ActualStartTime
+                : DateTime.SpecifyKind(showtime.ActualStartTime, DateTimeKind.Utc);
+
+            var timeUntilShowtime = showtimeUtc - nowUtc;
 
             if (timeUntilShowtime.TotalHours >= 24)
             {
@@ -163,7 +178,7 @@ namespace MV.ApplicationLayer.Services
             if (invoice.Status != "Success")
                 return (false, "Invoice is not paid successfully");
 
-            // 2. Check if already refunded
+            // 2. Check if already refundedx
             if (invoice.Status == "Refunded")
                 return (false, "Invoice has already been refunded");
 
@@ -176,11 +191,17 @@ namespace MV.ApplicationLayer.Services
             if (showtime == null)
                 return (false, "Showtime information not found");
 
-            if (showtime.ActualStartTime <= DateTime.Now)
+            // So sánh hoàn toàn theo UTC
+            var nowUtc = DateTime.UtcNow;
+            var showtimeUtc = showtime.ActualStartTime.Kind == DateTimeKind.Utc
+                ? showtime.ActualStartTime
+                : DateTime.SpecifyKind(showtime.ActualStartTime, DateTimeKind.Utc);
+
+            if (showtimeUtc <= nowUtc)
                 return (false, "Showtime has already started");
 
             // 5. Check if refund is within 12 hours
-            var timeUntilShowtime = showtime.ActualStartTime - DateTime.Now;
+            var timeUntilShowtime = showtimeUtc - nowUtc;
             if (timeUntilShowtime.TotalHours < 12)
                 return (false, "Refund must be requested at least 12 hours before showtime");
 
@@ -194,23 +215,6 @@ namespace MV.ApplicationLayer.Services
                 return null;
 
             return await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdAsync(ticketDetail.ShowtimeInstanceId);
-        }
-
-        private async Task CreateOnlineRefundRecordAsync(TicketInvoice invoice, decimal refundAmount, string reason, string? adminId)
-        {
-            var refundRecord = new PaymentOnline
-            {
-                Amount = refundAmount,
-                PaymentMethod = "Refund",
-                Status = "Refunded",
-                Note = $"Refund for Invoice {invoice.InvoiceId} - Reason: {reason} - Made by: {adminId ?? "System"}",
-                CreatedAt = DateTime.Now,
-                InvoiceId = invoice.InvoiceId,
-                BankAccId = "REFUND_" + invoice.InvoiceId,
-                BankName = "System Refund"
-            };
-
-            _unitOfWork.paymentOnlineRepository.Add(refundRecord);
         }
 
         private async Task ReleaseSeatsAsync(TicketInvoice invoice)
@@ -245,7 +249,7 @@ namespace MV.ApplicationLayer.Services
             // Lấy tên phim từ navigation property
             var movieName = showtime.Showtime?.Movie?.Title ?? "N/A";
 
-            var subject = "Movie ticket refund successful.";
+            var subject = "Movie ticket refund successful (Points refunded)";
             var body = $@"
                <!DOCTYPE html>
                 <html lang=""en"">
@@ -402,9 +406,8 @@ namespace MV.ApplicationLayer.Services
                       </div>
                       <div class=""content"">
                         <h2>Hello {user.Fullname},</h2>
-                        <p>Your refund request at <strong>Premium Cinema</strong> has been successfully processed.
-                        <br>The amount will be returned to your account within 3-5 business days.</p>
-        
+                        <p>Your refund request at <strong>Premium Cinema</strong> has been successfully processed.<br>
+                        <b>The amount has been refunded as <span style='color:#ffd700'>{refundAmount:N0} points</span> to your account.</b></p>
                         <div class=""refund-details"">
                             <h3>Refund Details</h3>
                             <ul>
@@ -413,11 +416,10 @@ namespace MV.ApplicationLayer.Services
                                 <li><strong>Showtime:</strong> <span>{showtime.ActualStartTime:dd/MM/yyyy HH:mm}</span></li>
                                 <li><strong>Auditorium:</strong> <span>{showtime.RoomName}</span></li>
                                 <li><strong>Original Amount:</strong> <span>{invoice.TotalPrice:N0} VNĐ</span></li>
-                                <li><strong>Refunded Amount:</strong> <span><font color=""#ffd700"">{refundAmount:N0} VNĐ</font></span></li>
+                                <li><strong>Refunded Score:</strong> <span><font color=""#ffd700"">{refundAmount:N0} points</font></span></li>
                                 <li><strong>Reason:</strong> <span>{refundReason}</span></li>
                             </ul>
                         </div>
-
                         <p>Thank you for using our service!</p>
                       </div>
                       <div class=""support"">
@@ -443,25 +445,25 @@ namespace MV.ApplicationLayer.Services
 
         private async Task<RefundResponse?> GetRefundRecordAsync(TicketInvoice invoice)
         {
-            var onlineRefund = await _unitOfWork.paymentOnlineRepository.GetByInvoiceIdAsync(invoice.InvoiceId);
-            if (onlineRefund != null && onlineRefund.Status == "Refunded")
+            // Lấy lịch sử cộng điểm hoàn vé theo InvoiceId
+            var refundScoreHistory = await _unitOfWork.scoreHistoryRepository.GetRefundScoreHistoryByInvoiceIdAsync(invoice.InvoiceId);
+            if (refundScoreHistory != null)
             {
                 var user = await _unitOfWork.userRepository.GetByIdAsync(invoice.Userid);
-                
                 return new RefundResponse
                 {
                     InvoiceId = invoice.InvoiceId,
                     OriginalAmount = invoice.TotalPrice,
-                    RefundAmount = onlineRefund.Amount,
-                    RefundReason = onlineRefund.Note ?? "",
-                    Status = onlineRefund.Status,
-                    PaymentMethod = invoice.PaymentType,
+                    RefundAmount = refundScoreHistory.ScoreIn, // Số điểm đã hoàn
+                    RefundReason = refundScoreHistory.Description ?? "",
+                    Status = "Completed",
+                    PaymentMethod = "Score",
                     UserEmail = user?.Email,
-                    UserName = user?.Fullname
+                    UserName = user?.Fullname,
+                    Notes = $"Refunded as score: {refundScoreHistory.ScoreIn:N0} points"
                 };
             }
-
             return null;
         }
     }
-} 
+}

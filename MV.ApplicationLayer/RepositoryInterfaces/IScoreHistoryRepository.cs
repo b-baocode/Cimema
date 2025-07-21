@@ -6,5 +6,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
     {
         Task AddAsync(ScoreHistory scoreHistory);
         Task<List<ScoreHistory>> GetByUserIdAsync(string userId);
+        Task<ScoreHistory?> GetRefundScoreHistoryByInvoiceIdAsync(int invoiceId);
     }
 }

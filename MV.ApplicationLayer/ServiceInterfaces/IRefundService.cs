@@ -12,4 +12,4 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<decimal> CalculateRefundAmountAsync(int invoiceId);
         Task<bool> CheckRefundEligibilityAsync(int invoiceId, string userId);
     }
-} 
+}
