@@ -89,15 +89,14 @@ namespace MV.ApplicationLayer.Services
                 throw new ValidationException("Poster is required.");
             }
 
-            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             var movie = new Movie
             {
                 MovieId = newMovieId,
                 Title = request.Title,
                 Poster = posterUrl,
                 PublishDate = request.PublishDate,
-                FromDate = request.FromDate,
-                ToDate = request.ToDate,
+                FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Utc),
+                ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Utc),
                 Actors = request.Actors,
                 Director = request.Director,
                 Studio = request.Studio,
@@ -158,11 +157,10 @@ namespace MV.ApplicationLayer.Services
             }
 
             // Update basic information
-            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             movie.Title = request.Title;
             movie.PublishDate = request.PublishDate;
-            movie.FromDate = request.FromDate;
-            movie.ToDate = request.ToDate;
+            movie.FromDate = DateTime.SpecifyKind(request.FromDate, DateTimeKind.Utc);
+            movie.ToDate = DateTime.SpecifyKind(request.ToDate, DateTimeKind.Utc);
             movie.Actors = request.Actors;
             movie.Director = request.Director;
             movie.Studio = request.Studio;
