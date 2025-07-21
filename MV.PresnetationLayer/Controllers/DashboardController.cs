@@ -7,7 +7,7 @@ namespace MV.PresnetationLayer.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin,Manager")]
+    //[Authorize(Roles = "Admin,Manager")]
     public class DashboardController : ControllerBase
     {
         private readonly IDashboardService _dashboardService;
@@ -116,6 +116,13 @@ namespace MV.PresnetationLayer.Controllers
             {
                 return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
+        }
+
+        [HttpPost("showtime-occupancy")]
+        public async Task<IActionResult> GetShowtimeOccupancy([FromBody] MovieShowtimeOccupancyRequest request)
+        {
+            var result = await _dashboardService.GetShowtimeOccupancyByMovieAsync(request);
+            return Ok(result);
         }
 
 

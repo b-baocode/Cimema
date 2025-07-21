@@ -11,5 +11,6 @@ namespace MV.ApplicationLayer.ServiceInterfaces
         Task<List<BookingResponse>> GetBookingsByUserAndStatusAsync(string userId, string status);
         Task<List<BookingResponse>> GetAllBookingsAsync();
         Task<bool> CancelBookingAsync(int invoiceId);
+        Task<MovieBookingListResponse> GetBookingsByMovieAndTimeRangeAsync(MovieBookingFilterRequest request);
     }
 }

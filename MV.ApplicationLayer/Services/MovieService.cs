@@ -96,8 +96,8 @@ namespace MV.ApplicationLayer.Services
                 Title = request.Title,
                 Poster = posterUrl,
                 PublishDate = request.PublishDate,
-                FromDate = TimeZoneInfo.ConvertTimeFromUtc(request.FromDate, vietnamTimeZone),
-                ToDate = TimeZoneInfo.ConvertTimeFromUtc(request.ToDate, vietnamTimeZone),
+                FromDate = request.FromDate,
+                ToDate = request.ToDate,
                 Actors = request.Actors,
                 Director = request.Director,
                 Studio = request.Studio,
@@ -161,8 +161,8 @@ namespace MV.ApplicationLayer.Services
             var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
             movie.Title = request.Title;
             movie.PublishDate = request.PublishDate;
-            movie.FromDate = TimeZoneInfo.ConvertTimeFromUtc(request.FromDate, vietnamTimeZone);
-            movie.ToDate = TimeZoneInfo.ConvertTimeFromUtc(request.ToDate, vietnamTimeZone);
+            movie.FromDate = request.FromDate;
+            movie.ToDate = request.ToDate;
             movie.Actors = request.Actors;
             movie.Director = request.Director;
             movie.Studio = request.Studio;

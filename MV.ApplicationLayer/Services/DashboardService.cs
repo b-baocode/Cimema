@@ -107,5 +107,41 @@ namespace MV.ApplicationLayer.Services
         {
             return await _unitOfWork.dashboardRepository.GetFoodRevenueChartAsync(type, startDate, endDate, foodIds);
         }
+
+        public async Task<List<ShowtimeOccupancyResponse>> GetShowtimeOccupancyByMovieAsync(MovieShowtimeOccupancyRequest request)
+        {
+            // Lấy tất cả showtime của movie
+            var showtimes = await _unitOfWork.showtimeRepository.GetShowtimesByMovieIdAsync(request.MovieId);
+            if (request.StartDate.HasValue)
+                showtimes = showtimes.Where(s => s.StartTime >= request.StartDate.Value).ToList();
+            if (request.EndDate.HasValue)
+                showtimes = showtimes.Where(s => s.EndTime <= request.EndDate.Value).ToList();
+
+            var result = new List<ShowtimeOccupancyResponse>();
+            foreach (var showtime in showtimes)
+            {
+                // Lấy các room instance của showtime này
+                var roomInstances = await _unitOfWork.showtimeRoomInstanceRepository.GetListByShowtimeIdAsync(showtime.ShowtimeId);
+                foreach (var roomInstance in roomInstances)
+                {
+                    // Tổng số ghế
+                    int totalSeats = roomInstance.RoomRows * roomInstance.RoomColumns;
+                    // Số ghế đã đặt
+                    int bookedSeats = await _unitOfWork.seatDataForShowtimeRepository.CountBookedSeatsAsync(roomInstance.ShowtimeInstanceId);
+                    double occupancyRate = totalSeats > 0 ? (bookedSeats * 100.0) / totalSeats : 0;
+                    result.Add(new ShowtimeOccupancyResponse
+                    {
+                        ShowtimeId = showtime.ShowtimeId,
+                        StartTime = showtime.StartTime,
+                        EndTime = showtime.EndTime,
+                        RoomName = roomInstance.RoomName,
+                        TotalSeats = totalSeats,
+                        BookedSeats = bookedSeats,
+                        OccupancyRate = occupancyRate
+                    });
+                }
+            }
+            return result;
+        }
     }
 }
