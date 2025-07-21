@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+ using Microsoft.EntityFrameworkCore;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.CustomQueryModels;
 using MV.DomainLayer.Entities;
@@ -154,6 +154,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.ShowtimeRoomInstances
                 .Include(sri => sri.SeatDataForShowtimes)
+                .Include(sri => sri.Showtime)
                 .FirstOrDefaultAsync(sri => sri.ShowtimeInstanceId == showtimeInstanceId);
         }
 
@@ -164,6 +165,15 @@ namespace MV.InfrastructureLayer.Repositories
                 .Include(sri => sri.Showtime)
                 .Include(sri => sri.Showtime.Movie)
                 .FirstOrDefaultAsync(sri => sri.ShowtimeInstanceId == showtimeInstanceId);
+        }
+
+        public async Task<List<ShowtimeRoomInstance>> GetListByShowtimeIdAsync(int showtimeId)
+        {
+            return await _context.ShowtimeRoomInstances
+                .Include(sri => sri.SeatDataForShowtimes)
+                .Include(sri => sri.Showtime)
+                .Where(sri => sri.ShowtimeId == showtimeId)
+                .ToListAsync();
         }
     }
 }

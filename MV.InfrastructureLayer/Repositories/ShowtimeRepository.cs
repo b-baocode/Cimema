@@ -278,5 +278,12 @@ namespace MV.InfrastructureLayer.Repositories
 
             return result;
         }
+
+        public async Task<List<Showtime>> GetShowtimesByMovieIdAsync(int movieId)
+        {
+            return await _context.Showtimes
+                .Where(s => s.MovieId == movieId)
+                .ToListAsync();
+        }
     }
 }

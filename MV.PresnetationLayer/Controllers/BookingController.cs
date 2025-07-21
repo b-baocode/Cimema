@@ -59,10 +59,20 @@ namespace MV.PresnetationLayer.Controllers
             return Ok(result);
         }
 
+
+        
         [HttpGet("all")]
         public async Task<IActionResult> GetAllBookings()
         {
             var result = await _bookingService.GetAllBookingsAsync();
+            return Ok(result);
+        }
+
+        [AllowAnonymous]
+        [HttpPost("movie-bookings")]
+        public async Task<IActionResult> GetBookingsByMovieAndTimeRange([FromBody] MovieBookingFilterRequest request)
+        {
+            var result = await _bookingService.GetBookingsByMovieAndTimeRangeAsync(request);
             return Ok(result);
         }
 

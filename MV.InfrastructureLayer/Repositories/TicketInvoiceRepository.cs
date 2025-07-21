@@ -59,6 +59,15 @@ namespace MV.InfrastructureLayer.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<TicketInvoice>> GetByTimeRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.TicketInvoices
+                .Include(ti => ti.TicketDetails)
+                .Include(ti => ti.Promotion)
+                .Where(ti => ti.CreatedAt >= startDate && ti.CreatedAt <= endDate)
+                .ToListAsync();
+        }
+
         public IEnumerable<TicketInvoice> GetAll()
         {
             return _context.TicketInvoices

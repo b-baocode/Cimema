@@ -12,6 +12,7 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task UpdateAsync(TicketInvoice invoice);
         Task DeleteAsync(int invoiceId);
         IEnumerable<TicketInvoice> GetAll();
+        Task<List<TicketInvoice>> GetByTimeRangeAsync(DateTime startDate, DateTime endDate);
         // Có thể bổ sung các method khác nếu cần (GetByUser, ...)
     }
 }
