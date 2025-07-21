@@ -9,11 +9,11 @@ namespace MV.ApplicationLayer.DTO.ResponseModel.BookingResponse
         public string PaymentType { get; set; }
         public List<BookingSeatResponse> Seats { get; set; }
         public List<BookingFoodResponse>? Foods { get; set; }
-        //public int? PromotionCode { get; set; }
         public string? UserId { get; set; }
         public int ScoresUsed { get; set; }
         public decimal ScoreDiscountAmount { get; set; }
         public int? PromotionId { get; set; }
         public string? PromotionName { get; set; }
+        public string? Username { get; set; }
     }
 }

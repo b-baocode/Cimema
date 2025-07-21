@@ -130,7 +130,6 @@ namespace MV.ApplicationLayer.Services
 
             string message = $"The following seat data IDs is booked: {seatIdString}; Status = InActive";
 
-            Console.WriteLine($"Atempting to send message to group: {groupName}");
             await _seatNotificationService.SendMessageToGroupAsync(groupName, message);
 
             // 12. Map to response
@@ -144,6 +143,7 @@ namespace MV.ApplicationLayer.Services
                 PromotionId = invoice.PromotionId,
                 PromotionName = invoice.Promotion?.PromotionName,
                 UserId = user.Userid,
+                Username = user.Username, // Add this line
                 ScoresUsed = (int)invoice.ScoresUsed,
                 ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
                 Seats = invoice.TicketDetails.Select(td => new BookingSeatResponse
@@ -186,6 +186,7 @@ namespace MV.ApplicationLayer.Services
             var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
 
             // Map response
+            var user = await _unitOfWork.userRepository.GetByIdAsync(userId);
             var response = new BookingResponse
             {
                 InvoiceId = invoice.InvoiceId,
@@ -196,6 +197,7 @@ namespace MV.ApplicationLayer.Services
                 PromotionId = invoice.PromotionId,
                 PromotionName = invoice.Promotion?.PromotionName,
                 UserId = userId,
+                Username = user?.Username, // Add this line
                 ScoresUsed = (int)invoice.ScoresUsed,
                 ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
                 Seats = ticketDetails.Select(td => new BookingSeatResponse
@@ -231,6 +233,7 @@ namespace MV.ApplicationLayer.Services
                 var foods = invoice.TicketInvoiceFoodItems.ToList();
                 var foodIds = foods.Select(f => f.FoodId).ToList();
                 var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
+                var user = await _unitOfWork.userRepository.GetByIdAsync(invoice.Userid);
                 responses.Add(new BookingResponse
                 {
                     InvoiceId = invoice.InvoiceId,
@@ -241,6 +244,7 @@ namespace MV.ApplicationLayer.Services
                     PromotionId = invoice.PromotionId,
                     PromotionName = invoice.Promotion?.PromotionName,
                     UserId = invoice.Userid,
+                    Username = user?.Username, // Add this line
                     ScoresUsed = (int)invoice.ScoresUsed,
                     ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
                     Seats = ticketDetails.Select(td => new BookingSeatResponse
@@ -277,6 +281,7 @@ namespace MV.ApplicationLayer.Services
                 var foods = invoice.TicketInvoiceFoodItems.ToList();
                 var foodIds = foods.Select(f => f.FoodId).ToList();
                 var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
+                var user = await _unitOfWork.userRepository.GetByIdAsync(invoice.Userid);
                 responses.Add(new BookingResponse
                 {
                     InvoiceId = invoice.InvoiceId,
@@ -287,6 +292,7 @@ namespace MV.ApplicationLayer.Services
                     PromotionId = invoice.PromotionId,
                     PromotionName = invoice.Promotion?.PromotionName,
                     UserId = invoice.Userid,
+                    Username = user?.Username, // Add this line
                     ScoresUsed = (int)invoice.ScoresUsed,
                     ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
                     Seats = ticketDetails.Select(td => new BookingSeatResponse
@@ -323,6 +329,7 @@ namespace MV.ApplicationLayer.Services
                 var foods = invoice.TicketInvoiceFoodItems.ToList();
                 var foodIds = foods.Select(f => f.FoodId).ToList();
                 var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
+                var user = await _unitOfWork.userRepository.GetByIdAsync(invoice.Userid);
                 responses.Add(new BookingResponse
                 {
                     InvoiceId = invoice.InvoiceId,
@@ -333,6 +340,7 @@ namespace MV.ApplicationLayer.Services
                     PromotionId = invoice.PromotionId,
                     PromotionName = invoice.Promotion?.PromotionName,
                     UserId = invoice.Userid,
+                    Username = user?.Username, // Add this line
                     ScoresUsed = (int)invoice.ScoresUsed,
                     ScoreDiscountAmount = (decimal)invoice.ScoreDiscountAmount,
                     Seats = ticketDetails.Select(td => new BookingSeatResponse
@@ -381,8 +389,6 @@ namespace MV.ApplicationLayer.Services
 
             string message = $"The following seat data IDs is Cancelled: {seatIdString}; Status = Active";
 
-            Console.WriteLine($"Atempting to send message to group: {groupName}");
-
             await _seatNotificationService.SendMessageToGroupAsync(groupName, message);
 
             foreach (var ticketDetail in invoice.TicketDetails)
@@ -393,6 +399,93 @@ namespace MV.ApplicationLayer.Services
             await _unitOfWork.ticketInvoiceRepository.UpdateAsync(invoice);
             await _unitOfWork.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<MovieBookingListResponse> GetBookingsByMovieAndTimeRangeAsync(MovieBookingFilterRequest request)
+        {
+            // Lấy tất cả hóa đơn trong khoảng thời gian (CreatedAt)
+            var invoices = await _unitOfWork.ticketInvoiceRepository.GetByTimeRangeAsync(request.StartDate, request.EndDate);
+            var filteredInvoices = new List<(TicketInvoice invoice, TicketDetail ticketDetail, ShowtimeRoomInstance showtimeInstance, User user, CinemaRoom room)>();
+
+            // Sau khi lấy invoices
+            int matchCount = 0;
+            foreach (var invoice in invoices)
+            {
+                var ticketDetails = invoice.TicketDetails.Where(td => td.ShowtimeInstanceId != null).ToList();
+                foreach (var td in ticketDetails)
+                {
+                    var showtimeInstance = await _unitOfWork.showtimeRoomInstanceRepository.GetByShowtimeInstanceIdAsync(td.ShowtimeInstanceId);
+                    if (showtimeInstance == null)
+                    {
+                        continue;
+                    }
+                    if (showtimeInstance.Showtime == null)
+                    {
+                        continue;
+                    }
+                    if (showtimeInstance.Showtime.MovieId != request.MovieId)
+                    {
+                        continue;
+                    }
+                    matchCount++;
+                    // Lấy user
+                    var user = await _unitOfWork.userRepository.GetByIdAsync(invoice.Userid);
+                    // Lấy room
+                    var room = await _unitOfWork.roomRepository.GetRoomByIdAsync(showtimeInstance.OriginalRoomId);
+                    filteredInvoices.Add((invoice, td, showtimeInstance, user, room));
+                }
+            }
+
+            // Phân trang
+            int skip = (request.Page.GetValueOrDefault(1) - 1) * request.PageSize.GetValueOrDefault(20);
+            var paged = filteredInvoices.Skip(skip).Take(request.PageSize.GetValueOrDefault(20)).ToList();
+
+            var bookings = new List<BookingDetailResponse>();
+            foreach (var (invoice, ticketDetail, showtimeInstance, user, room) in paged)
+            {
+                // Lấy danh sách ghế cho hóa đơn này
+                var seatDataDict = await _seatDataForShowtimeService.GetSeatsDictionaryByShowtimeInstanceIdAsync(ticketDetail.ShowtimeInstanceId);
+                var seats = invoice.TicketDetails
+                    .Where(td => td.ShowtimeInstanceId == ticketDetail.ShowtimeInstanceId)
+                    .Select(td => new BookingSeatResponse
+                    {
+                        SeatId = td.SeatDataId,
+                        SeatName = seatDataDict.ContainsKey(td.SeatDataId) ? seatDataDict[td.SeatDataId].RowLabel + seatDataDict[td.SeatDataId].ColumnNumber : "",
+                        Price = td.TicketPrice,
+                        Status = td.Status
+                    }).ToList();
+                // Lấy danh sách món ăn
+                var foodIds = invoice.TicketInvoiceFoodItems.Select(f => f.FoodId).ToList();
+                var foodEntities = (await _unitOfWork.foodRepository.GetFoodsByIdsAsync(foodIds)).ToList();
+                var foods = invoice.TicketInvoiceFoodItems.Select(fi => new BookingFoodResponse
+                {
+                    FoodId = fi.FoodId,
+                    FoodName = foodEntities.FirstOrDefault(f => f.FoodId == fi.FoodId)?.FoodName ?? "",
+                    Quantity = fi.BoughtQuantity,
+                    Price = fi.TotalFoodPrice
+                }).ToList();
+                bookings.Add(new BookingDetailResponse
+                {
+                    InvoiceId = invoice.InvoiceId,
+                    UserId = invoice.Userid,
+                    Username = user?.Username,
+                    CreatedAt = invoice.CreatedAt,
+                    Status = invoice.Status,
+                    TotalPrice = (decimal)invoice.TotalPrice,
+                    PaymentType = invoice.PaymentType,
+                    PromotionName = invoice.Promotion?.PromotionName,
+                    ScoresUsed = (int)invoice.ScoresUsed,
+                    Showtime = showtimeInstance.ActualStartTime,
+                    RoomName = room?.Name,
+                    Seats = seats,
+                    Foods = foods
+                });
+            }
+            return new MovieBookingListResponse
+            {
+                Bookings = bookings,
+                TotalCount = filteredInvoices.Count
+            };
         }
     }
 }

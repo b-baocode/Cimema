@@ -22,5 +22,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         /// Lấy ShowtimeRoomInstance với đầy đủ thông tin Showtime và Movie
         /// </summary>
         Task<ShowtimeRoomInstance?> GetByShowtimeInstanceIdWithDetailsAsync(int showtimeInstanceId);
+        Task<List<ShowtimeRoomInstance>> GetListByShowtimeIdAsync(int showtimeId);
     }
 }

@@ -8,5 +8,6 @@ namespace MV.ApplicationLayer.RepositoryInterfaces
         Task<SeatDataForShowtime?> GetSeatDataAsync(int seatDataId);
         Task UpdateAsync(SeatDataForShowtime seatData);
         Task<IEnumerable<SeatDataForShowtime>> GetSeatsForRoomInstanceAsync(int roomInstanceId);
+        Task<int> CountBookedSeatsAsync(int showtimeInstanceId);
     }
 }

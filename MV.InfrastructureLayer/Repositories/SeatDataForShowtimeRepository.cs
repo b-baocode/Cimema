@@ -40,5 +40,11 @@ namespace MV.InfrastructureLayer.Repositories
                 .ToListAsync();
             return getSeats;
         }
+
+        public async Task<int> CountBookedSeatsAsync(int showtimeInstanceId)
+        {
+            return await _context.SeatDataForShowtimes
+                .CountAsync(s => s.ShowtimeInstanceId == showtimeInstanceId && s.Status == "InActive");
+        }
     }
 }
