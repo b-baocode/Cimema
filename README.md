@@ -160,8 +160,6 @@ Xem chi tiết đầy đủ tại **Swagger UI** sau khi chạy ứng dụng.
 | Nguyễn Văn Hoàng | 71 commits |
 | Lê Sỹ Bình | 64 commits |
 | Trần Quốc Phú | 49 commits |
-| Lê Bá Nam | 3 commits |
-| Nguyễn Kim Hậu | 1 commit |
 
 *Số commit thống kê từ `git shortlog -sne --all`.*
 
