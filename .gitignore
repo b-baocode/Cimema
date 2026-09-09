@@ -491,3 +491,7 @@ $RECYCLE.BIN/
 # SonarQube files
 .sonar/
 .sonarqube/
+
+# Firebase service account credentials - KHONG commit len repo
+firebase-credentials.json
+*firebase-adminsdk*.json

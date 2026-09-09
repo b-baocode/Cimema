@@ -96,14 +96,20 @@ Cập nhật chuỗi kết nối và các khóa dịch vụ theo môi trường 
 
 > ⚠️ **Lưu ý bảo mật:** không commit khóa thật (JWT key, SMTP password, khóa cổng thanh toán) lên repository. Nên dùng [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) hoặc biến môi trường khi triển khai.
 
-**3. Khôi phục package và tạo database**
+**3. Cấu hình Firebase Storage**
+
+Tải service account key từ Firebase Console (*Project Settings → Service accounts → Generate new private key*) và lưu thành `MV.PresnetationLayer/firebase-credentials.json`. Có thể tham khảo cấu trúc tại `firebase-credentials.example.json`.
+
+> File này đã được `.gitignore` — **không commit lên repository**.
+
+**4. Khôi phục package và tạo database**
 
 ```bash
 dotnet restore
 dotnet ef database update --project MV.InfrastructureLayer --startup-project MV.PresnetationLayer
 ```
 
-**4. Chạy ứng dụng**
+**5. Chạy ứng dụng**
 
 ```bash
 dotnet run --project MV.PresnetationLayer
