@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MV.ApplicationLayer.QuarztInterfaces;
 using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.ApplicationLayer.ServiceInterfaces;
 using MV.ApplicationLayer.Services;
-using MV.InfrastructureLayer;
 using MV.InfrastructureLayer.DBContext;
 using MV.InfrastructureLayer.Repositories;
-using MV.InfrastructureLayer.Configuration;
-using MV.Infrastructure.Services;
+using MV.InfrastructureLayer.SchedulingRepository;
+using MV.InfrastructureLayer.Services;
 // using MV.InfrastructureLayer.Interfaces;
 
 namespace MV.InfrastructureLayer.Configuration
@@ -30,6 +30,18 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<IEmployeeService, EmployeeService>();
 
+            // Add Movie services
+            services.AddScoped<IMovieRepository, MovieRepository>();
+            services.AddScoped<IMovieService, MovieService>();
+
+            // Add Genre services
+            services.AddScoped<IGenreRepository, GenreRepository>();
+            services.AddScoped<IGenreService, GenreService>();
+
+            // Add Promotion services
+            services.AddScoped<IPromotionRepository, PromotionRepository>();
+            services.AddScoped<IPromotionService, PromotionService>();
+
             // Configure SmtpSettings
             services.Configure<SmtpSettings>(configuration.GetSection("SmtpSettings"));
 
@@ -37,18 +49,50 @@ namespace MV.InfrastructureLayer.Configuration
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
             services.AddSingleton<IPasswordRepository, PasswordRepository>();
+            services.AddScoped<IRoomRepository, RoomRepository>();
+            services.AddScoped<ISeatRepository, SeatRepository>();
+            services.AddScoped<ICoupleSeatRepository, CoupleSeatRepository>();
+            services.AddScoped<IFoodCategoryRepository, FoodCategoryRepository>();
+            services.AddScoped<IFoodRepository, FoodRepository>();
+            services.AddScoped<ISeatTypeRepository, SeatTypeRepository>();
+            services.AddScoped<IRoomTypeRepository, RoomTypeRepository>();
+            services.AddScoped<IPaymentOnlineRepository, PaymentOnlineRepository>();
+            services.AddScoped<IPaymentUpFrontRepository, PaymentUpFrontRepository>();
+            services.AddScoped<IShowtimeRoomInstanceRepository, ShowtimeRoomInstanceRepository>();
 
 
             //Service injection
-            services.AddScoped<ILoginService,LoginService>();
+            services.AddScoped<ILoginService, LoginService>();
             services.AddScoped<IRegisterService, RegisterService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoomService, RoomService>();
+            services.AddScoped<IFirebaseStorageService, FirebaseStorageService>();
+            services.AddScoped<IFoodCategoryService, FoodCategoryService>();
+            services.AddScoped<IFoodService, FoodService>();
+            services.AddScoped<IRoomTypeService, RoomTypeService>();
+            services.AddScoped<ISeatService, SeatService>();
+            services.AddScoped<ICommentRatingService, CommentRatingService>();
+            services.AddScoped<IShowtimeService, ShowtimeService>();
 
+            services.AddScoped<IShowtimeRoomInstanceService, ShowtimeRoomInstanceService>();
+            services.AddScoped<ISeatDataForShowtimeService, SeatDataForShowtimeService>();
+            services.AddScoped<ITicketInvoiceService, TicketInvoiceService>();
+            services.AddScoped<IScoreService, ScoreService>();
+            services.AddScoped<IScoreHistoryRepository, ScoreHistoryRepository>();
+            services.AddScoped<IBookingService, BookingService>();
+            services.AddScoped<IPaymentUpFrontService, PaymentUpFrontService>();
 
             //Unit of work
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            //Quartz
+            services.AddScoped<IJobScheduler, QuartzJobScheduler>();
+            // Add VnPay services
+            services.AddScoped<IVnPayService, MV.ApplicationLayer.Services.Vnpay.VnpayService>();
+
+            // Add QR Code services
+            services.AddScoped<IQrCodeService, QrCodeService>();
 
             return services;
         }

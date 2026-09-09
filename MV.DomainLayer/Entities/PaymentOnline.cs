@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace MV.DomainLayer.Entities;
 
-public partial class Payment
+public partial class PaymentOnline
 {
-    public int PaymentId { get; set; }
+    public int PaymentOnlineId { get; set; }
 
     public string BankAccId { get; set; } = null!;
 

@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using MV.ApplicationLayer.DTO.RequestModel;
 using MV.ApplicationLayer.ServiceInterfaces;
-using System;
 
 namespace MV.PresnetationLayer.Controllers
 {
-    public class RegisterController : Controller
+    public class RegisterController : ControllerBase
     {
         private readonly IRegisterService _registerService;
 

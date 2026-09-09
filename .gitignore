@@ -8,6 +8,8 @@
 
 # appsettings
 
+#firebase primary key
+swp391-2004-firebase-adminsdk-q3a4s-9c973ee407.json
 
 # User-specific files
 *.rsuser
@@ -485,3 +487,7 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# SonarQube files
+.sonar/
+.sonarqube/

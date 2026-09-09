@@ -1,0 +1,19 @@
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace MV.ApplicationLayer.DTO.RequestModel
+{
+    public class RoomGetByTimeRangeForShowtimeAddRequest
+    {
+        [Range(1, int.MaxValue, ErrorMessage = "Page must be greater than 0")]
+        public int Page { get; set; } = 1;
+
+        [Range(1, 100, ErrorMessage = "Page size must be between 1 and 100")]
+        public int PageSize { get; set; } = 10;
+
+        [Required]
+        public DateTime StartTime { get; set; }
+
+        [Required]
+        public int MovieId { get; set; }
+    }
+}

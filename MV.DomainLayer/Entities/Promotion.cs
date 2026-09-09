@@ -21,5 +21,9 @@ public partial class Promotion
 
     public string? Status { get; set; }
 
+    public int? EventId { get; set; }
+
+    public virtual PromotionEvent? Event { get; set; }
+
     public virtual ICollection<TicketInvoice> TicketInvoices { get; set; } = new List<TicketInvoice>();
 }

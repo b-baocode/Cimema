@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace MV.ApplicationLayer.DTO.RequestModel
 {
@@ -53,6 +48,8 @@ namespace MV.ApplicationLayer.DTO.RequestModel
         public string? Phone { get; set; }
 
         public string? Address { get; set; }
+
+        public int? RoleId { get; set; }
 
         public static ValidationResult ValidateBirthDate(DateOnly? birthDate, ValidationContext context)
         {

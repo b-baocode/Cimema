@@ -1,12 +1,7 @@
-﻿using MV.ApplicationLayer.RepositoryInterfaces;
+﻿using Microsoft.EntityFrameworkCore;
+using MV.ApplicationLayer.RepositoryInterfaces;
 using MV.DomainLayer.Entities;
 using MV.InfrastructureLayer.DBContext;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MV.InfrastructureLayer.Repositories
 {
@@ -23,7 +18,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             var query = _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Roleid == 2 || u.Roleid == 3); // Only get Manager (2) and Employee (3)
+                .Where(u => (u.Roleid == 2 || u.Roleid == 3) && u.Status == 1); // Only get Manager (2) and Employee (3) with Status = Active (1 for integer)
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -44,7 +39,7 @@ namespace MV.InfrastructureLayer.Repositories
         public async Task<int> GetTotalEmployeesAsync(string? keyword)
         {
             var query = _context.Users
-                .Where(u => u.Roleid == 2 || u.Roleid == 3); // Only count Manager (2) and Employee (3)
+                .Where(u => (u.Roleid == 2 || u.Roleid == 3) && u.Status == 1); // Only count Manager (2) and Employee (3) with Status = Active (1 for integer)
 
             if (!string.IsNullOrWhiteSpace(keyword))
             {
@@ -63,7 +58,7 @@ namespace MV.InfrastructureLayer.Repositories
         {
             return await _context.Users
                 .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Userid == id);
+                .FirstOrDefaultAsync(u => u.Userid == id && u.Status == 1);
         }
 
         public async Task<User> CreateEmployeeAsync(User employee)
@@ -87,8 +82,13 @@ namespace MV.InfrastructureLayer.Repositories
             var employee = await _context.Users.FindAsync(id);
             if (employee != null)
             {
-                _context.Users.Remove(employee);
+                // Soft Delete
+                employee.Status = 0; // Set Status to InActive (0 for integer)
+                _context.Users.Update(employee);
                 await _context.SaveChangesAsync();
+
+                // Hard Delete
+                // _context.Users.Remove(employee);
             }
         }
 
