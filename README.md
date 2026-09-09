@@ -149,15 +149,29 @@ Xem chi tiết đầy đủ tại **Swagger UI** sau khi chạy ứng dụng.
 - `DevelopVer2` — nhánh phát triển
 - `Feature/*` — các nhánh tính năng (Booking, Payment, Refund, Dashboard, QRCode, ...)
 
-## 👤 Tác giả
+## 👥 Nhóm phát triển
 
-**Bảo** ([@b-baocode](https://github.com/b-baocode))
+Đây là **dự án nhóm** được thực hiện trong khuôn khổ chương trình OJT (HCM25_CPL_NET_05 — Team 04). Các thành viên đóng góp vào codebase:
+
+| Thành viên | Đóng góp |
+|---|---|
+| Trần Hoàng Tuấn Minh | 118 commits |
+| Ngô Gia Bảo ([@b-baocode](https://github.com/b-baocode)) | 87 commits |
+| Nguyễn Văn Hoàng | 71 commits |
+| Lê Sỹ Bình | 64 commits |
+| Trần Quốc Phú | 49 commits |
+| Lê Bá Nam | 3 commits |
+| Nguyễn Kim Hậu | 1 commit |
+
+*Số commit thống kê từ `git shortlog -sne --all`.*
+
+### Về repository này
+
+Bản mirror trên GitHub này do **Ngô Gia Bảo** ([@b-baocode](https://github.com/b-baocode)) quản lý.
 
 - 🐙 GitHub: [github.com/b-baocode](https://github.com/b-baocode)
 - 📧 Email: [baong1024@gmail.com](mailto:baong1024@gmail.com)
 - 📦 Repository: [github.com/b-baocode/Cimema](https://github.com/b-baocode/Cimema)
-
-> Dự án được phát triển trong khuôn khổ chương trình OJT, với sự đóng góp của các thành viên trong nhóm.
 
 ## 📄 Giấy phép
 
@@ -167,6 +181,6 @@ Dự án phục vụ mục đích học tập và nghiên cứu.
 
 <div align="center">
 
-⭐ Nếu dự án hữu ích, hãy để lại một star nhé!
+Made with ❤️ by Team 04 — HCM25_CPL_NET_05
 
 </div>
