@@ -1,92 +1,166 @@
-# Team04_BE
+# 🎬 CosmoCiné — Movie Theater Management System
 
+Hệ thống quản lý rạp chiếu phim được xây dựng bằng **ASP.NET Core 8** theo kiến trúc **Clean Architecture** (4 tầng), hỗ trợ đặt vé trực tuyến, chọn ghế real-time, thanh toán đa cổng và quản trị toàn diện.
 
+---
 
-## Getting started
+## 📖 Giới thiệu
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+CosmoCiné là backend API phục vụ toàn bộ nghiệp vụ của một rạp chiếu phim: từ quản lý phim, suất chiếu, phòng chiếu và sơ đồ ghế, đến quy trình đặt vé, thanh toán online/offline, tích điểm thành viên, hoàn vé và báo cáo doanh thu.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## ✨ Tính năng chính
 
-## Add your files
+### Khách hàng
+- 🎟️ **Đặt vé trực tuyến** — chọn suất chiếu, chọn ghế và thanh toán
+- 💺 **Chọn ghế real-time** — SignalR khóa ghế tức thời, tránh trùng vé giữa nhiều người dùng
+- 💳 **Thanh toán** — cổng VNPay (sandbox) và thanh toán trả trước tại quầy
+- 🍿 **Đặt combo bắp nước** kèm vé
+- 📱 **Mã QR check-in** — sinh QR cho vé điện tử
+- ⭐ **Tích điểm thành viên** — điểm thưởng và lịch sử điểm
+- 💬 **Đánh giá & bình luận** phim
+- 💸 **Hoàn vé (Refund)** — hoàn tiền cho vé thanh toán online
+- 🔐 **Đăng nhập** — JWT và Google OAuth
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+### Quản trị
+- 🎥 **Quản lý phim** — thông tin phim, thể loại, hình ảnh (Firebase Storage)
+- 🕐 **Quản lý suất chiếu** — lịch chiếu theo phòng và khung giờ
+- 🏢 **Quản lý phòng chiếu** — loại phòng, sơ đồ ghế, ghế đôi, loại ghế
+- 👥 **Quản lý nhân viên & khách hàng**
+- 🎁 **Quản lý khuyến mãi** và sự kiện
+- 📊 **Dashboard** — thống kê doanh thu, tỷ lệ lấp đầy phòng (occupancy)
+- 📧 **Gửi email** tự động qua SMTP
+- ⏰ **Tác vụ nền** — Quartz.NET cho các job định kỳ
+
+## 🏗️ Kiến trúc
+
+Dự án tổ chức theo Clean Architecture với 4 tầng:
 
 ```
-cd existing_repo
-git remote add origin http://git.fa.edu.vn/hcm25_cpl_net_05/team04_be.git
-git branch -M main
-git push -uf origin main
+OJTMovieTheater.sln
+├── MV.DomainLayer/           # Entities, models truy vấn tùy chỉnh — không phụ thuộc tầng nào
+├── MV.ApplicationLayer/      # Business logic, Services, DTOs, Interfaces
+├── MV.InfrastructureLayer/   # EF Core DbContext, Repositories, Firebase, Quartz
+└── MV.PresnetationLayer/     # Web API Controllers, SignalR Hubs, Program.cs
 ```
 
-## Integrate with your tools
+Luồng phụ thuộc hướng vào trong: `Presentation → Infrastructure → Application → Domain`
 
-- [ ] [Set up project integrations](http://git.fa.edu.vn/hcm25_cpl_net_05/team04_be/-/settings/integrations)
+## 🛠️ Công nghệ sử dụng
 
-## Collaborate with your team
+| Hạng mục | Công nghệ |
+|---|---|
+| Framework | ASP.NET Core 8 (.NET 8) |
+| Cơ sở dữ liệu | PostgreSQL + Entity Framework Core 9 (Npgsql) |
+| Xác thực | JWT Bearer, Google OAuth, BCrypt |
+| Real-time | SignalR |
+| Thanh toán | VNPay |
+| Lưu trữ file | Firebase Storage / Google Cloud Storage |
+| Tác vụ nền | Quartz.NET |
+| Mã QR | QRCoder |
+| API Docs | Swagger / Swashbuckle |
+| Container | Docker |
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+## 🚀 Cài đặt và chạy
 
-## Test and Deploy
+### Yêu cầu
 
-Use the built-in continuous integration in GitLab.
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [PostgreSQL](https://www.postgresql.org/download/) 14 trở lên
+- (Tùy chọn) Docker
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+### Các bước
 
-***
+**1. Clone repository**
 
-# Editing this README
+```bash
+git clone https://github.com/b-baocode/Cimema.git
+cd Cimema
+```
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
+**2. Cấu hình `MV.PresnetationLayer/appsettings.json`**
 
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+Cập nhật chuỗi kết nối và các khóa dịch vụ theo môi trường của bạn:
 
-## Name
-Choose a self-explaining name for your project.
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Port=5432;Database=movietheatermanagement;Username=postgres;Password=your_password",
+    "PostgresQuartzDb": "Host=localhost;Port=5432;Database=QuartzDb;Username=postgres;Password=your_password"
+  },
+  "Jwt": {
+    "Key": "your_secret_key",
+    "Issuer": "http://localhost:5059"
+  }
+}
+```
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+> ⚠️ **Lưu ý bảo mật:** không commit khóa thật (JWT key, SMTP password, khóa cổng thanh toán) lên repository. Nên dùng [User Secrets](https://learn.microsoft.com/aspnet/core/security/app-secrets) hoặc biến môi trường khi triển khai.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+**3. Khôi phục package và tạo database**
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+```bash
+dotnet restore
+dotnet ef database update --project MV.InfrastructureLayer --startup-project MV.PresnetationLayer
+```
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+**4. Chạy ứng dụng**
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+```bash
+dotnet run --project MV.PresnetationLayer
+```
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+API sẽ chạy tại `http://localhost:5059`, Swagger UI tại `http://localhost:5059/swagger`.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### Chạy bằng Docker
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+```bash
+docker build -t cosmocine -f MV.PresnetationLayer/Dockerfile .
+docker run -p 5059:8080 cosmocine
+```
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+## 📡 API Endpoints
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+| Controller | Chức năng |
+|---|---|
+| `AuthController`, `LoginController`, `RegisterController` | Đăng ký, đăng nhập, xác thực |
+| `MovieController`, `GenreController` | Quản lý phim và thể loại |
+| `ShowtimeController`, `ShowtimeRoomInstanceController` | Quản lý suất chiếu |
+| `RoomController`, `RoomTypeController`, `SeatController` | Quản lý phòng chiếu và ghế |
+| `BookingController`, `TicketController` | Đặt vé và quản lý vé |
+| `PaymentController`, `PaymentUpFrontController` | Thanh toán online và tại quầy |
+| `FoodController`, `FoodCategoryController` | Quản lý combo bắp nước |
+| `PromotionController` | Quản lý khuyến mãi |
+| `CustomersController`, `EmployeeController`, `UserController` | Quản lý người dùng |
+| `CommentRatingController` | Bình luận và đánh giá |
+| `DashboardController` | Báo cáo thống kê |
+| `EmailController` | Gửi email |
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Xem chi tiết đầy đủ tại **Swagger UI** sau khi chạy ứng dụng.
 
-## License
-For open source projects, say how it is licensed.
+## 🌿 Cấu trúc nhánh
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- `main` — nhánh chính, code ổn định
+- `DevelopVer2` — nhánh phát triển
+- `Feature/*` — các nhánh tính năng (Booking, Payment, Refund, Dashboard, QRCode, ...)
+
+## 👤 Tác giả
+
+**Bảo** ([@b-baocode](https://github.com/b-baocode))
+
+- 🐙 GitHub: [github.com/b-baocode](https://github.com/b-baocode)
+- 📧 Email: [baong1024@gmail.com](mailto:baong1024@gmail.com)
+- 📦 Repository: [github.com/b-baocode/Cimema](https://github.com/b-baocode/Cimema)
+
+> Dự án được phát triển trong khuôn khổ chương trình OJT, với sự đóng góp của các thành viên trong nhóm.
+
+## 📄 Giấy phép
+
+Dự án phục vụ mục đích học tập và nghiên cứu.
+
+---
+
+<div align="center">
+
+⭐ Nếu dự án hữu ích, hãy để lại một star nhé!
+
+</div>
